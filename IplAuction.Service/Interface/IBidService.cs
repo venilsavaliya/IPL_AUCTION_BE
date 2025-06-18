@@ -1,0 +1,9 @@
+using IplAuction.Entities.DTOs;
+using IplAuction.Entities.ViewModels.Bid;
+
+namespace IplAuction.Service.Interface;
+
+public interface IBidService
+{
+    Task<ApiResponse<object>> PlaceBid(PlaceBidRequestModel request);
+}

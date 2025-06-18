@@ -1,0 +1,9 @@
+IplAuction.Api/bin
+IplAuction.Api/obj
+IplAuction.Entities/bin
+IplAuction.Entities/obj
+IplAuction.Service/bin
+IplAuction.Service/obj
+IplAuction.Repository/bin
+IplAuction.Repository/obj
+
