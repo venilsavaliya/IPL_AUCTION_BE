@@ -1,3 +1,4 @@
+using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.User;
@@ -24,14 +25,22 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams paginationParams)
+    public async Task<IActionResult> GetUsers([FromQuery] UserFilterParam filterParams)
     {
-        PaginatedResult<User> users = await _userService.GetPaginated(paginationParams);
-
-        var response = ApiResponseBuilder.With<PaginatedResult<User>>().StatusCode(200).SetData(users).Build();
-
-        return Ok(response);
+        var result = await _userService.GetUsersAsync(filterParams);
+        return Ok(result);
     }
+
+
+    // [HttpGet]
+    // public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams paginationParams)
+    // {
+    //     PaginatedResult<User> users = await _userService.GetPaginated(paginationParams);
+
+    //     var response = ApiResponseBuilder.With<PaginatedResult<User>>().StatusCode(200).SetData(users).Build();
+
+    //     return Ok(response);
+    // }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(int id)
@@ -43,7 +52,7 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut("")]
+    [HttpPut]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestModel model)
     {
         await _userService.UpdateUserAsync(model);

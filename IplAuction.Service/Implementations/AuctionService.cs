@@ -136,7 +136,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             BasePrice = player.BasePrice,
             Image = player.Image,
             Name = player.Name,
-            Skill = player.Skill,
+            Skill = player.Skill.ToString(),
             TeamId = player.TeamId,
             DateOfBirth = player.DateOfBirth,
         };

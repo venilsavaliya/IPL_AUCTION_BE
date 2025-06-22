@@ -1,4 +1,4 @@
-namespace IplAuction.Entities.DTOs;
+namespace IplAuction.Entities;
 
 public class PaginationParams
 {
@@ -6,6 +6,9 @@ public class PaginationParams
     public int PageSize { get; set; } = 10;
 
     private const int MaxPageSize = 50;
+
+    public string? SortBy { get; set; } = "CreatedAt";
+    public string? SortDirection { get; set; } = "desc";
 
     public int Skip => (PageNumber - 1) * PageSize;
 

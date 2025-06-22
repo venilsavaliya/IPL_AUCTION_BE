@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 
 namespace IplAuction.Repository.Interfaces;
@@ -9,7 +10,7 @@ public interface IGenericRepository<T> where T : class
     IQueryable<T> GetAllQueryableWithFilterAsync(Expression<Func<T, bool>> filter);
     Task<T?> GetWithFilterAsync(Expression<Func<T, bool>> filter);
     Task<T1?> GetWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector);
-    Task<PaginatedResult<T>> GetPagedAsync(PaginationParams paginationParams);
+    // Task<PaginatedResult<T>> GetPagedAsync(PaginationParams paginationParams);
     Task<List<T1>> GetAllWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector);
     Task<List<T>> GetAllAsync();
     Task<T?> FindAsync(int id);

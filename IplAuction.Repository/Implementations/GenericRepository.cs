@@ -16,10 +16,10 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<PaginatedResult<T>> GetPagedAsync(PaginationParams paginationParams)
-    {
-        return await _dbSet.AsQueryable().ToPaginatedListAsync(paginationParams);
-    }
+    // public async Task<PaginatedResult<T>> GetPagedAsync(PaginationParams paginationParams)
+    // {
+    //     return await _dbSet.AsQueryable().ToPaginatedListAsync<T,>(paginationParams);
+    // }
 
     public async Task<T?> GetWithFilterAsync(Expression<Func<T, bool>> filter)
     {

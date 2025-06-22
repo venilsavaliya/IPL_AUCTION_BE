@@ -1,5 +1,4 @@
 using IplAuction.Entities.DTOs;
-using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.User;
 
 namespace IplAuction.Service.Interface;
@@ -14,5 +13,6 @@ public interface IUserService
 
     Task DeleteUserAsync(int id);
 
-    Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams);
+    // Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams);
+    Task<PaginatedResult<UserResponseViewModel>> GetUsersAsync(UserFilterParam filterParams);
 }

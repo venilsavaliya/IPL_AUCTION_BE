@@ -10,4 +10,5 @@ public interface IPlayerService
     Task AddPlayerAsync(AddPlayerRequest player);
     Task UpdatePlayerAsync(UpdatePlayerRequest player);
     Task DeletePlayerAsync(int id);
+    Task<PaginatedResult<PlayerResponseModel>> GetPlayersAsync(PlayerFilterParams filterParams);
 }

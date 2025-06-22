@@ -8,29 +8,29 @@ namespace IplAuction.Repository.Implementations;
 
 public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<Auction>(context), IAuctionRepository
 {
-    public async Task<PaginatedResult<Auction>> GetFilteredAuctionsAsync(AuctionFilterModel auctionFilter)
-{
-    var query = _dbSet.AsQueryable();
+    // public async Task<PaginatedResult<Auction>> GetFilteredAuctionsAsync(AuctionFilterModel auctionFilter)
+    // {
+    //     var query = _dbSet.AsQueryable();
 
-    // Search by title 
-    if (!string.IsNullOrEmpty(auctionFilter.Search))
-    {
-        query = query.Where(a => a.Title.Contains(auctionFilter.Search, StringComparison.CurrentCultureIgnoreCase));
-    }
+    //     // Search by title 
+    //     if (!string.IsNullOrEmpty(auctionFilter.Search))
+    //     {
+    //         query = query.Where(a => a.Title.Contains(auctionFilter.Search, StringComparison.CurrentCultureIgnoreCase));
+    //     }
 
-    // Filter by status
-    if (auctionFilter.Status.HasValue)
-    {
-        query = query.Where(a => a.AuctionStatus == auctionFilter.Status);
-    }
+    //     // Filter by status
+    //     if (auctionFilter.Status.HasValue)
+    //     {
+    //         query = query.Where(a => a.AuctionStatus == auctionFilter.Status);
+    //     }
 
-    // Filter by date range
-    if (auctionFilter.StartDate.HasValue && auctionFilter.EndDate.HasValue)
-    {
-        query = query.Where(a => a.StartDate >= auctionFilter.StartDate && a.StartDate <= auctionFilter.EndDate);
-    }
+    //     // Filter by date range
+    //     if (auctionFilter.StartDate.HasValue && auctionFilter.EndDate.HasValue)
+    //     {
+    //         query = query.Where(a => a.StartDate >= auctionFilter.StartDate && a.StartDate <= auctionFilter.EndDate);
+    //     }
 
-    return await query.ToPaginatedListAsync(auctionFilter.Pagination);
-}
+    //     return await query.ToPaginatedListAsync(auctionFilter.Pagination);
+    // }
 
 }

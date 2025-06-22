@@ -22,6 +22,13 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
 
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetUsers([FromQuery] PlayerFilterParams filterParams)
+    {
+        var result = await _playerService.GetPlayersAsync(filterParams);
+        return Ok(result);
+    }
+
     // GET: api/player/{id}
 
     [HttpGet("{id}")]

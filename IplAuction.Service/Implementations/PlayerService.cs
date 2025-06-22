@@ -1,3 +1,4 @@
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Player;
@@ -6,9 +7,9 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class PlayerService(IFileStorageService fileStorageService, IGenericRepository<Player> playerRepository) : IPlayerService
+public class PlayerService(IFileStorageService fileStorageService, IPlayerRepository playerRepository) : IPlayerService
 {
-    private readonly IGenericRepository<Player> _playerRepository = playerRepository;
+    private readonly IPlayerRepository _playerRepository = playerRepository;
 
     private readonly IFileStorageService _fileStorageService = fileStorageService;
 
@@ -54,7 +55,7 @@ public class PlayerService(IFileStorageService fileStorageService, IGenericRepos
             BasePrice = p.BasePrice,
             DateOfBirth = p.DateOfBirth,
             TeamId = p.TeamId,
-            Skill = p.Skill
+            Skill = p.Skill.ToString()
         });
 
         return players;
@@ -70,7 +71,7 @@ public class PlayerService(IFileStorageService fileStorageService, IGenericRepos
             BasePrice = p.BasePrice,
             DateOfBirth = p.DateOfBirth,
             TeamId = p.TeamId,
-            Skill = p.Skill
+            Skill = p.Skill.ToString()
         }) ?? throw new NotFoundException(nameof(Player));
 
         return player;
@@ -88,5 +89,10 @@ public class PlayerService(IFileStorageService fileStorageService, IGenericRepos
         existingPlayer.UpdatedAt = DateTime.UtcNow;
 
         await _playerRepository.SaveChangesAsync();
+    }
+
+     public async Task<PaginatedResult<PlayerResponseModel>> GetPlayersAsync(PlayerFilterParams filterParams)
+    {
+        return await _playerRepository.GetFilteredPlayersAsync(filterParams);
     }
 }

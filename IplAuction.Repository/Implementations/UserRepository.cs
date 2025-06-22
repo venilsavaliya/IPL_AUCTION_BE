@@ -1,8 +1,11 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.Enums;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace IplAuction.Repository.Implementations;
 
@@ -45,4 +48,54 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
     //     return await query.ToPaginatedListAsync(filter.Pagination);
     // }
 
+    public async Task<PaginatedResult<UserResponseViewModel>> GetFilteredUsersAsync(UserFilterParam filterParams)
+    {
+        var query = _context.Users.AsQueryable();
+
+        // Search
+        if (!string.IsNullOrWhiteSpace(filterParams.Search))
+        {
+            string search = filterParams.Search.ToLower();
+
+            query = query.Where(u =>
+                u.Username.ToLower().Contains(search) ||
+                u.Email.ToLower().Contains(search));
+        }
+
+        // Filtering Role
+        if (!string.IsNullOrEmpty(filterParams.Role))
+        {
+            string role = filterParams.Role.ToLower();
+
+            if (Enum.TryParse<UserRole>(filterParams.Role, true, out var roleEnum))
+            {
+                query = query.Where(u => u.Role == roleEnum);
+            }
+        }
+
+        // Sorting
+        var allowedSorts = new[] { "Username", "Id", "CreatedAt", "Email" };
+        var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "Id";
+        var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
+        query = query.OrderBy($"{sortBy} {sortDirection}");
+
+        PaginationParams paginationParams = new()
+        {
+            PageNumber = filterParams.PageNumber,
+            PageSize = filterParams.PageSize
+        };
+
+        // Pagination
+
+        PaginatedResult<UserResponseViewModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new UserResponseViewModel
+        {
+            Id = u.Id,
+            Email = u.Email,
+            Username = u.Username,
+            Role = u.Role.ToString(),
+            CreatedAt = u.CreatedAt
+        });
+
+        return paginatedResult;
+    }
 }

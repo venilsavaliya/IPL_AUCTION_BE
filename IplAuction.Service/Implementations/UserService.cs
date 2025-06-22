@@ -7,9 +7,9 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class UserService(IGenericRepository<User> userRepository) : IUserService
+public class UserService(IUserRepository userRepository) : IUserService
 {
-    private readonly IGenericRepository<User> _userRepository = userRepository;
+    private readonly IUserRepository _userRepository = userRepository;
 
     public async Task<List<UserResponseViewModel>> GetAllAsync()
     {
@@ -57,8 +57,14 @@ public class UserService(IGenericRepository<User> userRepository) : IUserService
         await _userRepository.SaveChangesAsync();
     }
 
-    public async Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams)
+    // public async Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams)
+    // {
+    //     return await _userRepository.GetPagedAsync(paginationParams);
+    // }
+
+    public async Task<PaginatedResult<UserResponseViewModel>> GetUsersAsync(UserFilterParam filterParams)
     {
-        return await _userRepository.GetPagedAsync(paginationParams);
+        return await _userRepository.GetFilteredUsersAsync(filterParams);
     }
+
 }
