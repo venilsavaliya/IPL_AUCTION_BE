@@ -10,9 +10,9 @@ public class AddAuctionRequestModel
 
     public DateTime StartDate { get; set; }
 
-    public int MinimumBid { get; set; }
+    public int MinimumBidIncreament { get; set; }
 
-    public int MaxPurseSize { get; set; }
+    public int MaximumPurseSize { get; set; }
 
     public AuctionStatus AuctionStatus { get; set; } = AuctionStatus.Scheduled;
 }

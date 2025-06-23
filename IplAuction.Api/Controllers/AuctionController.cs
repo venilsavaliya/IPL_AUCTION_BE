@@ -15,8 +15,8 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
 {
     private readonly IAuctionService _auctionService = auctionService;
 
-
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> CreateAuction([FromBody] AddAuctionRequestModel request)
     {
         await _auctionService.AddAuctionAsync(request);
@@ -26,15 +26,23 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         return Ok(response);
     }
 
-    // [HttpGet]
-    // public async Task<IActionResult> GetAuction([FromBody] AddAuctionRequestModel request)
-    // {
-    //     await _auctionService.AddAuctionAsync(request);
+    [HttpPut]
+    public async Task<IActionResult> UpdateAuction([FromBody] UpdateAuctionRequestModel request)
+    {
+        await _auctionService.UpdateAuctionAsync(request);
 
-    //     var response = ApiResponseBuilder.Create(200);
+        var response = ApiResponseBuilder.Create(200);
 
-    //     return Ok(response);
-    // }
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAuction([FromQuery] AuctionFilterParam filterParams)
+    {
+        var result = await _auctionService.GetAuctionsAsync(filterParams);
+        return Ok(result);
+    }
 
     [HttpPost("join/{id}")]
     public async Task<IActionResult> JoinAuction(int id)

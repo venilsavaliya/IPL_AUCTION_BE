@@ -1,3 +1,4 @@
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
@@ -34,8 +35,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             ManagerId = (int)UserId,
             StartDate = request.StartDate,
             AuctionStatus = request.AuctionStatus,
-            MinimumBidIncreament = request.MinimumBid,
-            MaximumPurseSize = request.MaxPurseSize
+            MinimumBidIncreament = request.MinimumBidIncreament,
+            MaximumPurseSize = request.MaximumPurseSize
         };
 
         await _auctionRepository.AddAsync(auction);
@@ -72,6 +73,11 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         return auctions;
     }
 
+    public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)
+    {
+        return await _auctionRepository.GetFilteredAuctionsAsync(filterParams);
+    }
+
     public async Task<AuctionResponseModel> GetAuctionByIdAsync(int id)
     {
         AuctionResponseModel auction = await _auctionRepository.GetWithFilterAsync(a => a.IsDeleted == false, a => new AuctionResponseModel
@@ -94,6 +100,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         auction.UpdatedAt = DateTime.UtcNow;
         auction.StartDate = request.StartDate;
         auction.AuctionStatus = request.AuctionStatus;
+        auction.MinimumBidIncreament = request.MinimumBidIncreament;
+        auction.MaximumPurseSize = request.MaximumPurseSize;
 
         await _auctionRepository.SaveChangesAsync();
     }

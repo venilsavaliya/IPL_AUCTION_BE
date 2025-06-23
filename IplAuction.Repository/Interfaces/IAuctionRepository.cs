@@ -6,5 +6,6 @@ namespace IplAuction.Repository.Interfaces;
 
 public interface IAuctionRepository : IGenericRepository<Auction>
 {
-    // Task<PaginatedResult<Auction>> GetFilteredAuctionsAsync(AuctionFilterModel auctionFilter);
+
+    Task<PaginatedResult<AuctionResponseModel>> GetFilteredAuctionsAsync(AuctionFilterParam filterParams);
 }

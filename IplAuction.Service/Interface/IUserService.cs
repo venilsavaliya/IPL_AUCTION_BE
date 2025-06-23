@@ -13,6 +13,5 @@ public interface IUserService
 
     Task DeleteUserAsync(int id);
 
-    // Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams);
     Task<PaginatedResult<UserResponseViewModel>> GetUsersAsync(UserFilterParam filterParams);
 }

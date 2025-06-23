@@ -57,14 +57,8 @@ public class UserService(IUserRepository userRepository) : IUserService
         await _userRepository.SaveChangesAsync();
     }
 
-    // public async Task<PaginatedResult<User>> GetPaginated(PaginationParams paginationParams)
-    // {
-    //     return await _userRepository.GetPagedAsync(paginationParams);
-    // }
-
     public async Task<PaginatedResult<UserResponseViewModel>> GetUsersAsync(UserFilterParam filterParams)
     {
         return await _userRepository.GetFilteredUsersAsync(filterParams);
     }
-
 }

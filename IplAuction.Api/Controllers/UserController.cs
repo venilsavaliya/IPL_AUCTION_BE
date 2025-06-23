@@ -14,33 +14,25 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
-    [HttpGet("All")]
-    public async Task<IActionResult> GetAllUsers()
-    {
-        List<UserResponseViewModel> users = await _userService.GetAllAsync();
+    // [HttpGet("All")]
+    // public async Task<IActionResult> GetAllUsers()
+    // {
+    //     List<UserResponseViewModel> users = await _userService.GetAllAsync();
 
-        var response = ApiResponseBuilder.With<List<UserResponseViewModel>>().StatusCode(200).SetData(users).Build();
+    //     var response = ApiResponseBuilder.With<List<UserResponseViewModel>>().StatusCode(200).SetData(users).Build();
 
-        return Ok(response);
-    }
+    //     return Ok(response);
+    // }
 
     [HttpGet]
     public async Task<IActionResult> GetUsers([FromQuery] UserFilterParam filterParams)
     {
         var result = await _userService.GetUsersAsync(filterParams);
-        return Ok(result);
+
+        var response = ApiResponseBuilder.With<PaginatedResult<UserResponseViewModel>>().StatusCode(200).SetData(result).Build();
+
+        return Ok(response);
     }
-
-
-    // [HttpGet]
-    // public async Task<IActionResult> GetAllUsers([FromQuery] PaginationParams paginationParams)
-    // {
-    //     PaginatedResult<User> users = await _userService.GetPaginated(paginationParams);
-
-    //     var response = ApiResponseBuilder.With<PaginatedResult<User>>().StatusCode(200).SetData(users).Build();
-
-    //     return Ok(response);
-    // }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(int id)

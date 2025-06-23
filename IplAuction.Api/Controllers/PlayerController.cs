@@ -12,27 +12,28 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
     private readonly IPlayerService _playerService = playerService;
 
     // GET: api/player/All
-    [HttpGet("All")]
-    public async Task<IActionResult> GetAllPlayers()
-    {
-        List<PlayerResponseModel> players = await _playerService.GetAllPlayersAsync();
+    // [HttpGet("All")]
+    // public async Task<IActionResult> GetAllPlayers()
+    // {
+    //     List<PlayerResponseModel> players = await _playerService.GetAllPlayersAsync();
 
-        var response = ApiResponseBuilder.With<List<PlayerResponseModel>>().StatusCode(200).SetData(players).Build();
-        return Ok(response);
+    //     var response = ApiResponseBuilder.With<List<PlayerResponseModel>>().StatusCode(200).SetData(players).Build();
+    //     return Ok(response);
 
-    }
+    // }
 
     [HttpGet]
-    public async Task<IActionResult> GetUsers([FromQuery] PlayerFilterParams filterParams)
+    public async Task<IActionResult> GetPlayers([FromQuery] PlayerFilterParams filterParams)
     {
         var result = await _playerService.GetPlayersAsync(filterParams);
-        return Ok(result);
+
+        var response = ApiResponseBuilder.With<PaginatedResult<PlayerResponseModel>>().StatusCode(200).SetData(result).Build();
+
+        return Ok(response);
     }
 
     // GET: api/player/{id}
-
     [HttpGet("{id}")]
-
     public async Task<IActionResult> GetPlayer(int id)
     {
         PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(id);
@@ -65,9 +66,9 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
-    // PUT: api/player/{id}
+    // PUT: api/player
     [HttpPut]
-    public async Task<IActionResult> UpdatePlayer([FromBody] UpdatePlayerRequest player)
+    public async Task<IActionResult> UpdatePlayer([FromForm] UpdatePlayerRequest player)
     {
         await _playerService.UpdatePlayerAsync(player);
 
@@ -76,4 +77,11 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("import-csv")]
+    public async Task<IActionResult> ImportCsv(IFormFile file)
+    {
+        await _playerService.ImportPlayersFromCsvAsync(file);
+        
+        return Ok(new { Message = "Import successful" });
+    }
 }

@@ -36,7 +36,7 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
         }
 
         //Filtering Team
-        if (filterParams.TeamId != 0)
+        if (filterParams.TeamId != null && filterParams.TeamId != 0)
         {
             query = query.Where(u => u.TeamId == filterParams.TeamId);
         }
@@ -68,5 +68,11 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
         });
 
         return paginatedResult;
+    }
+
+    public async Task AddPlayersAsync(List<Player> players)
+    {
+        await _context.Players.AddRangeAsync(players);
+        await _context.SaveChangesAsync();
     }
 }

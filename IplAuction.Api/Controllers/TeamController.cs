@@ -13,7 +13,6 @@ public class TeamController(ITeamService teamService) : ControllerBase
     private readonly ITeamService _teamService = teamService;
 
     // GET: api/team/All
-
     [HttpGet("All")]
     public async Task<IActionResult> GetAllTeams()
     {
@@ -68,5 +67,4 @@ public class TeamController(ITeamService teamService) : ControllerBase
 
         return Ok(response);
     }
-
 }

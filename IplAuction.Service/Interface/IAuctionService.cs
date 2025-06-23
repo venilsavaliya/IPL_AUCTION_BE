@@ -8,6 +8,8 @@ public interface IAuctionService
 {
     Task<List<AuctionResponseModel>> GetAllAuctionAsync();
 
+    Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams);
+
     Task<AuctionResponseModel> GetAuctionByIdAsync(int id);
 
     Task AddAuctionAsync(AddAuctionRequestModel Auction);

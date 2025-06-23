@@ -7,4 +7,6 @@ namespace IplAuction.Repository.Interfaces;
 public interface IPlayerRepository : IGenericRepository<Player>
 {
     Task<PaginatedResult<PlayerResponseModel>> GetFilteredPlayersAsync(PlayerFilterParams filterParams);
+
+    Task AddPlayersAsync(List<Player> players);
 }

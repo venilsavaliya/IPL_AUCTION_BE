@@ -17,7 +17,7 @@ public class Player
 
     public ICollection<Bid> Bids { get; set; } = [];
 
-    public Team Team { get; set; } = new();
+    public Team Team { get; set; }
 
     public ICollection<UserTeam> UserTeams { get; set; } = [];
 
