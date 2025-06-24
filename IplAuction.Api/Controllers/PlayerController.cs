@@ -36,9 +36,9 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlayer(int id)
     {
-        PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(id);
+        var player = await _playerService.GetPlayerByIdAsync(id);
 
-        var response = ApiResponseBuilder.With<PlayerResponseModel>().StatusCode(200).SetData(player).Build();
+        var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
 
         return Ok(response);
     }
@@ -66,6 +66,16 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpPut("status")]
+    public async Task<IActionResult> UpdatePlayerStatus([FromBody] UpdatePlayerStatusRequest request)
+    {
+        await _playerService.UpdatePlayerStatusAsync(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
     // PUT: api/player
     [HttpPut]
     public async Task<IActionResult> UpdatePlayer([FromForm] UpdatePlayerRequest player)
@@ -81,7 +91,7 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
     public async Task<IActionResult> ImportCsv(IFormFile file)
     {
         await _playerService.ImportPlayersFromCsvAsync(file);
-        
+
         return Ok(new { Message = "Import successful" });
     }
 }

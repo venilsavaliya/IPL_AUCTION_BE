@@ -3,6 +3,7 @@ using System.Text;
 using CsvHelper;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Repository.Interfaces;
@@ -30,6 +31,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         {
             Name = player.Name,
             DateOfBirth = player.DateOfBirth,
+            Country = player.Country,
             Skill = player.Skill,
             BasePrice = player.BasePrice,
             TeamId = player.TeamId,
@@ -52,7 +54,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
         csv.Context.RegisterClassMap<PlayerMap>();
-        
+
         var players = csv.GetRecords<Player>().ToList();
 
         await _playerRepository.AddPlayersAsync(players);
@@ -69,31 +71,24 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
     public async Task<List<PlayerResponseModel>> GetAllPlayersAsync()
     {
-        List<PlayerResponseModel> players = await _playerRepository.GetAllWithFilterAsync(p => p.IsDeleted == false, p => new PlayerResponseModel
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Image = p.Image,
-            BasePrice = p.BasePrice,
-            DateOfBirth = p.DateOfBirth,
-            TeamId = p.TeamId,
-            Skill = p.Skill.ToString()
-        });
+        List<PlayerResponseModel> players = await _playerRepository.GetAllWithFilterAsync(p => p.IsDeleted == false, p => new PlayerResponseModel(p));
 
         return players;
     }
 
-    public async Task<PlayerResponseModel> GetPlayerByIdAsync(int id)
+    public async Task<PlayerResponseDetailModel> GetPlayerByIdAsync(int id)
     {
-        PlayerResponseModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseModel
+        PlayerResponseDetailModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseDetailModel
         {
-            Id = p.Id,
+            PlayerId = p.Id,
             Name = p.Name,
-            Image = p.Image,
+            ImageUrl = p.Image,
             BasePrice = p.BasePrice,
             DateOfBirth = p.DateOfBirth,
+            Country = p.Country,
+            IsActive = p.IsActive,
             TeamId = p.TeamId,
-            Skill = p.Skill.ToString()
+            Skill = p.Skill
         }) ?? throw new NotFoundException(nameof(Player));
 
         return player;
@@ -103,8 +98,16 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
     {
         Player existingPlayer = await _playerRepository.FindAsync(player.Id) ?? throw new NotFoundException(nameof(Player));
 
+        if (player.Image != null)
+        {
+            var imageUrl = await _fileStorageService.UploadFileAsync(player.Image);
+            existingPlayer.Image = imageUrl;
+        }
+
         existingPlayer.Name = player.Name;
         existingPlayer.DateOfBirth = player.DateOfBirth;
+        existingPlayer.IsActive = player.IsActive;
+        existingPlayer.Country = player.Country;
         existingPlayer.Skill = player.Skill;
         existingPlayer.BasePrice = player.BasePrice;
         existingPlayer.TeamId = player.TeamId;
@@ -116,5 +119,14 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
     public async Task<PaginatedResult<PlayerResponseModel>> GetPlayersAsync(PlayerFilterParams filterParams)
     {
         return await _playerRepository.GetFilteredPlayersAsync(filterParams);
+    }
+
+    public async Task UpdatePlayerStatusAsync(UpdatePlayerStatusRequest request)
+    {
+        Player existingPlayer = await _playerRepository.FindAsync(request.PlayerId) ?? throw new NotFoundException(nameof(Player));
+
+        existingPlayer.IsActive = request.Status;
+
+        await _playerRepository.SaveChangesAsync();
     }
 }

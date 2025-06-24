@@ -23,8 +23,8 @@ public static class IQueryableExtensions
         {
             Items = items,
             TotalCount = count,
-            PageNumber = paginationParams.PageNumber,
-            PageSize = paginationParams.PageSize
+            // PageNumber = paginationParams.PageNumber,
+            // PageSize = paginationParams.PageSize
         };
     }
 }

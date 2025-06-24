@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.Player;
@@ -140,13 +141,13 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         PlayerResponseModel response = new()
         {
-            Id = player.Id,
+            PlayerId = player.Id,
             BasePrice = player.BasePrice,
-            Image = player.Image,
+            ImageUrl = player.Image,
             Name = player.Name,
-            Skill = player.Skill.ToString(),
-            TeamId = player.TeamId,
-            DateOfBirth = player.DateOfBirth,
+            Skill = player.Skill,
+            Age = CalculateAge.CalculateAgeFromDbo(player.DateOfBirth),
+            Country = player.Country
         };
 
         return response;

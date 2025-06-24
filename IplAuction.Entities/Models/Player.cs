@@ -9,17 +9,15 @@ public class Player
     public PlayerSkill Skill { get; set; } 
     public int TeamId { get; set; }
     public DateOnly DateOfBirth { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string Country { get; set; } = null!;
     public decimal BasePrice { get; set; }
     public string? Image { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = null;
-
     public ICollection<Bid> Bids { get; set; } = [];
-
     public Team Team { get; set; }
-
     public ICollection<UserTeam> UserTeams { get; set; } = [];
-
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
 }

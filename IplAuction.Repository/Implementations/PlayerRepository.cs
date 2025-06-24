@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Repository.Interfaces;
@@ -13,7 +14,7 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
 {
     public async Task<PaginatedResult<PlayerResponseModel>> GetFilteredPlayersAsync(PlayerFilterParams filterParams)
     {
-        var query = _context.Players.Include(u => u.Team).AsQueryable();
+        var query = _context.Players.Include(u => u.Team).Where(p => p.IsDeleted != true).AsQueryable();
 
         // Search
         if (!string.IsNullOrWhiteSpace(filterParams.Search))
@@ -41,11 +42,20 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
             query = query.Where(u => u.TeamId == filterParams.TeamId);
         }
 
+        //Filtering Player Status
+        if (filterParams.ActiveStatus != null)
+        {
+            query = query.Where(u => u.IsActive == filterParams.ActiveStatus);
+        }
+
         // Sorting
-        var allowedSorts = new[] { "Name", "Id", "DateOfBirth", "Skill" };
-        var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "Id";
-        var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
-        query = query.OrderBy($"{sortBy} {sortDirection}");
+        var allowedSorts = new[] { "Name", "Id", "Age", "Skill", "BasePrice", "TeamName", "Country" };
+        var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "Name";
+        var sortDirection = filterParams.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
+
+        var sortProperty = sortBy == "TeamName" ? "Team.Name" : sortBy;
+
+        query = query.OrderBy($"{sortProperty} {sortDirection}");
 
         PaginationParams paginationParams = new()
         {
@@ -57,13 +67,14 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
 
         PaginatedResult<PlayerResponseModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new PlayerResponseModel
         {
-            Id = u.Id,
+            PlayerId = u.Id,
             Name = u.Name,
-            Image = u.Image,
-            TeamId = u.TeamId,
+            ImageUrl = u.Image,
             TeamName = u.Team.Name,
-            Skill = u.Skill.ToString(),
-            DateOfBirth = u.DateOfBirth,
+            Skill = u.Skill,
+            Age = CalculateAge.CalculateAgeFromDbo(u.DateOfBirth),
+            Country = u.Country,
+            IsActive = u.IsActive,
             BasePrice = u.BasePrice
         });
 
