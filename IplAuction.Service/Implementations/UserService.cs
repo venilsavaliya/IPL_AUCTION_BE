@@ -1,5 +1,7 @@
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
@@ -22,6 +24,12 @@ public class UserService(IUserRepository userRepository) : IUserService
         });
 
         return users;
+    }
+
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        User? user = await _userRepository.GetWithFilterAsync(u => u.Email == email);
+        return user;
     }
 
     public async Task<UserResponseViewModel> GetByIdAsync(int id)
@@ -61,4 +69,37 @@ public class UserService(IUserRepository userRepository) : IUserService
     {
         return await _userRepository.GetFilteredUsersAsync(filterParams);
     }
+
+    public async Task AddRefreshTokenAsync(User user, RefreshToken refreshToken)
+    {
+        await _userRepository.AddRefreshTokenAsync(user, refreshToken);
+    }
+
+    public async Task UpdatePasswordAsync(string email, string newPassword)
+    {
+        User user = await GetUserByEmailAsync(email) ?? throw new NotFoundException(nameof(User));
+        user.PasswordHash = Password.HashPassword(newPassword);
+        await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task<User> CreateUserAsync(AddUserRequestModel request)
+{
+    if (await IsEmailExistsAsync(request.Email))
+        throw new BadRequestException(Messages.EmailAlreadyExisted);
+
+    var passwordHash = Password.HashPassword(request.Password);
+
+    var user = new User
+    {
+        Username = request.Username,
+        Email = request.Email,
+        PasswordHash = passwordHash,
+        Role = UserRole.User
+    };
+
+    await _userRepository.AddAsync(user);
+    await _userRepository.SaveChangesAsync();
+
+    return user;
+}
 }

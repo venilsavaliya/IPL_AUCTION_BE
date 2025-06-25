@@ -4,6 +4,7 @@ using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Auth;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels;
 using IplAuction.Entities.ViewModels.User;
@@ -14,36 +15,32 @@ using Microsoft.Extensions.Options;
 
 namespace IplAuction.Service.Implementations;
 
-public class AuthService : IAuthService
+public class AuthService(IUserRepository userRepository, IJwtService jwtService, IRefreshTokenRepository refreshTokenRepository,
+    IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtsettings, IEmailService emailservice, IUserService userService, IRefreshTokenService refreshTokenService) : IAuthService
 {
-    private readonly IJwtService _jwtService;
+    private readonly IJwtService _jwtService = jwtService;
 
-    private readonly IEmailService _emailservice;
+    private readonly IEmailService _emailservice = emailservice;
 
-    private readonly IUserRepository _userRepository;
+    private readonly IUserRepository _userRepository = userRepository;
 
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IUserService _userService = userService;
 
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
-    private readonly JwtSettings _jwtSettings;
+    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
 
-    public AuthService(IUserRepository userRepository, IJwtService jwtService, IRefreshTokenRepository refreshTokenRepository,
-        IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtsettings, IEmailService emailservice)
-    {
-        _userRepository = userRepository;
-        _jwtService = jwtService;
-        _refreshTokenRepository = refreshTokenRepository;
-        _httpContextAccessor = httpContextAccessor;
-        _jwtSettings = jwtsettings.Value;
-        _emailservice = emailservice;
-    }
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
+    private readonly JwtSettings _jwtSettings = jwtsettings.Value;
 
     public async Task<JwtTokensResponseModel> LoginAsync(LoginRequest loginRequest)
     {
-        User? user = await _userRepository.GetWithFilterAsync(u => u.Email == loginRequest.Email);
+        User? user = await _userService.GetUserByEmailAsync(loginRequest.Email);
 
-        if (user == null || !VerifyPassword(loginRequest.Password, user.PasswordHash))
+        // User? user = await _userRepository.GetWithFilterAsync(u => u.Email == loginRequest.Email);
+
+        if (user == null || !Password.VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
             throw new BadRequestException(Messages.InvalidCredentials);
         }
@@ -52,7 +49,8 @@ public class AuthService : IAuthService
 
         var refreshToken = _jwtService.GenerateRefreshToken(loginRequest.RememberMe ? _jwtSettings.RefreshTokenExpirationDays : 1);
 
-        await _userRepository.AddRefreshTokenAsync(user, refreshToken);
+        // await _userRepository.AddRefreshTokenAsync(user, refreshToken);
+        await _userService.AddRefreshTokenAsync(user, refreshToken);
 
         _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
         {
@@ -79,14 +77,15 @@ public class AuthService : IAuthService
 
     public async Task RegisterAsync(AddUserRequestModel request)
     {
-        var existingUser = await _userRepository.GetWithFilterAsync(u => u.Email == request.Email);
+        // var existingUser = await _userRepository.GetWithFilterAsync(u => u.Email == request.Email);
+        var existingUser = await _userService.GetUserByEmailAsync(request.Email);
 
         if (existingUser != null)
         {
             throw new BadRequestException(Messages.EmailAlreadyExisted);
         }
 
-        string passwordHash = HashPassword(request.Password);
+        string passwordHash = Password.HashPassword(request.Password);
 
         var user = new User
         {
@@ -104,12 +103,14 @@ public class AuthService : IAuthService
 
     public async Task<JwtTokensResponseModel> RefreshTokenAsync(string refreshToken)
     {
-        var storedToken = await _refreshTokenRepository.GetToken(refreshToken);
+        // var storedToken = await _refreshTokenRepository.GetToken(refreshToken);
 
-        if (storedToken == null || !storedToken.IsActive)
-        {
-            throw new UnauthorizedAccessException();
-        }
+        // if (storedToken == null || !storedToken.IsActive)
+        // {
+        //     throw new UnauthorizedAccessException();
+        // }
+
+        var storedToken = await _refreshTokenService.GetToken(refreshToken);
 
         var user = storedToken.User;
 
@@ -117,7 +118,8 @@ public class AuthService : IAuthService
 
         var newRefreshToken = _jwtService.GenerateRefreshToken(1);
 
-        await _userRepository.AddRefreshTokenAsync(user, newRefreshToken);
+        // await _userRepository.AddRefreshTokenAsync(user, newRefreshToken);
+        await _userService.AddRefreshTokenAsync(user, newRefreshToken);
 
         return new JwtTokensResponseModel()
         {
@@ -134,7 +136,8 @@ public class AuthService : IAuthService
 
         if (refreshToken != null)
         {
-            await _refreshTokenRepository.Delete(refreshToken);
+            // await _refreshTokenRepository.Delete(refreshToken);
+            await _refreshTokenService.DeleteToken(refreshToken);
         }
     }
 
@@ -146,17 +149,18 @@ public class AuthService : IAuthService
         {
             throw new UnauthorizedAccessException();
         }
+        await _userService.UpdatePasswordAsync(request.Email, request.Password);
 
-        User user = await _userRepository.GetWithFilterAsync(u => u.Email == request.Email) ?? throw new NotFoundException(nameof(User));
+        // User user = await _userService.GetUserByEmailAsync(request.Email) ?? throw new NotFoundException(nameof(User));
 
-        user.PasswordHash = HashPassword(request.Password);
+        // user.PasswordHash = HashPassword(request.Password);
 
-        await _userRepository.SaveChangesAsync();
+        // await _userRepository.SaveChangesAsync();
     }
 
     public async Task<bool> ForgotPassword(ForgotPasswordRequest request)
     {
-        User user = await _userRepository.GetWithFilterAsync(u => u.Email == request.Email) ?? throw new NotFoundException(nameof(User));
+        User user = await _userService.GetUserByEmailAsync(request.Email) ?? throw new NotFoundException(nameof(User));
 
         var jwtToken = _jwtService.GeneratePasswordResetToken(request.Email, 60 * 24);
 
@@ -180,13 +184,13 @@ public class AuthService : IAuthService
         return user;
     }
 
-    public static bool VerifyPassword(string password, string storedHash)
-    {
-        return BCrypt.Net.BCrypt.Verify(password, storedHash);
-    }
+    // public static bool VerifyPassword(string password, string storedHash)
+    // {
+    //     return BCrypt.Net.BCrypt.Verify(password, storedHash);
+    // }
 
-    public static string HashPassword(string password)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password);
-    }
+    // public static string HashPassword(string password)
+    // {
+    //     return BCrypt.Net.BCrypt.HashPassword(password);
+    // }
 }

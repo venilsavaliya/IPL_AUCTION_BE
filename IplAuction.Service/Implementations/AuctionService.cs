@@ -11,17 +11,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IplAuction.Service.Implementations;
 
-public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IUserRepository userRepository, IGenericRepository<AuctionParticipants> auctionParticipantRepo, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IPlayerRepository playerRepository) : IAuctionService
+public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IGenericRepository<AuctionParticipants> auctionParticipantRepo, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IPlayerRepository playerRepository, IPlayerService playerService,IAuctionPlayerService auctionPlayerService) : IAuctionService
 {
     private readonly IAuctionRepository _auctionRepository = auctionRepository;
 
     private readonly ICurrentUserService _currentUser = currentUser;
 
-    private readonly IUserRepository _userRepository = userRepository;
+    // private readonly IPlayerRepository _playerRepository = playerRepository;
 
-    private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly IPlayerService _playerService = playerService;
 
     private readonly IGenericRepository<AuctionParticipants> _auctionParticipantRepo = auctionParticipantRepo;
+    private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
     private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
 
@@ -131,39 +132,37 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         return true;
     }
 
-    public async Task<PlayerResponseModel> GetRandomUnAuctionedPlayer(int auctionId)
+    public async Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId)
     {
         IQueryable<AuctionPlayer> players = _auctionPlayerRepo.GetAllQueryableWithFilterAsync(p => p.IsAuctioned == false && p.AuctionId == auctionId);
 
         AuctionPlayer auctionPlayer = await players.OrderBy(p => Guid.NewGuid()).FirstOrDefaultAsync() ?? throw new NotFoundException(nameof(AuctionPlayer));
 
-        Player? player = await _playerRepository.GetWithFilterAsync(p => p.Id == auctionPlayer.PlayerId) ?? throw new NotFoundException(nameof(Player));
+        // Player? player = await _playerRepository.GetWithFilterAsync(p => p.Id == auctionPlayer.PlayerId) ?? throw new NotFoundException(nameof(Player));
 
-        PlayerResponseModel response = new()
-        {
-            PlayerId = player.Id,
-            BasePrice = player.BasePrice,
-            ImageUrl = player.Image,
-            Name = player.Name,
-            Skill = player.Skill,
-            Age = CalculateAge.CalculateAgeFromDbo(player.DateOfBirth),
-            Country = player.Country
-        };
+        PlayerResponseDetailModel player = await _playerService.GetPlayerByIdAsync(auctionPlayer.Id);
 
-        return response;
+        // PlayerResponseModel response = new()
+        // {
+        //     PlayerId = player.Id,
+        //     BasePrice = player.BasePrice,
+        //     ImageUrl = player.Image,
+        //     Name = player.Name,
+        //     Skill = player.Skill,
+        //     Age = CalculateAge.CalculateAgeFromDbo(player.DateOfBirth),
+        //     Country = player.Country
+        // };
+
+        return player;
     }
 
     public async Task AddPlayerToAuction(ManageAuctionPlayerRequest request)
     {
-        AuctionPlayer auctionPlayer = new()
-        {
-            PlayerId = request.PlayerId,
-            AuctionId = request.AuctionId
-        };
+        await _auctionPlayerService.AddAuctionPlayer(request);
 
-        await _auctionPlayerRepo.AddAsync(auctionPlayer);
+        // await _auctionPlayerRepo.AddAsync(auctionPlayer);
 
-        await _auctionPlayerRepo.SaveChangesAsync();
+        // await _auctionPlayerRepo.SaveChangesAsync();
     }
 
     public async Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request)

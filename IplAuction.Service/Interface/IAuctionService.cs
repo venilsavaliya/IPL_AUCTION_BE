@@ -1,4 +1,5 @@
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.Player;
 
@@ -20,9 +21,9 @@ public interface IAuctionService
 
     Task<bool> JoinAuctionAsync(int id);
 
-    Task<PlayerResponseModel> GetRandomUnAuctionedPlayer(int auctionId);
+    Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId);
 
     Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
-    
+
     Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);
 }

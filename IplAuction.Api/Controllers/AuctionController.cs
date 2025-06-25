@@ -64,9 +64,9 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
     [HttpGet("/{auctionId}/next-player")]
     public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
     {
-        PlayerResponseModel player = await _auctionService.GetRandomUnAuctionedPlayer(auctionId);
+        PlayerResponseDetailModel player = await _auctionService.GetRandomUnAuctionedPlayer(auctionId);
 
-        var response = ApiResponseBuilder.With<PlayerResponseModel>().StatusCode(200).SetData(player).Build();
+        var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
 
         return Ok(response);
     }
