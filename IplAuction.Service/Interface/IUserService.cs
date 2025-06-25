@@ -22,5 +22,5 @@ public interface IUserService
 
     Task UpdatePasswordAsync(string email, string newPassword);
 
-    Task<User> CreateUserAsync(AddUserRequestModel request);
+    Task<User> CreateUserAsync(UserRequestModel request);
 }

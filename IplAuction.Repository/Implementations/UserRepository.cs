@@ -60,7 +60,7 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
             string search = filterParams.Search.ToLower();
 
             query = query.Where(u =>
-                u.Username.ToLower().Contains(search) ||
+                // u.Username.ToLower().Contains(search) ||
                 u.Email.ToLower().Contains(search));
         }
 
@@ -89,14 +89,7 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
 
         // Pagination
 
-        PaginatedResult<UserResponseViewModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new UserResponseViewModel
-        {
-            Id = u.Id,
-            Email = u.Email,
-            Username = u.Username,
-            Role = u.Role.ToString(),
-            CreatedAt = u.CreatedAt
-        });
+        PaginatedResult<UserResponseViewModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new UserResponseViewModel(u));
 
         return paginatedResult;
     }

@@ -36,9 +36,9 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet]
+    [HttpPost("filter")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAuction([FromQuery] AuctionFilterParam filterParams)
+    public async Task<IActionResult> GetAuction([FromBody] AuctionFilterParam filterParams)
     {
         var result = await _auctionService.GetAuctionsAsync(filterParams);
         return Ok(result);
@@ -61,33 +61,33 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         }
     }
 
-    [HttpGet("/{auctionId}/next-player")]
-    public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
-    {
-        PlayerResponseDetailModel player = await _auctionService.GetRandomUnAuctionedPlayer(auctionId);
+    // [HttpGet("/{auctionId}/next-player")]
+    // public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
+    // {
+    //     PlayerResponseDetailModel player = await _auctionService.GetRandomUnAuctionedPlayer(auctionId);
 
-        var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
+    //     var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
 
-        return Ok(response);
-    }
+    //     return Ok(response);
+    // }
 
-    [HttpPost("/AddPlayer")]
-    public async Task<IActionResult> AddPlayerToAuction([FromBody] ManageAuctionPlayerRequest request)
-    {
-        await _auctionService.AddPlayerToAuction(request);
+    // [HttpPost("/AddPlayer")]
+    // public async Task<IActionResult> AddPlayerToAuction([FromBody] ManageAuctionPlayerRequest request)
+    // {
+    //     await _auctionService.AddPlayerToAuction(request);
 
-        var response = ApiResponseBuilder.Create(200);
+    //     var response = ApiResponseBuilder.Create(200);
 
-        return Ok(response);
-    }
+    //     return Ok(response);
+    // }
 
-    [HttpDelete("/RemovePlayer")]
-    public async Task<IActionResult> RemovePlayerFromAuction([FromBody] ManageAuctionPlayerRequest request)
-    {
-        await _auctionService.RemovePlayerFromAuction(request);
+    // [HttpDelete("/RemovePlayer")]
+    // public async Task<IActionResult> RemovePlayerFromAuction([FromBody] ManageAuctionPlayerRequest request)
+    // {
+    //     await _auctionService.RemovePlayerFromAuction(request);
 
-        var response = ApiResponseBuilder.Create(200);
+    //     var response = ApiResponseBuilder.Create(200);
 
-        return Ok(response);
-    }
+    //     return Ok(response);
+    // }
 }

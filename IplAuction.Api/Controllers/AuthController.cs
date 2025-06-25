@@ -10,9 +10,10 @@ namespace IplAuction.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, IUserService userService) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
+    private readonly IUserService _userService = userService;
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -25,9 +26,9 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] AddUserRequestModel request)
+    public async Task<IActionResult> Register([FromBody] UserRequestModel request)
     {
-        await _authService.RegisterAsync(request);
+        await _userService.CreateUserAsync(request);
 
         var response = ApiResponseBuilder.Create(200);
 

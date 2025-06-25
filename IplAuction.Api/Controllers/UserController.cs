@@ -3,6 +3,7 @@ using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IplAuction.Api.Controllers;
@@ -24,8 +25,19 @@ public class UserController(IUserService userService) : ControllerBase
     //     return Ok(response);
     // }
 
-    [HttpGet]
-    public async Task<IActionResult> GetUsers([FromQuery] UserFilterParam filterParams)
+    [HttpPost]
+    // [Authorize(Roles ="Admin")]
+    public async Task<IActionResult> CreateUser([FromForm] AddUserRequestModel model)
+    {
+        await _userService.CreateUserAsync(model);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetUsers([FromBody] UserFilterParam filterParams)
     {
         var result = await _userService.GetUsersAsync(filterParams);
 
@@ -45,7 +57,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestModel model)
+    public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequestModel model)
     {
         await _userService.UpdateUserAsync(model);
 

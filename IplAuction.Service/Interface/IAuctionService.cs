@@ -21,9 +21,9 @@ public interface IAuctionService
 
     Task<bool> JoinAuctionAsync(int id);
 
-    Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId);
+    // Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId);
 
-    Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
+    // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 
-    Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);
+    // Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);
 }

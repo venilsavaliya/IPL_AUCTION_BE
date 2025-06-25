@@ -15,6 +15,7 @@ public static class Messages
     public const string UnAuthorize = "User Is UnAuthorize";
     public const string InvalidUserRole = "Invalid User Role For Assignment";
     public const string UserNotFound = "User Not Found";
+    public const string AccountCredential = "Account Credentials";
     public const string UserCreated = "User Created Successfully";
     public const string UserUpdated = "User Updated Successfully";
     public const string UserDeleted = "User Deleted Successfully";

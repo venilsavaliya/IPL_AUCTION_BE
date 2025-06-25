@@ -11,19 +11,8 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
 {
     private readonly IPlayerService _playerService = playerService;
 
-    // GET: api/player/All
-    // [HttpGet("All")]
-    // public async Task<IActionResult> GetAllPlayers()
-    // {
-    //     List<PlayerResponseModel> players = await _playerService.GetAllPlayersAsync();
-
-    //     var response = ApiResponseBuilder.With<List<PlayerResponseModel>>().StatusCode(200).SetData(players).Build();
-    //     return Ok(response);
-
-    // }
-
-    [HttpGet]
-    public async Task<IActionResult> GetPlayers([FromQuery] PlayerFilterParams filterParams)
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetPlayers([FromBody] PlayerFilterParams filterParams)
     {
         var result = await _playerService.GetPlayersAsync(filterParams);
 

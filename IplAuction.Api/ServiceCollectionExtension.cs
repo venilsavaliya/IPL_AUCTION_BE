@@ -1,4 +1,3 @@
-using IplAuction.Entities.Models;
 using IplAuction.Repository.Implementations;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Implementations;
@@ -24,11 +23,17 @@ public static class ServiceCollectionExtension
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAuctionService, AuctionService>();
-        services.AddScoped<IBidService,BidService>();
-        services.AddScoped<IBidQueueService,InMemoryBidQueueSevice>();
+        services.AddScoped<IBidService, BidService>();
+        services.AddScoped<IBidQueueService, InMemoryBidQueueSevice>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAuctionRepository, AuctionRepository>();
-        
+        services.AddScoped<IAuctionParticipantService, AuctionParticipantService>();
+        services.AddScoped<IAuctionPlayerService, AuctionPlayerService>();
+        services.AddScoped<IAuctionParticipantRepository, AuctionParticipantRepository>();
+        services.AddScoped<IAuctionPlayerRepository, AuctionPlayerRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
         return services;
     }
 }

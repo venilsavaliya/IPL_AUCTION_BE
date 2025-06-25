@@ -3,7 +3,6 @@ using System.Text;
 using CsvHelper;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
-using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Repository.Interfaces;
@@ -67,13 +66,6 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         player.IsDeleted = true;
 
         await _playerRepository.SaveChangesAsync();
-    }
-
-    public async Task<List<PlayerResponseModel>> GetAllPlayersAsync()
-    {
-        List<PlayerResponseModel> players = await _playerRepository.GetAllWithFilterAsync(p => p.IsDeleted == false, p => new PlayerResponseModel(p));
-
-        return players;
     }
 
     public async Task<PlayerResponseDetailModel> GetPlayerByIdAsync(int id)

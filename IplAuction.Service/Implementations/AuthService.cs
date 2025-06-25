@@ -15,18 +15,14 @@ using Microsoft.Extensions.Options;
 
 namespace IplAuction.Service.Implementations;
 
-public class AuthService(IUserRepository userRepository, IJwtService jwtService, IRefreshTokenRepository refreshTokenRepository,
+public class AuthService(IJwtService jwtService,
     IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtsettings, IEmailService emailservice, IUserService userService, IRefreshTokenService refreshTokenService) : IAuthService
 {
     private readonly IJwtService _jwtService = jwtService;
 
     private readonly IEmailService _emailservice = emailservice;
 
-    private readonly IUserRepository _userRepository = userRepository;
-
     private readonly IUserService _userService = userService;
-
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
     private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
 
@@ -38,8 +34,6 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
     {
         User? user = await _userService.GetUserByEmailAsync(loginRequest.Email);
 
-        // User? user = await _userRepository.GetWithFilterAsync(u => u.Email == loginRequest.Email);
-
         if (user == null || !Password.VerifyPassword(loginRequest.Password, user.PasswordHash))
         {
             throw new BadRequestException(Messages.InvalidCredentials);
@@ -49,7 +43,6 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
 
         var refreshToken = _jwtService.GenerateRefreshToken(loginRequest.RememberMe ? _jwtSettings.RefreshTokenExpirationDays : 1);
 
-        // await _userRepository.AddRefreshTokenAsync(user, refreshToken);
         await _userService.AddRefreshTokenAsync(user, refreshToken);
 
         _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
@@ -77,39 +70,11 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
 
     public async Task RegisterAsync(AddUserRequestModel request)
     {
-        // var existingUser = await _userRepository.GetWithFilterAsync(u => u.Email == request.Email);
-        var existingUser = await _userService.GetUserByEmailAsync(request.Email);
-
-        if (existingUser != null)
-        {
-            throw new BadRequestException(Messages.EmailAlreadyExisted);
-        }
-
-        string passwordHash = Password.HashPassword(request.Password);
-
-        var user = new User
-        {
-
-            Username = request.Username,
-            Email = request.Email,
-            PasswordHash = passwordHash,
-            Role = UserRole.User
-        };
-
-        await _userRepository.AddAsync(user);
-
-        await _userRepository.SaveChangesAsync();
+        await _userService.CreateUserAsync(request);
     }
 
     public async Task<JwtTokensResponseModel> RefreshTokenAsync(string refreshToken)
     {
-        // var storedToken = await _refreshTokenRepository.GetToken(refreshToken);
-
-        // if (storedToken == null || !storedToken.IsActive)
-        // {
-        //     throw new UnauthorizedAccessException();
-        // }
-
         var storedToken = await _refreshTokenService.GetToken(refreshToken);
 
         var user = storedToken.User;
@@ -118,7 +83,6 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
 
         var newRefreshToken = _jwtService.GenerateRefreshToken(1);
 
-        // await _userRepository.AddRefreshTokenAsync(user, newRefreshToken);
         await _userService.AddRefreshTokenAsync(user, newRefreshToken);
 
         return new JwtTokensResponseModel()
@@ -136,7 +100,6 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
 
         if (refreshToken != null)
         {
-            // await _refreshTokenRepository.Delete(refreshToken);
             await _refreshTokenService.DeleteToken(refreshToken);
         }
     }
@@ -150,12 +113,6 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
             throw new UnauthorizedAccessException();
         }
         await _userService.UpdatePasswordAsync(request.Email, request.Password);
-
-        // User user = await _userService.GetUserByEmailAsync(request.Email) ?? throw new NotFoundException(nameof(User));
-
-        // user.PasswordHash = HashPassword(request.Password);
-
-        // await _userRepository.SaveChangesAsync();
     }
 
     public async Task<bool> ForgotPassword(ForgotPasswordRequest request)
@@ -183,14 +140,4 @@ public class AuthService(IUserRepository userRepository, IJwtService jwtService,
         }
         return user;
     }
-
-    // public static bool VerifyPassword(string password, string storedHash)
-    // {
-    //     return BCrypt.Net.BCrypt.Verify(password, storedHash);
-    // }
-
-    // public static string HashPassword(string password)
-    // {
-    //     return BCrypt.Net.BCrypt.HashPassword(password);
-    // }
 }
