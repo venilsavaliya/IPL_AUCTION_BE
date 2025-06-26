@@ -76,11 +76,11 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("import-csv")]
-    public async Task<IActionResult> ImportCsv(IFormFile file)
-    {
-        await _playerService.ImportPlayersFromCsvAsync(file);
+    // [HttpPost("import-csv")]
+    // public async Task<IActionResult> ImportCsv(IFormFile file)
+    // {
+    //     await _playerService.ImportPlayersFromCsvAsync(file);
 
-        return Ok(new { Message = "Import successful" });
-    }
+    //     return Ok(new { Message = "Import successful" });
+    // }
 }

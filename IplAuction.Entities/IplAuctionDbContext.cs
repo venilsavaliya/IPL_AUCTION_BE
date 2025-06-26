@@ -1,3 +1,4 @@
+using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,10 +24,24 @@ public class IplAuctionDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>().HasData(new User()
+        {
+            Id = 1,
+            FirstName = "Admin",
+            Email = "admin@tatvasoft.com",
+            DateOfBirth = new DateOnly(1991, 12, 12),
+            Gender = Enums.UserGender.Male,
+            Role = Enums.UserRole.Admin,
+            MobileNumber = "1234567890",
+            PasswordHash = Password.HashPassword("admin")
+        });
 
         modelBuilder.Entity<User>()
             .Property(u => u.Role)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.Gender)
             .HasConversion<string>();
 
         modelBuilder.Entity<Auction>()
@@ -96,5 +111,7 @@ public class IplAuctionDbContext : DbContext
         modelBuilder.Entity<Player>()
             .Property(p => p.Skill)
             .HasConversion<string>();
+
+        base.OnModelCreating(modelBuilder);
     }
 }

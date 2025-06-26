@@ -13,7 +13,7 @@ public interface IAuthService
 
     Task Logout();
 
-    Task<JwtTokensResponseModel> RefreshTokenAsync(string refreshToken);
+    Task RefreshTokenAsync();
 
     UserInfoViewModel GetCurrentUser();
 

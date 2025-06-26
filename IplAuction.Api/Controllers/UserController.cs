@@ -15,16 +15,6 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
-    // [HttpGet("All")]
-    // public async Task<IActionResult> GetAllUsers()
-    // {
-    //     List<UserResponseViewModel> users = await _userService.GetAllAsync();
-
-    //     var response = ApiResponseBuilder.With<List<UserResponseViewModel>>().StatusCode(200).SetData(users).Build();
-
-    //     return Ok(response);
-    // }
-
     [HttpPost]
     // [Authorize(Roles ="Admin")]
     public async Task<IActionResult> CreateUser([FromForm] AddUserRequestModel model)
@@ -37,6 +27,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPost("filter")]
+    [Authorize]
     public async Task<IActionResult> GetUsers([FromBody] UserFilterParam filterParams)
     {
         var result = await _userService.GetUsersAsync(filterParams);

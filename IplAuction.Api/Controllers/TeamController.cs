@@ -23,6 +23,16 @@ public class TeamController(ITeamService teamService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetTeams([FromBody] TeamFilterParam filterParams)
+    {
+        var result = await _teamService.GetTeamsAsync(filterParams);
+
+        var response = ApiResponseBuilder.With<PaginatedResult<TeamResponseViewModel>>().StatusCode(200).SetData(result).Build();
+
+        return Ok(response);
+    }
+
     // GET: api/team/:id
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTeamById(int id)
@@ -48,7 +58,7 @@ public class TeamController(ITeamService teamService) : ControllerBase
 
     // PUT: api/team
     [HttpPut]
-    public async Task<IActionResult> UpdateTeam([FromBody] UpdateTeamRequest team)
+    public async Task<IActionResult> UpdateTeam([FromForm] UpdateTeamRequest team)
     {
         await _teamService.UpdateTeamAsync(team);
 

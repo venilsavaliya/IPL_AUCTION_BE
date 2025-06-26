@@ -1,15 +1,17 @@
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Team;
+using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class TeamService(IGenericRepository<Team> teamRepository, IFileStorageService fileStorage) : ITeamService
+public class TeamService(ITeamRepository teamRepository, IFileStorageService fileStorage) : ITeamService
 {
-    private readonly IGenericRepository<Team> _teamRepository = teamRepository;
+    private readonly ITeamRepository _teamRepository = teamRepository;
 
     private readonly IFileStorageService _fileStorage = fileStorage;
 
@@ -46,7 +48,7 @@ public class TeamService(IGenericRepository<Team> teamRepository, IFileStorageSe
 
     public async Task<TeamResponseViewModel> GetTeamByIdAsync(int id)
     {
-        TeamResponseViewModel team = await _teamRepository.GetWithFilterAsync(t => t.IsDeleted == false, t => new TeamResponseViewModel
+        TeamResponseViewModel team = await _teamRepository.GetWithFilterAsync(t => t.IsDeleted == false && t.Id == id, t => new TeamResponseViewModel
         {
             Id = t.Id,
             Name = t.Name,
@@ -80,5 +82,10 @@ public class TeamService(IGenericRepository<Team> teamRepository, IFileStorageSe
         team.IsDeleted = true;
 
         await _teamRepository.SaveChangesAsync();
+    }
+
+    public async Task<PaginatedResult<TeamResponseViewModel>> GetTeamsAsync(TeamFilterParam filterParams)
+    {
+        return await _teamRepository.GetFilteredTeamsAsync(filterParams);
     }
 }

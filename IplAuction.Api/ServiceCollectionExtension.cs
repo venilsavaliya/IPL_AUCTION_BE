@@ -33,6 +33,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAuctionPlayerRepository, AuctionPlayerRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<ITeamRepository, TeamRepository>();
 
         return services;
     }

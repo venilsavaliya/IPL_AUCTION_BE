@@ -22,37 +22,9 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
         await _context.SaveChangesAsync();
     }
 
-    
-
-    // public async Task<PaginatedResult<User>> GetFilteredAsync(UserFilterModel filter)
-    // {
-    //     var query = _dbSet.AsQueryable();
-
-    //     // Apply filters
-    //     if (!string.IsNullOrWhiteSpace(filter.Search))
-    //     {
-    //         query = query.Where(u =>
-    //             u.Username.Contains(filter.Search) ||
-    //             u.Email.Contains(filter.Search));
-    //     }
-
-    //     if (!string.IsNullOrEmpty(filter.Role))
-    //     {
-    //         query = query.Where(u => u.Role == filter.Role);
-    //     }
-
-    //     if (filter.IsActive.HasValue)
-    //     {
-    //         query = query.Where(u => u.IsActive == filter.IsActive.Value);
-    //     }
-
-    //     // Apply pagination
-    //     return await query.ToPaginatedListAsync(filter.Pagination);
-    // }
-
     public async Task<PaginatedResult<UserResponseViewModel>> GetFilteredUsersAsync(UserFilterParam filterParams)
     {
-        var query = _context.Users.AsQueryable();
+        var query = _context.Users.Where(u => u.IsDeleted != true).AsQueryable();
 
         // Search
         if (!string.IsNullOrWhiteSpace(filterParams.Search))
@@ -60,8 +32,9 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
             string search = filterParams.Search.ToLower();
 
             query = query.Where(u =>
-                // u.Username.ToLower().Contains(search) ||
-                u.Email.ToLower().Contains(search));
+                u.FirstName.ToLower().Contains(search)||
+                u.Email.ToLower().Contains(search)
+                || (u.LastName != null && u.LastName.ToLower().Contains(search)));
         }
 
         // Filtering Role
@@ -76,10 +49,25 @@ public class UserRepository(IplAuctionDbContext context) : GenericRepository<Use
         }
 
         // Sorting
-        var allowedSorts = new[] { "Username", "Id", "CreatedAt", "Email" };
-        var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "Id";
+        var allowedSorts = new[] { "Name", "DateOfBirth", "Email", "Role" };
+        var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "FirstName";
         var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
-        query = query.OrderBy($"{sortBy} {sortDirection}");
+        if (sortBy == "Name")
+        {
+            if (sortDirection == "asc")
+            {
+                query = query.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
+            }
+            else
+            {
+                query = query.OrderByDescending(u => u.FirstName).ThenByDescending(u => u.LastName);
+            }
+        }
+        else
+        {
+            query = query.OrderBy($"{sortBy} {sortDirection}");
+        }
+
 
         PaginationParams paginationParams = new()
         {

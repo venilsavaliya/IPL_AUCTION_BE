@@ -1,3 +1,4 @@
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
 using IplAuction.Entities.ViewModels.Team;
 
@@ -14,4 +15,5 @@ public interface ITeamService
     Task UpdateTeamAsync(UpdateTeamRequest team);
 
     Task DeleteTeamAsync(int id);
+    Task<PaginatedResult<TeamResponseViewModel>> GetTeamsAsync(TeamFilterParam filterParams);
 }

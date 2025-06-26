@@ -120,6 +120,11 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
             user.Role = UserRole.User;
         }
 
+        if (request.Image != null)
+        {
+            user.Image = await _fileStorageService.UploadFileAsync(request.Image);
+        }
+
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
 

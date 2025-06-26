@@ -26,7 +26,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserRequestModel request)
+    public async Task<IActionResult> Register([FromForm] UserRequestModel request)
     {
         await _userService.CreateUserAsync(request);
 
@@ -71,16 +71,16 @@ public class AuthController(IAuthService authService, IUserService userService) 
     }
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task<IActionResult> RefreshToken()
     {
-        JwtTokensResponseModel tokens = await _authService.RefreshTokenAsync(request.Token);
+        await _authService.RefreshTokenAsync();
 
-        var response = ApiResponseBuilder.With<JwtTokensResponseModel>().StatusCode(200).SetData(tokens).Build();
+        var response = ApiResponseBuilder.Create(200);
 
         return Ok(response);
     }
 
-    // [Authorize]
+    [Authorize]
     [HttpGet("me")]
     public IActionResult GetCurrentUser()
     {
