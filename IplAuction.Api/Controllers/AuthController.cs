@@ -82,9 +82,9 @@ public class AuthController(IAuthService authService, IUserService userService) 
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
-        UserInfoViewModel userInfo = _authService.GetCurrentUser();
+        UserInfoViewModel userInfo =await _authService.GetCurrentUser();
 
         var response = ApiResponseBuilder.With<UserInfoViewModel>().StatusCode(200).SetData(userInfo).Build();
 

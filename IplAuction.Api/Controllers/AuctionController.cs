@@ -16,7 +16,7 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
     private readonly IAuctionService _auctionService = auctionService;
 
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    // [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> CreateAuction([FromBody] AddAuctionRequestModel request)
     {
         await _auctionService.AddAuctionAsync(request);

@@ -141,7 +141,7 @@ public class AuthService(IJwtService jwtService,
         return isMailSent;
     }
 
-    public UserInfoViewModel GetCurrentUser()
+    public async Task<UserInfoViewModel> GetCurrentUser()
     {
         var accessToken = _httpContextAccessor.HttpContext?.Request.Cookies["accessToken"];
 
@@ -151,6 +151,9 @@ public class AuthService(IJwtService jwtService,
         {
             user = _jwtService.DecodeToken(accessToken);
         }
+
+        var user1 = await _userService.GetByIdAsync(int.Parse(user.Id??"0"));
+        user.ImageUrl = user1?.Image;
         return user;
     }
 }

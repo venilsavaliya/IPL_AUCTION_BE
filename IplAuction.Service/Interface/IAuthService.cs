@@ -15,7 +15,7 @@ public interface IAuthService
 
     Task RefreshTokenAsync();
 
-    UserInfoViewModel GetCurrentUser();
+    Task<UserInfoViewModel> GetCurrentUser();
 
     Task ResetPassword(ResetPasswordRequest request);
     
