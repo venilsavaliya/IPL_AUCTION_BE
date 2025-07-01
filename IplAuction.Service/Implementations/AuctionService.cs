@@ -1,31 +1,26 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
-using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
-using IplAuction.Entities.ViewModels.Player;
+using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
-using Microsoft.EntityFrameworkCore;
-
 namespace IplAuction.Service.Implementations;
 
-public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IGenericRepository<AuctionParticipants> auctionParticipantRepo, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IPlayerRepository playerRepository, IPlayerService playerService, IAuctionPlayerService auctionPlayerService, IAuctionParticipantService auctionParticipantService) : IAuctionService
+public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService) : IAuctionService
 {
     private readonly IAuctionRepository _auctionRepository = auctionRepository;
 
     private readonly ICurrentUserService _currentUser = currentUser;
 
-    // private readonly IPlayerRepository _playerRepository = playerRepository;
-
     private readonly IPlayerService _playerService = playerService;
 
-    // private readonly IGenericRepository<AuctionParticipants> _auctionParticipantRepo = auctionParticipantRepo;
     private readonly IAuctionParticipantService _auctionParticipantService = auctionParticipantService;
-    // private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
     private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
+
+    private readonly IUserService _userService = userService;
 
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
@@ -57,14 +52,14 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         return true;
     }
 
-    // public async Task<List<AuctionResponseModel>> GetFilteredAuctionAsync(AuctionFilterModel auctionFilterModel)
-    // {
-    //     List<AuctionResponseModel> auctions = await _auctionRepository.GetFilteredAuctionsAsync()
-    // }
-
     public async Task<List<AuctionResponseModel>> GetAllAuctionAsync()
     {
-        List<AuctionResponseModel> auctions = await _auctionRepository.GetAllWithFilterAsync(a => a.IsDeleted == false, a => new AuctionResponseModel
+        int userId = _currentUser.UserId;
+
+        UserResponseViewModel user = await _userService.GetByIdAsync(userId) ?? throw new NotFoundException(nameof(User));
+        
+        // Here Admin Can Fetch All the Auction And Manager Can Fetch The Auction Which Created By Him
+        List<AuctionResponseModel> auctions = await _auctionRepository.GetAllWithFilterAsync(a => a.IsDeleted == false && (user.Role == UserRole.Admin || a.ManagerId == userId), a => new AuctionResponseModel
         {
             Id = a.Id,
             ManagerId = a.ManagerId,

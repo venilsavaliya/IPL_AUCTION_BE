@@ -6,8 +6,6 @@ public class AddAuctionRequestModel
 {
     public string Title { get; set; } = null!;
 
-    public int ManagerId { get; set; }
-
     public DateTime StartDate { get; set; }
 
     public int MinimumBidIncreament { get; set; }

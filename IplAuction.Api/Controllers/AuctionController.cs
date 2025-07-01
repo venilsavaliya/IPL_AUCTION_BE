@@ -61,6 +61,16 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAuction(int id)
+    {
+        await _auctionService.DeleteAuctionAsync(id);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
     // [HttpGet("/{auctionId}/next-player")]
     // public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
     // {
