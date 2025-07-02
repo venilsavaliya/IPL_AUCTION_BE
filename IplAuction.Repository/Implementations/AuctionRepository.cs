@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
+using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Repository.Interfaces;
@@ -13,7 +14,7 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
 {
     public async Task<PaginatedResult<AuctionResponseModel>> GetFilteredAuctionsAsync(AuctionFilterParam filterParams)
     {
-        var query = _context.Auctions.Where(a=>a.IsDeleted != true).Include(u => u.UserTeams).AsQueryable();
+        var query = _context.Auctions.Include(a => a.AuctionParticipants).Where(a => a.IsDeleted != true).Include(u => u.UserTeams).AsQueryable();
 
         // Search
         if (!string.IsNullOrWhiteSpace(filterParams.Search))
@@ -55,18 +56,15 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         };
 
         // Pagination
-        PaginatedResult<AuctionResponseModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new AuctionResponseModel
-        {
-            Id = u.Id,
-            Title = u.Title,
-            StartDate = u.StartDate,
-            AuctionStatus = u.AuctionStatus,
-            ManagerId = u.ManagerId,
-            MaximumPurseSize = u.MaximumPurseSize,
-            MinimumBidIncreament = u.MinimumBidIncreament,
-            TotalTeams = u.UserTeams.Count()
-        });
+        PaginatedResult<AuctionResponseModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new AuctionResponseModel(u));
 
         return paginatedResult;
+    }
+
+    public async Task<AuctionResponseModel> GetAuctionById(int id)
+    {
+        Auction auction = await _context.Auctions.Include(a => a.AuctionParticipants).FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted != true) ?? throw new NotFoundException(nameof(Auction));
+
+        return new AuctionResponseModel(auction);
     }
 }

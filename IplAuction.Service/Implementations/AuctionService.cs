@@ -8,7 +8,7 @@ using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 namespace IplAuction.Service.Implementations;
 
-public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService) : IAuctionService
+public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService, IUnitOfWork unitOfWork) : IAuctionService
 {
     private readonly IAuctionRepository _auctionRepository = auctionRepository;
 
@@ -18,27 +18,48 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     private readonly IAuctionParticipantService _auctionParticipantService = auctionParticipantService;
 
-    private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
-
     private readonly IUserService _userService = userService;
+
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
         // Get UserId From The Jwt Claims
         int? UserId = _currentUser.UserId;
 
-        Auction auction = new()
-        {
-            Title = request.Title,
-            ManagerId = (int)UserId,
-            StartDate = request.StartDate,
-            AuctionStatus = request.AuctionStatus,
-            MinimumBidIncreament = request.MinimumBidIncreament,
-            MaximumPurseSize = request.MaximumPurseSize
-        };
+        await _unitOfWork.BeginTransactionAsync();
 
-        await _auctionRepository.AddAsync(auction);
-        await _auctionRepository.SaveChangesAsync();
+        try
+        {
+            Auction auction = new()
+            {
+                Title = request.Title,
+                ManagerId = (int)UserId,
+                StartDate = request.StartDate,
+                AuctionStatus = request.AuctionStatus,
+                MinimumBidIncreament = request.MinimumBidIncreament,
+                MaximumPurseSize = request.MaximumPurseSize,
+                MaximumTeamsCanJoin = request.MaximumTeamsCanJoin,
+                ModeOfAuction = request.ModeOfAuction
+            };
+
+            await _auctionRepository.AddAsync(auction);
+            await _auctionRepository.SaveChangesAsync();
+
+            var auctionParticipants = request.ParticipantUserIds.Select(uid => new AuctionParticipants
+            {
+                AuctionId = auction.Id,
+                UserId = uid
+            }).ToList();
+
+            await _auctionParticipantService.AddParticipantsAsync(auctionParticipants);
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<bool> DeleteAuctionAsync(int id)
@@ -57,7 +78,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         int userId = _currentUser.UserId;
 
         UserResponseViewModel user = await _userService.GetByIdAsync(userId) ?? throw new NotFoundException(nameof(User));
-        
+
         // Here Admin Can Fetch All the Auction And Manager Can Fetch The Auction Which Created By Him
         List<AuctionResponseModel> auctions = await _auctionRepository.GetAllWithFilterAsync(a => a.IsDeleted == false && (user.Role == UserRole.Admin || a.ManagerId == userId), a => new AuctionResponseModel
         {
@@ -78,14 +99,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     public async Task<AuctionResponseModel> GetAuctionByIdAsync(int id)
     {
-        AuctionResponseModel auction = await _auctionRepository.GetWithFilterAsync(a => a.IsDeleted == false, a => new AuctionResponseModel
-        {
-            Id = a.Id,
-            ManagerId = a.ManagerId,
-            StartDate = a.StartDate,
-            AuctionStatus = a.AuctionStatus,
-            Title = a.Title
-        }) ?? throw new NotFoundException(nameof(Auction));
+        AuctionResponseModel auction = await _auctionRepository.GetAuctionById(id);
 
         return auction;
     }
@@ -94,14 +108,61 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     {
         Auction? auction = await _auctionRepository.GetWithFilterAsync(a => a.IsDeleted == false && a.Id == request.Id) ?? throw new NotFoundException(nameof(Auction));
 
-        auction.Title = request.Title;
-        auction.UpdatedAt = DateTime.UtcNow;
-        auction.StartDate = request.StartDate;
-        auction.AuctionStatus = request.AuctionStatus;
-        auction.MinimumBidIncreament = request.MinimumBidIncreament;
-        auction.MaximumPurseSize = request.MaximumPurseSize;
+        await _unitOfWork.BeginTransactionAsync();
 
-        await _auctionRepository.SaveChangesAsync();
+        try
+        {
+            List<AuctionParticipants> oldParticipants = await _auctionParticipantService.GetParticipantsByAuctionIdAsync(auction.Id);
+
+            List<int> oldParticipantUserIds = oldParticipants.Select(p => p.UserId).ToList();
+            List<int> newParticipantUserIds = request.ParticipantUserIds;
+
+            var toAdd = newParticipantUserIds.Except(oldParticipantUserIds).ToList();
+            var toRemove = oldParticipantUserIds.Except(newParticipantUserIds).ToList();
+
+            // Remove Users
+            if (toRemove.Count != 0)
+            {
+                List<AuctionParticipants> participantsToRemove = await _auctionParticipantService.GetParticipantsByUserIdsAsync(auction.Id, toRemove);
+
+                if (participantsToRemove.Count > 0)
+                {
+                    await _auctionParticipantService.RemoveParticipantsAsync(participantsToRemove);
+                }
+            }
+
+            // Add New Users
+            if (toAdd.Count != 0)
+            {
+                List<AuctionParticipants> participantsToAdd = toAdd.Select(uid => new AuctionParticipants
+                {
+                    AuctionId = auction.Id,
+                    UserId = uid
+                }).ToList();
+
+                await _auctionParticipantService.AddParticipantsAsync(participantsToAdd);
+            }
+
+            auction.Title = request.Title;
+            auction.UpdatedAt = DateTime.UtcNow;
+            auction.StartDate = request.StartDate;
+            auction.AuctionStatus = request.AuctionStatus;
+            auction.MinimumBidIncreament = request.MinimumBidIncreament;
+            auction.MaximumPurseSize = request.MaximumPurseSize;
+            auction.MaximumTeamsCanJoin = request.MaximumTeamsCanJoin;
+            auction.ModeOfAuction = request.ModeOfAuction;
+
+            await _auctionRepository.SaveChangesAsync();
+
+            await _unitOfWork.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
+
+
     }
 
     public async Task<bool> JoinAuctionAsync(int id)

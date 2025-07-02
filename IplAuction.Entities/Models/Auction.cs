@@ -14,6 +14,8 @@ public class Auction
 
     public AuctionStatus AuctionStatus { get; set; } = AuctionStatus.Scheduled;
 
+    public int MaximumTeamsCanJoin { get; set; } = 10;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public int MinimumBidIncreament { get; set; } = 500000;
@@ -21,6 +23,8 @@ public class Auction
     public int MaximumPurseSize { get; set; } = 20000000;
 
     public int CurrentBid { get; set; } = 0;
+
+    public bool ModeOfAuction { get; set; } = false;
 
     public int? CurrentPlayerId { get; set; }
 
@@ -33,6 +37,7 @@ public class Auction
     public ICollection<AuctionParticipants> AuctionParticipants { get; set; } = [];
 
     public ICollection<Bid> Bids { get; set; } = [];
+
     public ICollection<UserTeam> UserTeams { get; set; } = [];
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
 }

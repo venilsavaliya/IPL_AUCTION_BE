@@ -27,7 +27,7 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
     {
         var player = await _playerService.GetPlayerByIdAsync(id);
 
-        var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
+        var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().SetData(player).Build();
 
         return Ok(response);
     }

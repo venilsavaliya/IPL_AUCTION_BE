@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250702054402_MaxTeamJoinField")]
+    partial class MaxTeamJoinField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,9 +60,6 @@ namespace IplAuction.Entities.Migrations
 
                     b.Property<int>("MinimumBidIncreament")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("ModeOfAuction")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -335,7 +335,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 2, 11, 8, 25, 358, DateTimeKind.Utc).AddTicks(7925),
+                            CreatedAt = new DateTime(2025, 7, 2, 5, 44, 0, 751, DateTimeKind.Utc).AddTicks(9915),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -343,7 +343,7 @@ namespace IplAuction.Entities.Migrations
                             IsDeleted = false,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$1ECSpWm1fCXfNDGDTrswIOxYXtKCgu906CVRKyXMzeLoOukpH94mO",
+                            PasswordHash = "$2a$11$.lMZEMn363YJj1cFwf089OTEmUy.9VACyhmk/4bgBA5y.c.Qogtoa",
                             Role = "Admin"
                         });
                 });

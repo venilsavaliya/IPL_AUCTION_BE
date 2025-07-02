@@ -34,6 +34,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITeamRepository, TeamRepository>();
+        services.AddScoped<IUnitOfWork,UnitOfWork >();
+
 
         return services;
     }

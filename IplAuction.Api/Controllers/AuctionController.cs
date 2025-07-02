@@ -1,7 +1,6 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Auction;
-using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +13,18 @@ namespace IplAuction.Api.Controllers;
 public class AuctionController(IAuctionService auctionService) : ControllerBase
 {
     private readonly IAuctionService _auctionService = auctionService;
+
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAuctionById(int id)
+    {
+        AuctionResponseModel auction = await _auctionService.GetAuctionByIdAsync(id);
+
+        var response = ApiResponseBuilder.With<AuctionResponseModel>().SetData(auction).Build();
+
+        return Ok(response);
+    }
+
 
     [HttpPost]
     // [Authorize(Roles = "Admin,Manager")]

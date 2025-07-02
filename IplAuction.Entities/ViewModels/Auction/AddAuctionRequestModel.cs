@@ -12,5 +12,11 @@ public class AddAuctionRequestModel
 
     public int MaximumPurseSize { get; set; }
 
+    public int MaximumTeamsCanJoin { get; set; }
+
+    public bool ModeOfAuction { get; set; } 
+
+    public List<int> ParticipantUserIds { get; set; } = []; 
+
     public AuctionStatus AuctionStatus { get; set; } = AuctionStatus.Scheduled;
 }

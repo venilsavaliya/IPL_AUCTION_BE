@@ -20,4 +20,25 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
 
         await _auctionParticipantRepo.SaveChangesAsync();
     }
+
+    public async Task AddParticipantsAsync(List<AuctionParticipants> auctionParticipants)
+    {
+        await _auctionParticipantRepo.AddRangeAsync(auctionParticipants);
+        await _auctionParticipantRepo.SaveChangesAsync();
+    }
+    public async Task RemoveParticipantsAsync(List<AuctionParticipants> auctionParticipants)
+    {
+        _auctionParticipantRepo.RemoveRange(auctionParticipants);
+
+        await _auctionParticipantRepo.SaveChangesAsync();
+    }
+
+    public async Task<List<AuctionParticipants>> GetParticipantsByUserIdsAsync(int auctionid, List<int> auctionParticipants)
+    {
+        return await _auctionParticipantRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionid && auctionParticipants.Contains(ap.UserId));
+    }
+    public async Task<List<AuctionParticipants>> GetParticipantsByAuctionIdAsync(int auctionid)
+    {
+        return await _auctionParticipantRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionid);
+    }
 }
