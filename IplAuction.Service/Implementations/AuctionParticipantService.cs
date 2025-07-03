@@ -1,4 +1,5 @@
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
@@ -37,8 +38,14 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
     {
         return await _auctionParticipantRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionid && auctionParticipants.Contains(ap.UserId));
     }
+
     public async Task<List<AuctionParticipants>> GetParticipantsByAuctionIdAsync(int auctionid)
     {
         return await _auctionParticipantRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionid);
+    }
+
+    public async Task<List<UserResponseViewModel>> GetAuctionParticipantsByAuctionId(int auctionid)
+    {
+        return await _auctionParticipantRepo.GetAllParticipantsByAuctionIdAsync(auctionid);
     }
 }

@@ -40,7 +40,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
                 MinimumBidIncreament = request.MinimumBidIncreament,
                 MaximumPurseSize = request.MaximumPurseSize,
                 MaximumTeamsCanJoin = request.MaximumTeamsCanJoin,
-                ModeOfAuction = request.ModeOfAuction
+                ModeOfAuction = request.AuctionMode
             };
 
             await _auctionRepository.AddAsync(auction);
@@ -104,6 +104,14 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         return auction;
     }
 
+   public async Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId)
+    {
+        List<UserResponseViewModel> teams = await _auctionParticipantService.GetAuctionParticipantsByAuctionId(auctionId);
+
+        return teams;
+    }
+
+
     public async Task UpdateAuctionAsync(UpdateAuctionRequestModel request)
     {
         Auction? auction = await _auctionRepository.GetWithFilterAsync(a => a.IsDeleted == false && a.Id == request.Id) ?? throw new NotFoundException(nameof(Auction));
@@ -150,7 +158,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             auction.MinimumBidIncreament = request.MinimumBidIncreament;
             auction.MaximumPurseSize = request.MaximumPurseSize;
             auction.MaximumTeamsCanJoin = request.MaximumTeamsCanJoin;
-            auction.ModeOfAuction = request.ModeOfAuction;
+            auction.ModeOfAuction = request.AuctionMode;
 
             await _auctionRepository.SaveChangesAsync();
 

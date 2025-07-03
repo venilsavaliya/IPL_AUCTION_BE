@@ -1,13 +1,14 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IplAuction.Api.Controllers;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AuctionController(IAuctionService auctionService) : ControllerBase
@@ -25,6 +26,15 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("teams/{id}")]
+    public async Task<IActionResult> GetAllAuctionTeams(int id)
+    {
+        List<UserResponseViewModel> teams = await _auctionService.GetAllTeamsOfAuction(id);
+
+        var response = ApiResponseBuilder.With< List<UserResponseViewModel>>().SetData(teams).Build();
+
+        return Ok(response);
+    }
 
     [HttpPost]
     // [Authorize(Roles = "Admin,Manager")]

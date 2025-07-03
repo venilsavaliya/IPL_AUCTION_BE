@@ -2,6 +2,7 @@ using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.Player;
+using IplAuction.Entities.ViewModels.User;
 
 namespace IplAuction.Service.Interface;
 
@@ -20,6 +21,8 @@ public interface IAuctionService
     Task<bool> DeleteAuctionAsync(int id);
 
     Task<bool> JoinAuctionAsync(int id);
+
+    Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId);
 
     // Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId);
 

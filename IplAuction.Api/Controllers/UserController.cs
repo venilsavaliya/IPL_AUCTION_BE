@@ -47,6 +47,17 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("usernamelist")]
+     public async Task<IActionResult> GetUserNamesList()
+    {
+        List<UserNameResponseViewModel> users = await _userService.GetAllUserFullNameList();
+
+        var response = ApiResponseBuilder.With<List<UserNameResponseViewModel>>().SetData(users).Build();
+
+        return Ok(response);
+    }
+
+
     [HttpPut]
     public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequestModel model)
     {

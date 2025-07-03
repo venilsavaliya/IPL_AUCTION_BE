@@ -8,7 +8,7 @@ public class UserResponseViewModel
 {
     public UserResponseViewModel()
     {
-        
+
     }
     public UserResponseViewModel(Models.User user)
     {
@@ -31,4 +31,6 @@ public class UserResponseViewModel
     public string? Image { get; set; }
     public UserGender Gender { get; set; }
     public string MobileNumber { get; set; } = null!;
+
+    public string FullName => $"{FirstName} {LastName}";
 }

@@ -10,6 +10,8 @@ public interface IUserService
 
     Task<UserResponseViewModel> GetByIdAsync(int id);
 
+    Task<List<UserNameResponseViewModel>> GetAllUserFullNameList();
+
     Task UpdateUserAsync(UpdateUserRequestModel model);
 
     Task DeleteUserAsync(int id);

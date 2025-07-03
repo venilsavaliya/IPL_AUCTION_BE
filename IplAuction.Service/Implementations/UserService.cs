@@ -37,6 +37,12 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
 
         return user;
     }
+    public async Task<List<UserNameResponseViewModel>> GetAllUserFullNameList()
+    {
+        List<UserNameResponseViewModel> users = await _userRepository.GetAllWithFilterAsync(u => u.IsDeleted == false, u => new UserNameResponseViewModel(u)) ?? throw new NotFoundException(nameof(User));
+
+        return users;
+    }
 
     public async Task UpdateUserAsync(UpdateUserRequestModel model)
     {

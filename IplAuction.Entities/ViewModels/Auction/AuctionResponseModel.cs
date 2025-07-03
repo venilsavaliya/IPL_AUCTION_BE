@@ -16,6 +16,7 @@ public class AuctionResponseModel
         MinimumBidIncreament = a.MinimumBidIncreament;
         ParticipantsUserIds = a.AuctionParticipants.Select(ap => ap.UserId).ToList();
         MaximumTeamsCanJoin = a.MaximumTeamsCanJoin;
+        AuctionMode = a.ModeOfAuction;
     }
 
     public int Id { get; set; }
@@ -35,4 +36,6 @@ public class AuctionResponseModel
     public List<int> ParticipantsUserIds { get; set; } = [];
 
     public AuctionStatus AuctionStatus { get; set; } = AuctionStatus.Scheduled;
+
+    public bool AuctionMode { get; set; }
 }

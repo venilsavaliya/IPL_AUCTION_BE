@@ -14,7 +14,7 @@ public class AddAuctionRequestModel
 
     public int MaximumTeamsCanJoin { get; set; }
 
-    public bool ModeOfAuction { get; set; } 
+    public bool AuctionMode { get; set; } 
 
     public List<int> ParticipantUserIds { get; set; } = []; 
 
