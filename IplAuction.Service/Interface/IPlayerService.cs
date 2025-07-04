@@ -7,11 +7,13 @@ namespace IplAuction.Service.Interface;
 
 public interface IPlayerService
 {
-    Task<PlayerResponseDetailModel> GetPlayerByIdAsync(int id);
+    Task<PlayerResponseDetailModel> GetPlayerDetailByIdAsync(int id);
+    Task<PlayerResponseModel> GetPlayerByIdAsync(int id);
     Task AddPlayerAsync(AddPlayerRequest player);
     Task UpdatePlayerAsync(UpdatePlayerRequest player);
     Task UpdatePlayerStatusAsync(UpdatePlayerStatusRequest request);
     Task DeletePlayerAsync(int id);
     Task<PaginatedResult<PlayerResponseModel>> GetPlayersAsync(PlayerFilterParams filterParams);
     Task ImportPlayersFromCsvAsync(IFormFile file);
+    Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId);
 }

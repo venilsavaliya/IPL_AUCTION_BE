@@ -1,5 +1,7 @@
+using IplAuction.Entities.Migrations;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
@@ -9,7 +11,7 @@ public class AuctionPlayerService(IGenericRepository<AuctionPlayer> auctionPlaye
 {
     private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
 
-    public async Task AddAuctionPlayer(ManageAuctionPlayerRequest request)
+    public async Task AddAuctionPlayer(AddAuctionPlayerRequest request)
     {
         var entity = new AuctionPlayer
         {
@@ -19,5 +21,11 @@ public class AuctionPlayerService(IGenericRepository<AuctionPlayer> auctionPlaye
 
         await _auctionPlayerRepo.AddAsync(entity);
         await _auctionPlayerRepo.SaveChangesAsync();
+    }
+
+    public async Task<List<int>> GetAllAuctionedPlayerIds(int auctionId)
+    {
+        var auctionPlayers = await _auctionPlayerRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionId);
+        return auctionPlayers.Select(ap => ap.PlayerId).ToList();
     }
 }

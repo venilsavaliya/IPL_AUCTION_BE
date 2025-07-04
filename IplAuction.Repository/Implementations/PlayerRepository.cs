@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
+using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Player;
@@ -85,5 +86,17 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
     {
         await _context.Players.AddRangeAsync(players);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId)
+    {
+        var auctionplayers = await _context.AuctionPlayers
+            .Where(ap => ap.AuctionId == auctionId).Select(ap => ap.PlayerId).ToListAsync();
+
+        PlayerResponseModel player = await _context.Players.Where(p => !auctionplayers.Contains(p.Id) && p.IsActive == true && p.IsDeleted == false)
+                        .OrderBy(p => Guid.NewGuid())
+                        .Select(p => new PlayerResponseModel(p)).FirstOrDefaultAsync() ?? throw new NotFoundException(nameof(player));
+
+        return player;
     }
 }

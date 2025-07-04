@@ -9,4 +9,7 @@ public interface IPlayerRepository : IGenericRepository<Player>
     Task<PaginatedResult<PlayerResponseModel>> GetFilteredPlayersAsync(PlayerFilterParams filterParams);
 
     Task AddPlayersAsync(List<Player> players);
+
+    Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId);
+   
 }

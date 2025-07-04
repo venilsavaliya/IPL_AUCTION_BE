@@ -1,4 +1,5 @@
 using IplAuction.Entities;
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Bid;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,15 @@ public class BidController(IBidService bidService, IBidQueueService bidQueueServ
     private readonly IBidQueueService _bidQueueService = bidQueueService;
 
     [HttpPost("place")]
-    public IActionResult PlaceBid([FromBody] PlaceBidRequestModel request)
+    public async Task<IActionResult> PlaceBid([FromBody] PlaceBidRequestModel request)
     {
-        _bidQueueService.Enqueue(request);
+        // _bidQueueService.Enqueue(request);
 
-        return StatusCode(200, Messages.BidWillProcess);
+        // return StatusCode(200, Messages.BidWillProcess);
+        await _bidService.PlaceOfflineBid(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
     }
 }

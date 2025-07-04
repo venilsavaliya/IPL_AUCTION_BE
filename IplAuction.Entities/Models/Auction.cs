@@ -26,7 +26,7 @@ public class Auction
 
     public bool ModeOfAuction { get; set; } = false;
 
-    public int? CurrentPlayerId { get; set; }
+    public int CurrentPlayerId { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 

@@ -8,6 +8,7 @@ namespace IplAuction.Service.Interface;
 
 public interface IAuctionService
 {
+    
     Task<List<AuctionResponseModel>> GetAllAuctionAsync();
 
     Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams);
@@ -24,7 +25,7 @@ public interface IAuctionService
 
     Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId);
 
-    // Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId);
+    Task<PlayerResponseModel> GetCurrentAuctionPlayer(int auctionId);
 
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 

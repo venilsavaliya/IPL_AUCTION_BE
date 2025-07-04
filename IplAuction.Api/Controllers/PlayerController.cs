@@ -25,7 +25,7 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlayer(int id)
     {
-        var player = await _playerService.GetPlayerByIdAsync(id);
+        var player = await _playerService.GetPlayerDetailByIdAsync(id);
 
         var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().SetData(player).Build();
 

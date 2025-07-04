@@ -68,7 +68,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         await _playerRepository.SaveChangesAsync();
     }
 
-    public async Task<PlayerResponseDetailModel> GetPlayerByIdAsync(int id)
+    public async Task<PlayerResponseDetailModel> GetPlayerDetailByIdAsync(int id)
     {
         PlayerResponseDetailModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseDetailModel
         {
@@ -82,6 +82,12 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
             TeamId = p.TeamId,
             Skill = p.Skill
         }) ?? throw new NotFoundException(nameof(Player));
+
+        return player;
+    }
+    public async Task<PlayerResponseModel> GetPlayerByIdAsync(int id)
+    {
+        PlayerResponseModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseModel(p)) ?? throw new NotFoundException(nameof(Player));
 
         return player;
     }
@@ -121,4 +127,19 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
         await _playerRepository.SaveChangesAsync();
     }
+
+    public async Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId)
+    {
+        PlayerResponseModel player = await _playerRepository.GetRadomUnAuctionedPlayer(auctionId);
+
+        return player;
+    }
+
+    public async Task<PlayerResponseModel> GetCurrentAuctionPlayer(int auctionId)
+    {
+        PlayerResponseModel player = await _playerRepository.GetRadomUnAuctionedPlayer(auctionId);
+
+        return player;
+    }
+    
 }

@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +12,11 @@ namespace IplAuction.Api.Controllers;
 // [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class AuctionController(IAuctionService auctionService) : ControllerBase
+public class AuctionController(IAuctionService auctionService, IPlayerService playerService) : ControllerBase
 {
     private readonly IAuctionService _auctionService = auctionService;
+
+    private readonly IPlayerService _playerService = playerService;
 
     [HttpGet("{id}")]
     [AllowAnonymous]
@@ -31,7 +34,7 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
     {
         List<UserResponseViewModel> teams = await _auctionService.GetAllTeamsOfAuction(id);
 
-        var response = ApiResponseBuilder.With< List<UserResponseViewModel>>().SetData(teams).Build();
+        var response = ApiResponseBuilder.With<List<UserResponseViewModel>>().SetData(teams).Build();
 
         return Ok(response);
     }
@@ -92,15 +95,26 @@ public class AuctionController(IAuctionService auctionService) : ControllerBase
         return Ok(response);
     }
 
-    // [HttpGet("/{auctionId}/next-player")]
-    // public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
-    // {
-    //     PlayerResponseDetailModel player = await _auctionService.GetRandomUnAuctionedPlayer(auctionId);
+    [HttpGet("next-player/{auctionId}")]
+    public async Task<IActionResult> GetUnAuctionedPlayer(int auctionId)
+    {
+        PlayerResponseModel player = await _playerService.GetRadomUnAuctionedPlayer(auctionId);
 
-    //     var response = ApiResponseBuilder.With<PlayerResponseDetailModel>().StatusCode(200).SetData(player).Build();
+        var response = ApiResponseBuilder.With<PlayerResponseModel>().StatusCode(200).SetData(player).Build();
 
-    //     return Ok(response);
-    // }
+        return Ok(response);
+    }
+
+    [HttpGet("currentPlayer/{auctionId}")]
+    public async Task<IActionResult> GetCurrentAuctionPlayer(int auctionId)
+    {
+        PlayerResponseModel player = await _auctionService.GetCurrentAuctionPlayer(auctionId);
+
+        var response = ApiResponseBuilder.With<PlayerResponseModel>().StatusCode(200).SetData(player).Build();
+
+        return Ok(response);
+    }
+
 
     // [HttpPost("/AddPlayer")]
     // public async Task<IActionResult> AddPlayerToAuction([FromBody] ManageAuctionPlayerRequest request)

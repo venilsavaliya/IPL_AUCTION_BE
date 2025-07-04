@@ -3,12 +3,13 @@ using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 namespace IplAuction.Service.Implementations;
 
-public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService, IUnitOfWork unitOfWork) : IAuctionService
+public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService, IUnitOfWork unitOfWork, IAuctionPlayerService auctionPlayerService) : IAuctionService
 {
     private readonly IAuctionRepository _auctionRepository = auctionRepository;
 
@@ -21,6 +22,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     private readonly IUserService _userService = userService;
 
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
+    private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
@@ -104,7 +107,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         return auction;
     }
 
-   public async Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId)
+    public async Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId)
     {
         List<UserResponseViewModel> teams = await _auctionParticipantService.GetAuctionParticipantsByAuctionId(auctionId);
 
@@ -198,6 +201,17 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         return true;
     }
+
+    public async Task<PlayerResponseModel> GetCurrentAuctionPlayer(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(auction.CurrentPlayerId);
+
+        return player;
+    }
+
+  
 
     // public async Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId)
     // {

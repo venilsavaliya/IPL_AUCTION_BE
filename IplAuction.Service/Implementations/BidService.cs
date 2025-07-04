@@ -9,9 +9,10 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class BidService(IGenericRepository<Bid> bidRepository, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IGenericRepository<Auction> auctionRepo, ICurrentUserService currentUser, IGenericRepository<AuctionParticipants> auctionParticipantsRepo) : IBidService
+public class BidService(IBidRepository bidRepository, IGenericRepository<AuctionPlayer> auctionPlayerRepo, IGenericRepository<Auction> auctionRepo, ICurrentUserService currentUser, IGenericRepository<AuctionParticipants> auctionParticipantsRepo) : IBidService
 {
-    private readonly IGenericRepository<Bid> _bidRepository = bidRepository;
+    // private readonly IGenericRepository<Bid> _bidRepository = bidRepository;
+    private readonly IBidRepository _bidRepository = bidRepository;
     private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
     private readonly IGenericRepository<Auction> _auctionRepo = auctionRepo;
     private readonly IGenericRepository<AuctionParticipants> _auctionParticipantsRepo = auctionParticipantsRepo;
@@ -63,7 +64,7 @@ public class BidService(IGenericRepository<Bid> bidRepository, IGenericRepositor
             PlayerId = request.PlayerId,
             UserId = (int)UserId,
             Amount = request.BidAmount,
-            PlacedAt = request.PlacedAt
+            PlacedAt = DateTime.UtcNow
         };
 
         await _bidRepository.AddAsync(bid);
@@ -73,5 +74,48 @@ public class BidService(IGenericRepository<Bid> bidRepository, IGenericRepositor
         return responseBuilder
             .SetStatusCodeAndMessage(201, Messages.BidAdded)
             .Build();
+    }
+
+    public async Task PlaceOfflineBid(PlaceBidRequestModel request)
+    {   
+        Auction auction = await _auctionRepo.FindAsync(request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        AuctionPlayer auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.PlayerId == request.PlayerId) ?? throw new NotFoundException(nameof(AuctionPlayer));
+
+        if (auction.AuctionStatus != AuctionStatus.Live)
+        {
+            throw new BadRequestException(Messages.AuctionNotLive);
+        }
+
+        if (auctionPlayer.IsSold)
+        {
+            throw new BadRequestException(Messages.PlayerAlreadySold);
+        }
+
+        if (request.BidAmount < auction.CurrentBid + auction.MinimumBidIncreament)
+        {
+            throw new BadRequestException(Messages.BidMustHigher);
+        }
+
+        AuctionParticipants user = await _auctionParticipantsRepo.GetWithFilterAsync(u => u.UserId == request.UserId) ?? throw new NotFoundException(nameof(AuctionParticipants));
+
+        if (request.BidAmount <= user!.PurseBalance)
+        {
+            throw new BadRequestException(Messages.InsufficientBalance);
+        }
+
+
+        Bid bid = new()
+        {
+            AuctionId = request.AuctionId,
+            PlayerId = request.PlayerId,
+            UserId = request.UserId,
+            Amount = request.BidAmount,
+            PlacedAt = DateTime.UtcNow
+        };
+
+        await _bidRepository.AddAsync(bid);
+
+        await _bidRepository.SaveChangesAsync();
     }
 }
