@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
 
@@ -8,7 +9,7 @@ namespace IplAuction.Service.Interface;
 
 public interface IAuctionService
 {
-    
+
     Task<List<AuctionResponseModel>> GetAllAuctionAsync();
 
     Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams);
@@ -26,6 +27,8 @@ public interface IAuctionService
     Task<List<UserResponseViewModel>> GetAllTeamsOfAuction(int auctionId);
 
     Task<PlayerResponseModel> GetCurrentAuctionPlayer(int auctionId);
+
+    Task SetCurrentPlayerForAuction(AuctionPlayerRequest request);
 
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 

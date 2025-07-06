@@ -1,6 +1,4 @@
-using IplAuction.Entities.Migrations;
 using IplAuction.Entities.Models;
-using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;

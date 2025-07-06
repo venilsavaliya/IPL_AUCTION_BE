@@ -3,6 +3,7 @@ using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
@@ -209,6 +210,17 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(auction.CurrentPlayerId);
 
         return player;
+    }
+
+    public async Task SetCurrentPlayerForAuction(AuctionPlayerRequest request)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        auction.CurrentPlayerId = request.PlayerId;
+
+        _auctionRepository.Update(auction);
+
+        await _auctionRepository.SaveChangesAsync();
     }
 
   

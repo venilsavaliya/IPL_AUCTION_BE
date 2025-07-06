@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
@@ -111,6 +112,16 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         PlayerResponseModel player = await _auctionService.GetCurrentAuctionPlayer(auctionId);
 
         var response = ApiResponseBuilder.With<PlayerResponseModel>().StatusCode(200).SetData(player).Build();
+
+        return Ok(response);
+    }
+
+    [HttpPost("setcurrentplayer")]
+    public async Task<IActionResult> SetCurrentAuctionPlayer(AuctionPlayerRequest request)
+    {
+        await _auctionService.SetCurrentPlayerForAuction(request);
+
+        var response = ApiResponseBuilder.Create(200);
 
         return Ok(response);
     }

@@ -1,10 +1,13 @@
 namespace IplAuction.Entities.ViewModels.AuctionPlayer;
 
-public class AddAuctionPlayerRequest
+public class AuctionPlayerRequest
 {
-     public int AuctionId { get; set; }
+    public int AuctionId { get; set; }
 
     public int PlayerId { get; set; }
+}
+public class AddAuctionPlayerRequest : AuctionPlayerRequest
+{
 
     public bool IsSold { get; set; } = false;
 
