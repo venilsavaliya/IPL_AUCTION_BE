@@ -30,7 +30,7 @@ builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("
 
 builder.Services.AddHttpContextAccessor();
 
-// builder.Services.AddHostedService<AuctionStatusUpdater>();
+builder.Services.AddHostedService<AuctionStatusUpdater>();
 
 // builder.Services.AddHostedService<AuctionDbListenerService>();
 

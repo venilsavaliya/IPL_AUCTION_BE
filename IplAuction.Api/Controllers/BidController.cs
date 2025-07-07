@@ -25,4 +25,14 @@ public class BidController(IBidService bidService, IBidQueueService bidQueueServ
 
         return Ok(response);
     }
+
+    [HttpPost("latest")]
+    public async Task<IActionResult> GetLatestBid([FromBody] LatestBidRequestModel request)
+    {
+        var bid = await _bidService.GetLatestBidByAuctionId(request);
+
+        var response = ApiResponseBuilder.With<BidResponseModel>().SetData(bid).Build();
+
+        return Ok(response);
+    }
 }

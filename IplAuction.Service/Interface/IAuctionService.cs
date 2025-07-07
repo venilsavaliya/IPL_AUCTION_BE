@@ -30,6 +30,8 @@ public interface IAuctionService
 
     Task SetCurrentPlayerForAuction(AuctionPlayerRequest request);
 
+    Task RemoveCurrentPlayerFromAuction(int auctionId);
+
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 
     // Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);

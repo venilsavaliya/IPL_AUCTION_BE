@@ -77,7 +77,7 @@ public class BidService(IBidRepository bidRepository, IGenericRepository<Auction
     }
 
     public async Task PlaceOfflineBid(PlaceBidRequestModel request)
-    {   
+    {
         Auction auction = await _auctionRepo.FindAsync(request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
 
         AuctionPlayer auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.PlayerId == request.PlayerId) ?? throw new NotFoundException(nameof(AuctionPlayer));
@@ -92,14 +92,14 @@ public class BidService(IBidRepository bidRepository, IGenericRepository<Auction
             throw new BadRequestException(Messages.PlayerAlreadySold);
         }
 
-        if (request.BidAmount < auction.CurrentBid + auction.MinimumBidIncreament)
-        {
-            throw new BadRequestException(Messages.BidMustHigher);
-        }
+        // if (request.BidAmount < auction.CurrentBid + auction.MinimumBidIncreament)
+        // {
+        //     throw new BadRequestException(Messages.BidMustHigher);
+        // }
 
         AuctionParticipants user = await _auctionParticipantsRepo.GetWithFilterAsync(u => u.UserId == request.UserId) ?? throw new NotFoundException(nameof(AuctionParticipants));
 
-        if (request.BidAmount <= user!.PurseBalance)
+        if (request.BidAmount > user!.PurseBalance)
         {
             throw new BadRequestException(Messages.InsufficientBalance);
         }
@@ -117,5 +117,14 @@ public class BidService(IBidRepository bidRepository, IGenericRepository<Auction
         await _bidRepository.AddAsync(bid);
 
         await _bidRepository.SaveChangesAsync();
+    }
+
+    public async Task<BidResponseModel> GetLatestBidByAuctionId(LatestBidRequestModel request)
+    {
+        Bid bid = await _bidRepository.GetLatestBidByAuctionId(request);
+
+        BidResponseModel latestBid = new(bid);
+
+        return latestBid;
     }
 }

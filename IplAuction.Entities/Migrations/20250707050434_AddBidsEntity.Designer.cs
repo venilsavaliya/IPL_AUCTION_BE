@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250707050434_AddBidsEntity")]
+    partial class AddBidsEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,7 +338,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 7, 11, 24, 15, 905, DateTimeKind.Utc).AddTicks(9190),
+                            CreatedAt = new DateTime(2025, 7, 7, 5, 4, 33, 940, DateTimeKind.Utc).AddTicks(1972),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -343,7 +346,7 @@ namespace IplAuction.Entities.Migrations
                             IsDeleted = false,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$Qnm/x2OFeWRRRYbNVtJdneoazEsEOrDJ6zNPL2AsTOC2R7LZVNSgi",
+                            PasswordHash = "$2a$11$Ebx00gvpCeu5PKIJQ1J6s.a4svHnoLy3BkFUCLB3wEdDzAWLPMaZu",
                             Role = "Admin"
                         });
                 });
@@ -376,7 +379,7 @@ namespace IplAuction.Entities.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTeams");
+                    b.ToTable("UserTeam");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Auction", b =>

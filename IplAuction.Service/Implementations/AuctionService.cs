@@ -223,6 +223,17 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         await _auctionRepository.SaveChangesAsync();
     }
 
+    public async Task RemoveCurrentPlayerFromAuction(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        auction.CurrentPlayerId = 0;
+
+        _auctionRepository.Update(auction);
+
+        await _auctionRepository.SaveChangesAsync();
+    }
+
   
 
     // public async Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId)

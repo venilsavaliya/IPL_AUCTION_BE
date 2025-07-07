@@ -37,8 +37,12 @@ public static class ServiceCollectionExtension
         services.AddScoped<IBidRepository, BidRepository>();
         services.AddScoped<IAuctionPlayerService, AuctionPlayerService>();
         services.AddScoped<IAuctionPlayerRepository, AuctionPlayerRepository>();
-        services.AddScoped<IUnitOfWork,UnitOfWork >();
+        services.AddScoped<IUserTeamService, UserTeamService>();
+        services.AddScoped<IUserTeamRepository, UserTeamRepository>();
+        services.AddScoped<IAuctionParticipantRepository, AuctionParticipantRepository>();
+        services.AddScoped<IAuctionParticipantService, AuctionParticipantService>();
 
+        services.AddScoped<IUnitOfWork,UnitOfWork >();
 
         return services;
     }

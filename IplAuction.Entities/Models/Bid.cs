@@ -20,3 +20,4 @@ public class Bid
 
     public Player Player { get; set; } = null!;
 }
+
