@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Auth;
 using IplAuction.Entities.ViewModels;
+using IplAuction.Entities.ViewModels.Auth;
 using IplAuction.Entities.ViewModels.User;
 
 namespace IplAuction.Service.Interface;
@@ -13,7 +14,7 @@ public interface IAuthService
 
     Task Logout();
 
-    Task RefreshTokenAsync();
+    Task<RefreshTokenResponse> RefreshTokenAsync();
 
     Task<UserInfoViewModel> GetCurrentUser();
 

@@ -26,6 +26,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
+   
+
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
         // Get UserId From The Jwt Claims
@@ -81,6 +83,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     {
         int userId = _currentUser.UserId;
 
+        
+
         UserResponseViewModel user = await _userService.GetByIdAsync(userId) ?? throw new NotFoundException(nameof(User));
 
         // Here Admin Can Fetch All the Auction And Manager Can Fetch The Auction Which Created By Him
@@ -98,6 +102,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)
     {
+        
         return await _auctionRepository.GetFilteredAuctionsAsync(filterParams);
     }
 
@@ -234,7 +239,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         await _auctionRepository.SaveChangesAsync();
     }
 
-  
+
 
     // public async Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId)
     // {

@@ -1,6 +1,4 @@
 using IplAuction.Entities.Enums;
-using IplAuction.Entities.Models;
-
 
 namespace IplAuction.Entities.ViewModels.User;
 
@@ -21,6 +19,7 @@ public class UserResponseViewModel
         Image = user.Image;
         Gender = user.Gender;
         MobileNumber = user.MobileNumber;
+        IsNotificationOn = user.IsNotificationOn;
     }
     public int Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
@@ -31,6 +30,8 @@ public class UserResponseViewModel
     public string? Image { get; set; }
     public UserGender Gender { get; set; }
     public string MobileNumber { get; set; } = null!;
+
+    public bool IsNotificationOn { get; set; }  
 
     public string FullName => $"{FirstName} {LastName}";
 }

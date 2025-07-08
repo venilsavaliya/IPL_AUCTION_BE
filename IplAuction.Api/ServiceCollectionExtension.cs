@@ -1,8 +1,10 @@
+using IplAuction.Api.SignalR;
 using IplAuction.Repository.Implementations;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Implementations;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
 
 namespace IplAuction.Api;
 
@@ -41,7 +43,9 @@ public static class ServiceCollectionExtension
         services.AddScoped<IUserTeamRepository, UserTeamRepository>();
         services.AddScoped<IAuctionParticipantRepository, AuctionParticipantRepository>();
         services.AddScoped<IAuctionParticipantService, AuctionParticipantService>();
-
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddScoped<IUnitOfWork,UnitOfWork >();
 
         return services;

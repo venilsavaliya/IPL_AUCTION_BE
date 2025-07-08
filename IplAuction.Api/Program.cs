@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using IplAuction.Api;
 using IplAuction.Service.HostedService;
 using System.Text.Json.Serialization;
+using IplAuction.Entities.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,8 @@ builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHostedService<AuctionStatusUpdater>();
+
+builder.Services.AddSignalR();
 
 // builder.Services.AddHostedService<AuctionDbListenerService>();
 
@@ -85,6 +88,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.UseStaticFiles();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 

@@ -27,6 +27,8 @@ public class IplAuctionDbContext : DbContext
     public DbSet<Bid> Bids { get; set; }
     public DbSet<UserTeam> UserTeams { get; set; }
 
+    public DbSet<Notification> Notifications { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(new User()
@@ -116,6 +118,11 @@ public class IplAuctionDbContext : DbContext
         modelBuilder.Entity<Player>()
             .Property(p => p.Skill)
             .HasConversion<string>();
+
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(n => n.Notifications)
+            .HasForeignKey(n => n.UserId);
 
         base.OnModelCreating(modelBuilder);
     }

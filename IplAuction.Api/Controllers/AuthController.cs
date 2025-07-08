@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Auth;
 using IplAuction.Entities.ViewModels;
+using IplAuction.Entities.ViewModels.Auth;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -73,9 +74,9 @@ public class AuthController(IAuthService authService, IUserService userService) 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken()
     {
-        await _authService.RefreshTokenAsync();
+        var authTokens = await _authService.RefreshTokenAsync();
 
-        var response = ApiResponseBuilder.Create(200);
+        var response = ApiResponseBuilder.With<RefreshTokenResponse>().SetData(authTokens).Build();
 
         return Ok(response);
     }

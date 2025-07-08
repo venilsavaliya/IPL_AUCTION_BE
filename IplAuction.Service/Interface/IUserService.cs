@@ -1,5 +1,6 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Entities.ViewModels.User;
 
 namespace IplAuction.Service.Interface;
@@ -25,4 +26,6 @@ public interface IUserService
     Task UpdatePasswordAsync(string email, string newPassword);
 
     Task<User> CreateUserAsync(UserRequestModel request);
+
+    Task ChangeNotificationStatus(UpdateNotificationStatus request);
 }

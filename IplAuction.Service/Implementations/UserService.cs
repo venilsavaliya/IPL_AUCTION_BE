@@ -4,6 +4,7 @@ using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
@@ -136,4 +137,15 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
 
         return user;
     }
+
+    public async Task ChangeNotificationStatus(UpdateNotificationStatus request)
+    {
+        User user = await _userRepository.GetWithFilterAsync(u => u.IsDeleted != true && u.Id == request.UserId) ?? throw new NotFoundException(nameof(User));
+
+        user.IsNotificationOn = request.NewStatus;
+
+        await _userRepository.SaveChangesAsync();
+    }
+
+    
 }

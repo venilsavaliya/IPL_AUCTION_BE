@@ -15,6 +15,7 @@ public class User
     public UserGender Gender { get; set; }
     public string MobileNumber { get; set; } = null!;
     public bool IsDeleted { get; set; } = false;
+    public bool IsNotificationOn { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = null;
 
@@ -25,6 +26,8 @@ public class User
     public ICollection<AuctionParticipants> AuctionParticipants { get; set; } = [];
 
     public ICollection<Bid> Bids { get; set; } = [];
+
+    public ICollection<Notification> Notifications { get; set; } = [];
 
     public ICollection<UserTeam> UserTeams { get; set; } = [];
 

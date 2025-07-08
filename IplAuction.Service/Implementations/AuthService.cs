@@ -7,6 +7,7 @@ using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels;
+using IplAuction.Entities.ViewModels.Auth;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
@@ -73,7 +74,7 @@ public class AuthService(IJwtService jwtService,
         await _userService.CreateUserAsync(request);
     }
 
-    public async Task RefreshTokenAsync()
+    public async Task<RefreshTokenResponse> RefreshTokenAsync()
     {
 
         var cookieRefreshToken = (_httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"]) ?? throw new UnauthorizedAccessException(Messages.UnAuthorize);
@@ -103,6 +104,12 @@ public class AuthService(IJwtService jwtService,
         });
 
         await _userService.AddRefreshTokenAsync(user, newRefreshToken);
+
+        return new RefreshTokenResponse
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken.Token
+        };
     }
 
     public async Task Logout()
@@ -152,8 +159,9 @@ public class AuthService(IJwtService jwtService,
             user = _jwtService.DecodeToken(accessToken);
         }
 
-        var user1 = await _userService.GetByIdAsync(int.Parse(user.Id??"0"));
-        user.ImageUrl = user1?.Image;
+        var user1 = await _userService.GetByIdAsync(int.Parse(user.Id??"0")) ?? throw new NotFoundException(nameof(User));
+        user.ImageUrl = user1.Image;
+        user.IsNotificationOn = user1.IsNotificationOn;
         return user;
     }
 }

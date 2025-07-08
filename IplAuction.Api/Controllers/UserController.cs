@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +49,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("usernamelist")]
-     public async Task<IActionResult> GetUserNamesList()
+    public async Task<IActionResult> GetUserNamesList()
     {
         List<UserNameResponseViewModel> users = await _userService.GetAllUserFullNameList();
 
@@ -77,4 +78,16 @@ public class UserController(IUserService userService) : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("ChangeNotificationStatus")]
+    public async Task<IActionResult> ChangeNotificationStatus(UpdateNotificationStatus request)
+    {
+        await _userService.ChangeNotificationStatus(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
+    
 }

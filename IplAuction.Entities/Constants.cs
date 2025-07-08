@@ -60,6 +60,10 @@ public static class Messages
     public const string BidWillProcess = "Bid Will be Processed";
     public const string InsufficientBalance = "You Don't Have Sufficient Balance";
     public const string RegistrationOver = "Registration Time Is Over";
+
+    public const string Congratulations = "Congratulations!";
+    
+    public const string PlayerSoldToUser = "{0} has been sold to you";
 }
 
 public static class JwtClaims
