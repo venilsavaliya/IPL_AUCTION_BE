@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
@@ -31,6 +32,8 @@ public interface IAuctionService
     Task SetCurrentPlayerForAuction(AuctionPlayerRequest request);
 
     Task RemoveCurrentPlayerFromAuction(int auctionId);
+
+    Task<List<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(int userId);
 
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 

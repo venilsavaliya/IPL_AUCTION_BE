@@ -1,6 +1,7 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
@@ -122,6 +123,16 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         await _auctionService.SetCurrentPlayerForAuction(request);
 
         var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
+    [HttpGet("participated/all/{userId}")]
+    public async Task<IActionResult> GetAllJoinedAuctionsOfUser(int userId)
+    {
+        List<UserAuctionResponseModel> userAuctions = await _auctionService.GetAllJoinedAuctionsOfUser(userId);
+
+        var response = ApiResponseBuilder.With<List<UserAuctionResponseModel>>().SetData(userAuctions).Build();
 
         return Ok(response);
     }

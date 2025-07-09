@@ -3,6 +3,7 @@ using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
@@ -26,7 +27,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
-   
+
 
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
@@ -83,7 +84,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     {
         int userId = _currentUser.UserId;
 
-        
+
 
         UserResponseViewModel user = await _userService.GetByIdAsync(userId) ?? throw new NotFoundException(nameof(User));
 
@@ -102,7 +103,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)
     {
-        
+
         return await _auctionRepository.GetFilteredAuctionsAsync(filterParams);
     }
 
@@ -237,6 +238,13 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         _auctionRepository.Update(auction);
 
         await _auctionRepository.SaveChangesAsync();
+    }
+
+    public async Task<List<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(int userId)
+    {
+        var userAuctions = await _auctionRepository.GetUsersAuctions(userId);
+
+        return userAuctions;
     }
 
 

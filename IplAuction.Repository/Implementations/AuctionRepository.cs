@@ -4,6 +4,7 @@ using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -66,5 +67,20 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         Auction auction = await _context.Auctions.Include(a => a.AuctionParticipants).FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted != true) ?? throw new NotFoundException(nameof(Auction));
 
         return new AuctionResponseModel(auction);
+    }
+
+    public async Task<List<UserAuctionResponseModel>> GetUsersAuctions(int userId)
+    {
+        List<UserAuctionResponseModel> userAuctions = await _context.Auctions.Include(u => u.UserTeams).Select(u => new UserAuctionResponseModel
+        {
+            AuctionId = u.Id,
+            AuctionTitle = u.Title,
+            AuctionStatus = u.AuctionStatus,
+            StartTime = u.StartDate,
+            TotalAmountSpent = u.UserTeams.Where(ut => ut.UserId == userId).Sum(ut => ut.Price),
+            TotalPlayer = u.UserTeams.Where(ut => ut.UserId == userId).Count()
+        }).ToListAsync();
+
+        return userAuctions;
     }
 }
