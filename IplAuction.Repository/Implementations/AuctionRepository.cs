@@ -5,6 +5,7 @@ using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.AuctionParticipant;
+using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -69,18 +70,62 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         return new AuctionResponseModel(auction);
     }
 
-    public async Task<List<UserAuctionResponseModel>> GetUsersAuctions(int userId)
+    public async Task<PaginatedResult<UserAuctionResponseModel>> GetUsersAuctions(UserAuctionFilterParam filterParams)
     {
-        List<UserAuctionResponseModel> userAuctions = await _context.Auctions.Include(u => u.UserTeams).Select(u => new UserAuctionResponseModel
+        var query = _context.Auctions.Where(u => u.IsDeleted != true).Select(u => new UserAuctionResponseModel
         {
             AuctionId = u.Id,
+            UserId = filterParams.UserId,
             AuctionTitle = u.Title,
             AuctionStatus = u.AuctionStatus,
             StartTime = u.StartDate,
-            TotalAmountSpent = u.UserTeams.Where(ut => ut.UserId == userId).Sum(ut => ut.Price),
-            TotalPlayer = u.UserTeams.Where(ut => ut.UserId == userId).Count()
-        }).ToListAsync();
+            AmountRemaining =u.MaximumPurseSize - u.UserTeams.Where(ut => ut.UserId == filterParams.UserId).Sum(ut => ut.Price),
+            TotalPlayer = u.UserTeams.Count(ut => ut.UserId == filterParams.UserId)
+        });
 
-        return userAuctions;
+        // Search
+        if (!string.IsNullOrWhiteSpace(filterParams.Search))
+        {
+            string search = filterParams.Search.ToLower();
+
+            query = query.Where(u =>
+                u.AuctionTitle.ToLower().Contains(search));
+        }
+
+        // Filtering Role
+        if (!string.IsNullOrEmpty(filterParams.Status))
+        {
+            if (Enum.TryParse<AuctionStatus>(filterParams.Status, true, out var statusEnum))
+            {
+                query = query.Where(u => u.AuctionStatus == statusEnum);
+            }
+        }
+
+        //Filtering Date
+        if (filterParams.FromDate.HasValue && filterParams.ToDate.HasValue)
+        {
+            var fromDateUtc = DateTime.SpecifyKind(filterParams.FromDate.Value, DateTimeKind.Utc);
+            var toDateUtc = DateTime.SpecifyKind(filterParams.ToDate.Value, DateTimeKind.Utc);
+
+            query = query.Where(u => u.StartTime >= fromDateUtc && u.StartTime <= toDateUtc);
+        }
+
+        // Sorting Computed Fields
+        var allowedCustomSort = new[] { "TotalPlayer", "AmountRemaining","AuctionTitle","StartTime"};
+
+         var sortBy = allowedCustomSort.Contains(filterParams.SortBy) ? filterParams.SortBy : "AuctionId";
+        var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
+        query = query.OrderBy($"{sortBy} {sortDirection}");
+
+        PaginationParams paginationParams = new()
+        {
+            PageNumber = filterParams.PageNumber,
+            PageSize = filterParams.PageSize
+        };
+
+        // Pagination
+        PaginatedResult<UserAuctionResponseModel> paginatedResult = await query.ToPaginatedListAsync(paginationParams, u => new UserAuctionResponseModel(u));
+
+        return paginatedResult;
     }
 }

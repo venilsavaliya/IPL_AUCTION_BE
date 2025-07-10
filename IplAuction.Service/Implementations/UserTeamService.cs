@@ -9,12 +9,13 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class UserTeamService(IUserTeamRepository userTeamRepository, IAuctionService auctionService, IAuctionParticipantService auctionParticipantService, INotificationService notificationService, IPlayerService playerService) : IUserTeamService
+public class UserTeamService(IUserTeamRepository userTeamRepository, IAuctionService auctionService, IAuctionParticipantService auctionParticipantService, INotificationService notificationService, IPlayerService playerService, ICurrentUserService currentUserService) : IUserTeamService
 {
     private readonly IUserTeamRepository _userTeamRepository = userTeamRepository;
     private readonly IAuctionService _auctionService = auctionService;
     private readonly IAuctionParticipantService _auctionParticipantService = auctionParticipantService;
 
+    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly INotificationService _notificationService = notificationService;
 
     private readonly IPlayerService _playerService = playerService;
@@ -49,7 +50,8 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, IAuctionSer
             Title = Messages.Congratulations,
             Message = string.Format(Messages.PlayerSoldToUser, player.Name)
         };
-       
+
+
         await _notificationService.AddNotification(notification);
 
         await _notificationService.SendNotificationToUserAsync(request.UserId.ToString(), notification);
@@ -61,7 +63,10 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, IAuctionSer
 
     public async Task<List<UserTeamResponseModel>> GetUserTeams(UserTeamRequestModel request)
     {
-         
+        int userId = _currentUserService.UserId;
+
+        request.UserId = userId;
+
         return await _userTeamRepository.GetUserTeams(request);
     }
 }

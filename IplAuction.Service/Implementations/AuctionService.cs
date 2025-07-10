@@ -240,9 +240,13 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         await _auctionRepository.SaveChangesAsync();
     }
 
-    public async Task<List<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(int userId)
+    public async Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams)
     {
-        var userAuctions = await _auctionRepository.GetUsersAuctions(userId);
+        int userId = _currentUser.UserId;
+
+        filterParams.UserId = userId;
+
+        var userAuctions = await _auctionRepository.GetUsersAuctions(filterParams);
 
         return userAuctions;
     }

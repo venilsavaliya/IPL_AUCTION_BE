@@ -127,12 +127,12 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         return Ok(response);
     }
 
-    [HttpGet("participated/all/{userId}")]
-    public async Task<IActionResult> GetAllJoinedAuctionsOfUser(int userId)
+    [HttpPost("participated/all")]
+    public async Task<IActionResult> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams)
     {
-        List<UserAuctionResponseModel> userAuctions = await _auctionService.GetAllJoinedAuctionsOfUser(userId);
+        PaginatedResult<UserAuctionResponseModel> userAuctions = await _auctionService.GetAllJoinedAuctionsOfUser(filterParams);
 
-        var response = ApiResponseBuilder.With<List<UserAuctionResponseModel>>().SetData(userAuctions).Build();
+        var response = ApiResponseBuilder.With<PaginatedResult<UserAuctionResponseModel>>().SetData(userAuctions).Build();
 
         return Ok(response);
     }

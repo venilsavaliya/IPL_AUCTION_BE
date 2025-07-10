@@ -33,7 +33,7 @@ public interface IAuctionService
 
     Task RemoveCurrentPlayerFromAuction(int auctionId);
 
-    Task<List<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(int userId);
+    Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams);
 
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 
