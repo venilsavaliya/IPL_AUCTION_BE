@@ -56,7 +56,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             var auctionParticipants = request.ParticipantUserIds.Select(uid => new AuctionParticipants
             {
                 AuctionId = auction.Id,
-                UserId = uid
+                UserId = uid,
+                PurseBalance = request.MaximumPurseSize,
             }).ToList();
 
             await _auctionParticipantService.AddParticipantsAsync(auctionParticipants);

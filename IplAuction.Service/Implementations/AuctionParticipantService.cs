@@ -12,7 +12,9 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
     private readonly IAuctionParticipantRepository _auctionParticipantRepo = auctionParticipantRepo;
 
     public async Task AddParticipantAsync(int auctionId, int userId)
-    {
+    {   
+        
+
         AuctionParticipants auctionParticipants = new()
         {
             UserId = userId,

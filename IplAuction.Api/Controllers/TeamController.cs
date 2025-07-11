@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IplAuction.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]")] 
 public class TeamController(ITeamService teamService) : ControllerBase
 {
     private readonly ITeamService _teamService = teamService;

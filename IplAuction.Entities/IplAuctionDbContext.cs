@@ -124,6 +124,16 @@ public class IplAuctionDbContext : DbContext
             .WithMany(n => n.Notifications)
             .HasForeignKey(n => n.UserId);
 
+        modelBuilder.Entity<Match>()
+            .HasOne(m => m.TeamA)
+            .WithMany()
+            .HasForeignKey(m => m.TeamAId);
+
+        modelBuilder.Entity<Match>()
+            .HasOne(m => m.TeamB)
+            .WithMany()
+            .HasForeignKey(m => m.TeamBId);
+
         base.OnModelCreating(modelBuilder);
     }
 }

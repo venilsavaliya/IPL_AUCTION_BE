@@ -45,6 +45,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAuctionParticipantService, AuctionParticipantService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IMatchService, MatchService>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddScoped<IUnitOfWork,UnitOfWork >();
 

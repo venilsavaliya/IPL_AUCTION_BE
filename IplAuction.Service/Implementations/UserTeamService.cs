@@ -63,10 +63,13 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, IAuctionSer
 
     public async Task<List<UserTeamResponseModel>> GetUserTeams(UserTeamRequestModel request)
     {
-        int userId = _currentUserService.UserId;
+        if (request.UserId == 0)
+        {
+            int userId = _currentUserService.UserId;
 
-        request.UserId = userId;
-
+            request.UserId = userId;
+        }
+    
         return await _userTeamRepository.GetUserTeams(request);
     }
 }
