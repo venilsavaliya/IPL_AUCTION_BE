@@ -22,6 +22,26 @@ public class MatchController(IMatchService matchService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetMatchById(int id)
+    {
+        MatchResponse match = await _matchService.GetMatchById(id);
+
+        var response = ApiResponseBuilder.With<MatchResponse>().SetData(match).Build();
+
+        return Ok(response);
+    }
+
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetFilteredMatches([FromBody] MatchFilterParams matchFilterParams)
+    {
+        PaginatedResult<MatchResponse> result = await _matchService.GetFilteredMatchAsync(matchFilterParams);
+
+        var response = ApiResponseBuilder.With<PaginatedResult<MatchResponse>>().SetData(result).Build();
+
+        return Ok(response);
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddMatch([FromBody] MatchRequest request)
     {
@@ -31,6 +51,17 @@ public class MatchController(IMatchService matchService) : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateMatch([FromBody] UpdateMatchRequest request)
+    {
+        await _matchService.UpdateMatch(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteMatch(int id)
     {

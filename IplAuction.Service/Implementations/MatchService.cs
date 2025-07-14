@@ -1,3 +1,4 @@
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Match;
@@ -6,7 +7,7 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class MatchService(IMatchRepository matchRepository) :IMatchService
+public class MatchService(IMatchRepository matchRepository) : IMatchService
 {
 
     private readonly IMatchRepository _matchRepository = matchRepository;
@@ -22,6 +23,17 @@ public class MatchService(IMatchRepository matchRepository) :IMatchService
         };
 
         await _matchRepository.AddAsync(match);
+        await _matchRepository.SaveChangesAsync();
+    }
+
+    public async Task UpdateMatch(UpdateMatchRequest request)
+    {
+        Match match = await _matchRepository.GetWithFilterAsync(m => m.Id == request.Id && m.IsDeleted != true) ?? throw new NotFoundException(nameof(Match));
+
+        match.TeamAId = request.TeamAId;
+        match.TeamBId = request.TeamBId;
+        match.StartDate = request.StartDate;
+
         await _matchRepository.SaveChangesAsync();
     }
 
@@ -46,5 +58,17 @@ public class MatchService(IMatchRepository matchRepository) :IMatchService
             StartDate = m.StartDate
         });
         return response;
+    }
+
+    public async Task<PaginatedResult<MatchResponse>> GetFilteredMatchAsync(MatchFilterParams filterParams)
+    {
+        PaginatedResult<MatchResponse> result = await _matchRepository.GetFilteredMatchAsync(filterParams);
+
+        return result;
+    }
+
+    public async Task<MatchResponse> GetMatchById(int id)
+    {
+        return await _matchRepository.GetById(id);
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    [Migration("20250626064715_AddedInitialEntities")]
-    partial class AddedInitialEntities
+    [Migration("20250714132203_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,7 +43,7 @@ namespace IplAuction.Entities.Migrations
                     b.Property<int>("CurrentBid")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("CurrentPlayerId")
+                    b.Property<int>("CurrentPlayerId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -55,8 +55,14 @@ namespace IplAuction.Entities.Migrations
                     b.Property<int>("MaximumPurseSize")
                         .HasColumnType("integer");
 
+                    b.Property<int>("MaximumTeamsCanJoin")
+                        .HasColumnType("integer");
+
                     b.Property<int>("MinimumBidIncreament")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("ModeOfAuction")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -135,7 +141,74 @@ namespace IplAuction.Entities.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("AuctionPlayer");
+                    b.ToTable("AuctionPlayers");
+                });
+
+            modelBuilder.Entity("IplAuction.Entities.Models.BallEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BallNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BatsmanId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BowlerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DismissedPlayerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ExtraRuns")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ExtraType")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("FielderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InningNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NonStrikerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OverNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RunsScored")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WicketType")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatsmanId");
+
+                    b.HasIndex("BowlerId");
+
+                    b.HasIndex("DismissedPlayerId");
+
+                    b.HasIndex("FielderId");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("NonStrikerId");
+
+                    b.ToTable("BallEvents");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Bid", b =>
@@ -169,7 +242,71 @@ namespace IplAuction.Entities.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bid");
+                    b.ToTable("Bids");
+                });
+
+            modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TeamAId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TeamBId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamAId");
+
+                    b.HasIndex("TeamBId");
+
+                    b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("IplAuction.Entities.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Player", b =>
@@ -251,6 +388,124 @@ namespace IplAuction.Entities.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("IplAuction.Entities.Models.ScoringRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScoringRules");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EventType = "Run",
+                            Points = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            EventType = "Four",
+                            Points = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            EventType = "Six",
+                            Points = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            EventType = "HalfCentury",
+                            Points = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            EventType = "Century",
+                            Points = 8
+                        },
+                        new
+                        {
+                            Id = 6,
+                            EventType = "Duck",
+                            Points = -2
+                        },
+                        new
+                        {
+                            Id = 7,
+                            EventType = "Catch",
+                            Points = 8
+                        },
+                        new
+                        {
+                            Id = 8,
+                            EventType = "ThreeCatchHaul",
+                            Points = 4
+                        },
+                        new
+                        {
+                            Id = 9,
+                            EventType = "Stumping",
+                            Points = 12
+                        },
+                        new
+                        {
+                            Id = 10,
+                            EventType = "DirectRunOut",
+                            Points = 12
+                        },
+                        new
+                        {
+                            Id = 11,
+                            EventType = "AssistedRunOut",
+                            Points = 6
+                        },
+                        new
+                        {
+                            Id = 12,
+                            EventType = "Wicket",
+                            Points = 25
+                        },
+                        new
+                        {
+                            Id = 13,
+                            EventType = "ThreeWicketHaul",
+                            Points = 4
+                        },
+                        new
+                        {
+                            Id = 14,
+                            EventType = "FourWicketHaul",
+                            Points = 8
+                        },
+                        new
+                        {
+                            Id = 15,
+                            EventType = "FiveWicketHaul",
+                            Points = 16
+                        },
+                        new
+                        {
+                            Id = 16,
+                            EventType = "MaidenOver",
+                            Points = 12
+                        });
+                });
+
             modelBuilder.Entity("IplAuction.Entities.Models.Team", b =>
                 {
                     b.Property<int>("Id")
@@ -306,8 +561,10 @@ namespace IplAuction.Entities.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsNotificationOn")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("MobileNumber")
@@ -333,15 +590,16 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 26, 6, 47, 14, 663, DateTimeKind.Utc).AddTicks(6084),
+                            CreatedAt = new DateTime(2025, 7, 14, 13, 22, 2, 704, DateTimeKind.Utc).AddTicks(5843),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
                             Gender = "Male",
                             IsDeleted = false,
+                            IsNotificationOn = true,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$9odMY29wNB73aeGoAqoatOvpnDvPjpI7SMXkgZNjJL.pi1AiJn8S2",
+                            PasswordHash = "$2a$11$AGVvGTQZ3AGWf1UmW1Q7Y.oKfOKRoMsYP/Verwm6EYXD1R9pfw3vy",
                             Role = "Admin"
                         });
                 });
@@ -374,7 +632,7 @@ namespace IplAuction.Entities.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTeam");
+                    b.ToTable("UserTeams");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Auction", b =>
@@ -432,6 +690,55 @@ namespace IplAuction.Entities.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IplAuction.Entities.Models.BallEvent", b =>
+                {
+                    b.HasOne("IplAuction.Entities.Models.Player", "Batsman")
+                        .WithMany()
+                        .HasForeignKey("BatsmanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IplAuction.Entities.Models.Player", "Bowler")
+                        .WithMany()
+                        .HasForeignKey("BowlerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IplAuction.Entities.Models.Player", "DismissedPlayer")
+                        .WithMany()
+                        .HasForeignKey("DismissedPlayerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IplAuction.Entities.Models.Player", "Fielder")
+                        .WithMany()
+                        .HasForeignKey("FielderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IplAuction.Entities.Models.Match", "Match")
+                        .WithMany("BallEvents")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IplAuction.Entities.Models.Player", "NonStriker")
+                        .WithMany()
+                        .HasForeignKey("NonStrikerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Batsman");
+
+                    b.Navigation("Bowler");
+
+                    b.Navigation("DismissedPlayer");
+
+                    b.Navigation("Fielder");
+
+                    b.Navigation("Match");
+
+                    b.Navigation("NonStriker");
+                });
+
             modelBuilder.Entity("IplAuction.Entities.Models.Bid", b =>
                 {
                     b.HasOne("IplAuction.Entities.Models.Auction", "Auction")
@@ -455,6 +762,36 @@ namespace IplAuction.Entities.Migrations
                     b.Navigation("Auction");
 
                     b.Navigation("Player");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
+                {
+                    b.HasOne("IplAuction.Entities.Models.Team", "TeamA")
+                        .WithMany()
+                        .HasForeignKey("TeamAId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IplAuction.Entities.Models.Team", "TeamB")
+                        .WithMany()
+                        .HasForeignKey("TeamBId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeamA");
+
+                    b.Navigation("TeamB");
+                });
+
+            modelBuilder.Entity("IplAuction.Entities.Models.Notification", b =>
+                {
+                    b.HasOne("IplAuction.Entities.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -519,6 +856,11 @@ namespace IplAuction.Entities.Migrations
                     b.Navigation("UserTeams");
                 });
 
+            modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
+                {
+                    b.Navigation("BallEvents");
+                });
+
             modelBuilder.Entity("IplAuction.Entities.Models.Player", b =>
                 {
                     b.Navigation("AuctionPlayers");
@@ -542,6 +884,8 @@ namespace IplAuction.Entities.Migrations
                     b.Navigation("Bids");
 
                     b.Navigation("ManagedAuction");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("RefreshTokens");
 

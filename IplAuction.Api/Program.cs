@@ -9,6 +9,9 @@ using IplAuction.Api;
 using IplAuction.Service.HostedService;
 using System.Text.Json.Serialization;
 using IplAuction.Entities.Hubs;
+using FluentValidation;
+using IplAuction.Api.Validators;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,9 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+builder.Services
+    .AddValidatorsFromAssemblyContaining<MatchRequestValidator>()  // Registers all validators
+    .AddFluentValidationAutoValidation();                            // Enables automatic validation
 
 builder.Services.AddEndpointsApiExplorer();
 

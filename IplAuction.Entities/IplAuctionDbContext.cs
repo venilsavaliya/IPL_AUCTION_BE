@@ -1,3 +1,4 @@
+using IplAuction.Entities.Enums;
 using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using Microsoft.EntityFrameworkCore;
@@ -25,9 +26,16 @@ public class IplAuctionDbContext : DbContext
     public DbSet<AuctionPlayer> AuctionPlayers { get; set; }
 
     public DbSet<Bid> Bids { get; set; }
+
     public DbSet<UserTeam> UserTeams { get; set; }
 
+    public DbSet<Match> Matches { get; set; }
+
+    public DbSet<ScoringRule> ScoringRules { get; set; }
+
     public DbSet<Notification> Notifications { get; set; }
+    
+    public DbSet<BallEvent> BallEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +50,25 @@ public class IplAuctionDbContext : DbContext
             MobileNumber = "1234567890",
             PasswordHash = Password.HashPassword("admin")
         });
+
+        modelBuilder.Entity<ScoringRule>().HasData(
+            new ScoringRule { Id = 1, EventType = CricketEventType.Run, Points = 1 },
+            new ScoringRule { Id = 2, EventType = CricketEventType.Four, Points = 1 },
+            new ScoringRule { Id = 3, EventType = CricketEventType.Six, Points = 2 },
+            new ScoringRule { Id = 4, EventType = CricketEventType.HalfCentury, Points = 4 },
+            new ScoringRule { Id = 5, EventType = CricketEventType.Century, Points = 8 },
+            new ScoringRule { Id = 6, EventType = CricketEventType.Duck, Points = -2 },
+            new ScoringRule { Id = 7, EventType = CricketEventType.Catch, Points = 8 },
+            new ScoringRule { Id = 8, EventType = CricketEventType.ThreeCatchHaul, Points = 4 },
+            new ScoringRule { Id = 9, EventType = CricketEventType.Stumping, Points = 12 },
+            new ScoringRule { Id = 10, EventType = CricketEventType.DirectRunOut, Points = 12 },
+            new ScoringRule { Id = 11, EventType = CricketEventType.AssistedRunOut, Points = 6 },
+            new ScoringRule { Id = 12, EventType = CricketEventType.Wicket, Points = 25 },
+            new ScoringRule { Id = 13, EventType = CricketEventType.ThreeWicketHaul, Points = 4 },
+            new ScoringRule { Id = 14, EventType = CricketEventType.FourWicketHaul, Points = 8 },
+            new ScoringRule { Id = 15, EventType = CricketEventType.FiveWicketHaul, Points = 16 },
+            new ScoringRule { Id = 16, EventType = CricketEventType.MaidenOver, Points = 12 }
+        );
 
         modelBuilder.Entity<User>()
             .Property(u => u.Role)
@@ -134,6 +161,53 @@ public class IplAuctionDbContext : DbContext
             .WithMany()
             .HasForeignKey(m => m.TeamBId);
 
+        modelBuilder.Entity<ScoringRule>()
+            .Property(sr => sr.EventType)
+            .HasConversion<string>();
+        
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.Match)
+            .WithMany(m => m.BallEvents)
+            .HasForeignKey(b => b.MatchId);
+
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.Batsman)
+            .WithMany()
+            .HasForeignKey(b => b.BatsmanId)
+            .OnDelete(DeleteBehavior.Restrict); // to prevent cascading deletes
+
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.NonStriker)
+            .WithMany()
+            .HasForeignKey(b => b.NonStrikerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.Bowler)
+            .WithMany()
+            .HasForeignKey(b => b.BowlerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.DismissedPlayer)
+            .WithMany()
+            .HasForeignKey(b => b.DismissedPlayerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BallEvent>()
+            .HasOne(b => b.Fielder)
+            .WithMany()
+            .HasForeignKey(b => b.FielderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<BallEvent>()
+            .Property(b => b.WicketType)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<BallEvent>()
+            .Property(b => b.ExtraType)
+            .HasConversion<string>();
+            
         base.OnModelCreating(modelBuilder);
     }
 }

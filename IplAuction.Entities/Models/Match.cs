@@ -10,10 +10,12 @@ public class Match
 
     public int TeamBId { get; set; }
 
-    public bool IsDeleted { get; set;}
+    public bool IsDeleted { get; set; }
 
     public DateTime StartDate { get; set; }
 
     public Team TeamA { get; set; } = null!;
     public Team TeamB { get; set; } = null!;
+
+    public ICollection<BallEvent> BallEvents { get; set; } = [];
 }
