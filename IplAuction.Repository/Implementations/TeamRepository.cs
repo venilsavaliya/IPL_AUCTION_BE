@@ -1,13 +1,16 @@
 using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.Team;
 using IplAuction.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
 namespace IplAuction.Repository.Implementations;
 
-public class TeamRepository(IplAuctionDbContext context) : GenericRepository<Team>(context) , ITeamRepository
+public class TeamRepository(IplAuctionDbContext context) : GenericRepository<Team>(context), ITeamRepository
 {
     public async Task<PaginatedResult<TeamResponseViewModel>> GetFilteredTeamsAsync(TeamFilterParam filterParams)
     {
@@ -41,4 +44,12 @@ public class TeamRepository(IplAuctionDbContext context) : GenericRepository<Tea
 
         return paginatedResult;
     }
+
+
+    public async Task<List<TeamPlayerResponse>> GetAllPlayersByTeamId(int id)
+    {
+        List<TeamPlayerResponse> players = await _context.Teams.Where(t => t.Id == id && t.IsDeleted != true).SelectMany(t => t.Players).Where(p => !p.IsDeleted).Select(p => new TeamPlayerResponse(p)).ToListAsync() ?? throw new NotFoundException(nameof(Team));
+
+        return players;
+    }  
 }

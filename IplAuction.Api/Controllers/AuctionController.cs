@@ -5,6 +5,7 @@ using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
+using IplAuction.Entities.ViewModels.UserTeam;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,16 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         List<UserResponseViewModel> teams = await _auctionService.GetAllTeamsOfAuction(id);
 
         var response = ApiResponseBuilder.With<List<UserResponseViewModel>>().SetData(teams).Build();
+
+        return Ok(response);
+    }
+
+    [HttpPost("player/marksold")]
+    public async Task<IActionResult> MarkPlayerSold([FromBody] AddUserTeamRequestModel request)
+    {
+        await _auctionService.MarkPlayerSold(request);
+
+        var response = ApiResponseBuilder.Create(200);
 
         return Ok(response);
     }

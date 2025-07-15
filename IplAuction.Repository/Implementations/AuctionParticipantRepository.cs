@@ -35,6 +35,22 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         return participants;
     }
 
+    public async Task<List<AuctionTeamResponseModel>> GetAllJoinedTeams(int auctionId)
+    {
+        return await _context.AuctionParticipants
+                        .Where(ap => ap.AuctionId == auctionId)
+                        .Select(ap => new AuctionTeamResponseModel
+                        {
+                            UserId = ap.UserId,
+                            FullName = $"{ap.User.FirstName} {ap.User.LastName ?? ""}",
+                            AuctionId = ap.AuctionId,
+                            ImageUrl = ap.User.Image ?? "",
+                            BalanceLeft = ap.PurseBalance,
+                            TotalPlayers = ap.User.UserTeams.Count()
+                        }).ToListAsync();
+
+    }
+
     public async Task<AuctionParticipantResponseModel> GetAuctionParticipant(AuctionParticipantRequestModel request)
     {
         var participant = await _context.AuctionParticipants

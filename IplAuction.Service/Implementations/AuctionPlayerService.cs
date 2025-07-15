@@ -1,3 +1,4 @@
+using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Repository.Interfaces;
@@ -5,9 +6,9 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class AuctionPlayerService(IGenericRepository<AuctionPlayer> auctionPlayerRepo) : IAuctionPlayerService
+public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : IAuctionPlayerService
 {
-    private readonly IGenericRepository<AuctionPlayer> _auctionPlayerRepo = auctionPlayerRepo;
+    private readonly IAuctionPlayerRepository _auctionPlayerRepo = auctionPlayerRepo;
 
     public async Task AddAuctionPlayer(AddAuctionPlayerRequest request)
     {
@@ -25,5 +26,16 @@ public class AuctionPlayerService(IGenericRepository<AuctionPlayer> auctionPlaye
     {
         var auctionPlayers = await _auctionPlayerRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionId);
         return auctionPlayers.Select(ap => ap.PlayerId).ToList();
+    }
+
+    public async Task MarkPlayerUnsold(AddAuctionPlayerRequest request)
+    {
+        AuctionPlayer auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId) ?? throw new NotFoundException(nameof(AuctionPlayer));
+
+        auctionPlayer.IsSold = false;
+
+        auctionPlayer.IsAuctioned = true;
+
+        await _auctionPlayerRepo.SaveChangesAsync();
     }
 }

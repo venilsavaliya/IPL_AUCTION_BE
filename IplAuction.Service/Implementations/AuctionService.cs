@@ -1,3 +1,4 @@
+using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
@@ -5,13 +6,15 @@ using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
+using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
+using IplAuction.Entities.ViewModels.UserTeam;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 namespace IplAuction.Service.Implementations;
 
-public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService, IUnitOfWork unitOfWork, IAuctionPlayerService auctionPlayerService) : IAuctionService
+public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserService currentUser, IPlayerService playerService, IAuctionParticipantService auctionParticipantService, IUserService userService, IUnitOfWork unitOfWork, IAuctionPlayerService auctionPlayerService, INotificationService notificationService, IUserTeamService userTeamService) : IAuctionService
 {
     private readonly IAuctionRepository _auctionRepository = auctionRepository;
 
@@ -27,7 +30,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     private readonly IAuctionPlayerService _auctionPlayerService = auctionPlayerService;
 
-
+    private readonly INotificationService _notificationService = notificationService;
+    private readonly IUserTeamService _userTeamService = userTeamService;
 
     public async Task AddAuctionAsync(AddAuctionRequestModel request)
     {
@@ -68,6 +72,36 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             await _unitOfWork.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task MarkPlayerSold(AddUserTeamRequestModel request)
+    {
+        // Remove Current Player Being Auctioned From The Auction After Getting Sold 
+        await RemoveCurrentPlayerFromAuction(request.AuctionId);
+
+        // Adjust The Purse Balance Of The User
+        DeductBalanceRequest balanceRequest = new()
+        {
+            AuctionId = request.AuctionId,
+            Amount = request.Price,
+            UserId = request.UserId
+        };
+        await _auctionParticipantService.DeductUserBalance(balanceRequest);
+
+        PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(request.PlayerId);
+
+        AddNotificationRequest notification = new()
+        {
+            UserId = request.UserId,
+            Title = Messages.Congratulations,
+            Message = string.Format(Messages.PlayerSoldToUser, player.Name)
+        };
+
+        await _notificationService.AddNotification(notification);
+
+        await _notificationService.SendNotificationToUserAsync(request.UserId.ToString(), notification);
+
+        await _userTeamService.AddUserTeam(request);
     }
 
     public async Task<bool> DeleteAuctionAsync(int id)

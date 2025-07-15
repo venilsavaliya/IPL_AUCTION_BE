@@ -30,4 +30,14 @@ public class AuctionParticipantController(IAuctionParticipantService auctionPart
 
         return Ok(response);
     }
+
+    [HttpGet("teams/joined/{auctionId}")]
+    public async Task<IActionResult> GetAllJoinedTeams(int auctionId)
+    {
+        List<AuctionTeamResponseModel> teams = await _auctionParticipantService.GetAllJoinedTeams(auctionId);
+
+        var response = ApiResponseBuilder.With<List<AuctionTeamResponseModel>>().SetData(teams).Build();
+
+        return Ok(response);
+    }
 }

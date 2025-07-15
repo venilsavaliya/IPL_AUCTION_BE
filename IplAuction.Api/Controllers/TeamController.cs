@@ -1,5 +1,6 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
+using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.Team;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,16 @@ public class TeamController(ITeamService teamService) : ControllerBase
         List<TeamResponseViewModel> teams = await _teamService.GetAllTeamAsync();
 
         var response = ApiResponseBuilder.With<List<TeamResponseViewModel>>().StatusCode(200).SetData(teams).Build();
+
+        return Ok(response);
+    }
+
+    [HttpGet("players/{id}")]
+    public async Task<IActionResult> GetAllPlayers(int id)
+    {
+        List<TeamPlayerResponse> players = await _teamService.GetAllPlayersByTeamId(id);
+
+        var response = ApiResponseBuilder.With<List<TeamPlayerResponse>>().StatusCode(200).SetData(players).Build();
 
         return Ok(response);
     }

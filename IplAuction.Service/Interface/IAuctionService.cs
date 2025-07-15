@@ -5,6 +5,7 @@ using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.User;
+using IplAuction.Entities.ViewModels.UserTeam;
 
 namespace IplAuction.Service.Interface;
 
@@ -32,6 +33,7 @@ public interface IAuctionService
     Task SetCurrentPlayerForAuction(AuctionPlayerRequest request);
 
     Task RemoveCurrentPlayerFromAuction(int auctionId);
+    Task MarkPlayerSold(AddUserTeamRequestModel request);
 
     Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams);
 

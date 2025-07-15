@@ -2,6 +2,7 @@ using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.Team;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
@@ -46,6 +47,7 @@ public class TeamService(ITeamRepository teamRepository, IFileStorageService fil
         return teams;
     }
 
+
     public async Task<TeamResponseViewModel> GetTeamByIdAsync(int id)
     {
         TeamResponseViewModel team = await _teamRepository.GetWithFilterAsync(t => t.IsDeleted == false && t.Id == id, t => new TeamResponseViewModel
@@ -87,5 +89,10 @@ public class TeamService(ITeamRepository teamRepository, IFileStorageService fil
     public async Task<PaginatedResult<TeamResponseViewModel>> GetTeamsAsync(TeamFilterParam filterParams)
     {
         return await _teamRepository.GetFilteredTeamsAsync(filterParams);
+    }
+
+    public async Task<List<TeamPlayerResponse>> GetAllPlayersByTeamId(int id)
+    {
+        return await _teamRepository.GetAllPlayersByTeamId(id);
     }
 }

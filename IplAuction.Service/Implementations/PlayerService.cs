@@ -85,6 +85,9 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
         return player;
     }
+
+    
+
     public async Task<PlayerResponseModel> GetPlayerByIdAsync(int id)
     {
         PlayerResponseModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseModel(p)) ?? throw new NotFoundException(nameof(Player));

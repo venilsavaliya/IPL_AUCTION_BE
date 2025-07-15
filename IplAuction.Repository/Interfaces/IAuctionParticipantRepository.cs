@@ -11,4 +11,6 @@ public interface IAuctionParticipantRepository : IGenericRepository<AuctionParti
     Task<List<AuctionParticipantResponseModel>> GetAuctionParticipants(int auctionId);
 
     Task<AuctionParticipantResponseModel> GetAuctionParticipant(AuctionParticipantRequestModel request);
+
+    Task<List<AuctionTeamResponseModel>> GetAllJoinedTeams(int auctionId);
 }

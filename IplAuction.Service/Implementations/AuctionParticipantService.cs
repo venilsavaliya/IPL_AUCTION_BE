@@ -63,6 +63,11 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
         return await _auctionParticipantRepo.GetAuctionParticipant(requestModel);
     }
 
+    public async Task<List<AuctionTeamResponseModel>> GetAllJoinedTeams(int auctionId)
+    {
+        return await _auctionParticipantRepo.GetAllJoinedTeams(auctionId);
+    }
+
     public async Task DeductUserBalance(DeductBalanceRequest request)
     {
         AuctionParticipants participant = await _auctionParticipantRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.UserId == request.UserId) ?? throw new NotFoundException(nameof(AuctionParticipants));
