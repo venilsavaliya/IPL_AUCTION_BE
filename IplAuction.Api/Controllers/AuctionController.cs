@@ -78,7 +78,8 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
     public async Task<IActionResult> GetAuction([FromBody] AuctionFilterParam filterParams)
     {
         var result = await _auctionService.GetAuctionsAsync(filterParams);
-        return Ok(result);
+        var response = ApiResponseBuilder.With<PaginatedResult<AuctionResponseModel>>().SetData(result).Build();
+        return Ok(response);
     }
 
     [HttpPost("join/{id}")]

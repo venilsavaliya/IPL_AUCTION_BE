@@ -145,4 +145,13 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         return player;
     }
     
+    public async Task<List<PlayerIdName>> GetAllPlayerIdNameAsync()
+    {
+        var players = await _playerRepository.GetAllAsync();
+        return players.Where(p => !p.IsDeleted).Select(p => new PlayerIdName
+        {
+            Id = p.Id,
+            Name = p.Name
+        }).ToList();
+    }
 }

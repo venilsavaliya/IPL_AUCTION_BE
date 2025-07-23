@@ -23,8 +23,6 @@ public class BallEvent
         DismissedPlayerId = request.DismissedPlayerId;
         FielderId = request.FielderId;
     }
-
-
     public int Id { get; set; }
     public int MatchId { get; set; }
     public int InningNumber { get; set; }

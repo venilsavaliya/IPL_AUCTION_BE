@@ -42,6 +42,15 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
+    // GET: api/player/all/namelist
+    [HttpGet("all/namelist")]
+    public async Task<IActionResult> GetAllPlayerIdName()
+    {
+        var result = await _playerService.GetAllPlayerIdNameAsync();
+        var response = ApiResponseBuilder.With<List<PlayerIdName>>().StatusCode(200).SetData(result).Build();
+        return Ok(response);
+    }
+
     // POST: api/player
     [HttpPost]
     [Consumes("multipart/form-data")]

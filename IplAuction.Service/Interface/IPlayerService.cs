@@ -16,4 +16,5 @@ public interface IPlayerService
     Task<PaginatedResult<PlayerResponseModel>> GetPlayersAsync(PlayerFilterParams filterParams);
     Task ImportPlayersFromCsvAsync(IFormFile file);
     Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId);
+    Task<List<PlayerIdName>> GetAllPlayerIdNameAsync();
 }
