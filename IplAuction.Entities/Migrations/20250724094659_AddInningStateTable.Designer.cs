@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724094659_AddInningStateTable")]
+    partial class AddInningStateTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,45 +243,6 @@ namespace IplAuction.Entities.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bids");
-                });
-
-            modelBuilder.Entity("IplAuction.Entities.Models.InningState", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BowlerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("InningNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MatchId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NonStrikerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StrikerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BowlerId");
-
-                    b.HasIndex("MatchId");
-
-                    b.HasIndex("NonStrikerId");
-
-                    b.HasIndex("StrikerId");
-
-                    b.ToTable("InningStates");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
@@ -626,7 +590,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 24, 10, 0, 6, 585, DateTimeKind.Utc).AddTicks(9866),
+                            CreatedAt = new DateTime(2025, 7, 24, 9, 46, 57, 264, DateTimeKind.Utc).AddTicks(431),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -635,7 +599,7 @@ namespace IplAuction.Entities.Migrations
                             IsNotificationOn = true,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$ZIGWxw/9EnJ20njRpJ2HUuki9cLBkM3isQrJmJRZEG2YkPiLCtPJO",
+                            PasswordHash = "$2a$11$q39wMHPLlP2vA4zFj.ZU/uBn7jhi/h4zIksI/l33P3WjfHRIgA9iy",
                             Role = "Admin"
                         });
                 });
@@ -802,41 +766,6 @@ namespace IplAuction.Entities.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IplAuction.Entities.Models.InningState", b =>
-                {
-                    b.HasOne("IplAuction.Entities.Models.Player", "Bowler")
-                        .WithMany()
-                        .HasForeignKey("BowlerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IplAuction.Entities.Models.Match", "Match")
-                        .WithMany("InningStates")
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IplAuction.Entities.Models.Player", "NonStriker")
-                        .WithMany()
-                        .HasForeignKey("NonStrikerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IplAuction.Entities.Models.Player", "Striker")
-                        .WithMany()
-                        .HasForeignKey("StrikerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bowler");
-
-                    b.Navigation("Match");
-
-                    b.Navigation("NonStriker");
-
-                    b.Navigation("Striker");
-                });
-
             modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
                 {
                     b.HasOne("IplAuction.Entities.Models.Team", "TeamA")
@@ -930,8 +859,6 @@ namespace IplAuction.Entities.Migrations
             modelBuilder.Entity("IplAuction.Entities.Models.Match", b =>
                 {
                     b.Navigation("BallEvents");
-
-                    b.Navigation("InningStates");
                 });
 
             modelBuilder.Entity("IplAuction.Entities.Models.Player", b =>

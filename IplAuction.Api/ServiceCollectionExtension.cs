@@ -51,6 +51,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IScoringRulesService, ScoringRulesService>();
         services.AddScoped<IBallEventRepository, BallEventRepository>();
         services.AddScoped<IBallEventService, BallEventService>();
+        services.AddScoped<IInningStateRepository, InningStateRepository>();
+        services.AddScoped<IInningStateService, InningStateService>();
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddScoped<IUnitOfWork,UnitOfWork >();
 

@@ -21,12 +21,19 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
     //     return await _dbSet.AsQueryable().ToPaginatedListAsync<T,>(paginationParams);
     // }
 
-    public async Task<T?> GetWithFilterAsync(Expression<Func<T, bool>> filter)
+    public async Task<T?> GetWithFilterAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
     {
-        return await _dbSet.FirstOrDefaultAsync(filter);
+        IQueryable<T> query = _dbSet;
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(filter);
     }
 
-    public async Task<T1?> GetWithFilterAsync<T1>(Expression<Func<T, bool>> filter,Expression<Func<T, T1>> selector)
+    public async Task<T1?> GetWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
     {
         return await _dbSet.Where(filter).Select(selector).FirstOrDefaultAsync();
     }
@@ -36,10 +43,24 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         return await _dbSet.Where(filter).ToListAsync();
     }
 
+    public async Task<List<T>> GetEagerLoadAllWithFilterAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.Where(filter).ToListAsync();
+    }
+
     public IQueryable<T> GetAllQueryableWithFilterAsync(Expression<Func<T, bool>> filter)
     {
         return _dbSet.Where(filter);
     }
+
+
 
     public async Task<List<T1>> GetAllWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
     {
@@ -82,5 +103,7 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
     {
         return await _context.SaveChangesAsync() > 0;
     }
+
+
 }
 

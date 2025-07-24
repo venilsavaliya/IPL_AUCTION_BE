@@ -37,6 +37,8 @@ public class IplAuctionDbContext : DbContext
     
     public DbSet<BallEvent> BallEvents { get; set; }
 
+    public DbSet<InningState> InningStates { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(new User()
@@ -207,7 +209,28 @@ public class IplAuctionDbContext : DbContext
         modelBuilder.Entity<BallEvent>()
             .Property(b => b.ExtraType)
             .HasConversion<string>();
-            
+
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.Match)
+            .WithMany(m => m.InningStates)
+            .HasForeignKey(i => i.MatchId);
+
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.Striker)
+            .WithMany()
+            .HasForeignKey(i => i.StrikerId);
+
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.NonStriker)
+            .WithMany()
+            .HasForeignKey(i => i.NonStrikerId);
+
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.Bowler)
+            .WithMany()
+            .HasForeignKey(i => i.BowlerId);
+        
+        
         base.OnModelCreating(modelBuilder);
     }
 }

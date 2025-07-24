@@ -5,16 +5,62 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class BallEventService(IBallEventRepository ballEventRepository) : IBallEventService
+public class BallEventService(IBallEventRepository ballEventRepository, IInningStateService inningStateService) : IBallEventService
 {
     private readonly IBallEventRepository _ballEventRepository = ballEventRepository;
+    private readonly IInningStateService _inningStateService = inningStateService;
 
     public async Task AddBall(AddBallEventRequest request)
     {
         BallEvent ball = new(request);
 
         await _ballEventRepository.AddAsync(ball);
-
         await _ballEventRepository.SaveChangesAsync();
+
+        // Swap strike if needed
+        bool isLegal = ball.ExtraType == null;
+        if (isLegal)
+        {
+            // Odd runs: swap strike
+            if (ball.RunsScored % 2 == 1)
+            {
+                await _inningStateService.SwapStrikeAsync(ball.MatchId, ball.InningNumber);
+            }
+            // End of over: swap strike
+            // Count legal deliveries in this over
+            var overBalls = await _ballEventRepository.GetAllWithFilterAsync(b => b.MatchId == ball.MatchId && b.InningNumber == ball.InningNumber && b.OverNumber == ball.OverNumber);
+            int legalDeliveries = overBalls.Count(b => b.ExtraType == null);
+            if (legalDeliveries == 6)
+            {
+                await _inningStateService.SwapStrikeAsync(ball.MatchId, ball.InningNumber);
+            }
+        }
+    }
+
+    public async Task<List<BallEvent>> GetBallEventsForMatch(int matchId, int? inningNumber = null)
+    {
+        if (inningNumber.HasValue)
+        {
+            return await _ballEventRepository.GetEagerLoadAllWithFilterAsync(b => b.MatchId == matchId && b.InningNumber == inningNumber.Value, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
+        }
+        else
+        {
+            return await _ballEventRepository.GetEagerLoadAllWithFilterAsync(b => b.MatchId == matchId, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
+        }
+    }
+
+    public async Task<List<BallEvent>> GetRecentBalls(int matchId, int inningNumber, int count, bool includeExtras = true)
+    {
+        var allBalls = await _ballEventRepository.GetAllWithFilterAsync(b => b.MatchId == matchId && b.InningNumber == inningNumber);
+        if (!allBalls.Any())
+            return new List<BallEvent>();
+        // Find the latest over number
+        int latestOver = allBalls.Max(b => b.OverNumber);
+        // Get all balls from the latest over
+        var ballsOfLatestOver = allBalls.Where(b => b.OverNumber == latestOver)
+                                        .OrderBy(b => b.BallNumber)
+                                        .ThenBy(b => b.Timestamp)
+                                        .ToList();
+        return ballsOfLatestOver;
     }
 }

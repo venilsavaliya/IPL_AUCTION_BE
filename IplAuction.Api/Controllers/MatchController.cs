@@ -32,6 +32,14 @@ public class MatchController(IMatchService matchService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{matchId}/live")]
+    public async Task<IActionResult> GetLiveMatchStatus(int matchId)
+    {
+        var status = await _matchService.GetLiveMatchStatus(matchId);
+        var response = ApiResponseBuilder.With<LiveMatchStatusResponse>().SetData(status).Build();
+        return Ok(response);
+    }
+
     [HttpPost("filter")]
     public async Task<IActionResult> GetFilteredMatches([FromBody] MatchFilterParams matchFilterParams)
     {

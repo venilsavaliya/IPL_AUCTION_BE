@@ -16,6 +16,7 @@ public class Match
 
     public Team TeamA { get; set; } = null!;
     public Team TeamB { get; set; } = null!;
-
     public ICollection<BallEvent> BallEvents { get; set; } = [];
+
+    public ICollection<InningState> InningStates { get; set; } = [];
 }

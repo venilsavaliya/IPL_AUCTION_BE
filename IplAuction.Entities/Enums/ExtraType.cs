@@ -6,5 +6,5 @@ public enum ExtraType
     NoBall = 2,
     Bye = 3,
     LegBye = 4,
-    Penalty = 5 
+    Penalty = 5
 }

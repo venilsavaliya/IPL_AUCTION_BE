@@ -15,4 +15,5 @@ public interface IMatchService
     Task<MatchResponse> GetMatchById(int id);
 
     Task UpdateMatch(UpdateMatchRequest request);
+    Task<LiveMatchStatusResponse> GetLiveMatchStatus(int matchId);
 }
