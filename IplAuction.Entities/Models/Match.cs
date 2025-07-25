@@ -14,6 +14,8 @@ public class Match
 
     public DateTime StartDate { get; set; }
 
+    public int InningNumber { get; set; } = 0; 
+
     public Team TeamA { get; set; } = null!;
     public Team TeamB { get; set; } = null!;
     public ICollection<BallEvent> BallEvents { get; set; } = [];

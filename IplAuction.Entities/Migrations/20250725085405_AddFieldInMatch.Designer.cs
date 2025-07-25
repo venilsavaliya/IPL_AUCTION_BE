@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725085405_AddFieldInMatch")]
+    partial class AddFieldInMatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,7 +253,7 @@ namespace IplAuction.Entities.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BowlerId")
+                    b.Property<int>("BowlerId")
                         .HasColumnType("integer");
 
                     b.Property<int>("InningNumber")
@@ -259,10 +262,10 @@ namespace IplAuction.Entities.Migrations
                     b.Property<int>("MatchId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("NonStrikerId")
+                    b.Property<int>("NonStrikerId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("StrikerId")
+                    b.Property<int>("StrikerId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Timestamp")
@@ -629,7 +632,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 25, 13, 20, 26, 745, DateTimeKind.Utc).AddTicks(6041),
+                            CreatedAt = new DateTime(2025, 7, 25, 8, 54, 3, 461, DateTimeKind.Utc).AddTicks(5048),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -638,7 +641,7 @@ namespace IplAuction.Entities.Migrations
                             IsNotificationOn = true,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$TH3/4NBv0jI3clSPKtdHt.ieQJxxQiYLN4MEuKD8E75wdUct35E9y",
+                            PasswordHash = "$2a$11$5X3Ayrst87kKJgh8KltpuuN3blcVjcXhMtxFLdZ1JAGIVWuCprBqu",
                             Role = "Admin"
                         });
                 });
@@ -809,7 +812,9 @@ namespace IplAuction.Entities.Migrations
                 {
                     b.HasOne("IplAuction.Entities.Models.Player", "Bowler")
                         .WithMany()
-                        .HasForeignKey("BowlerId");
+                        .HasForeignKey("BowlerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("IplAuction.Entities.Models.Match", "Match")
                         .WithMany("InningStates")
@@ -819,11 +824,15 @@ namespace IplAuction.Entities.Migrations
 
                     b.HasOne("IplAuction.Entities.Models.Player", "NonStriker")
                         .WithMany()
-                        .HasForeignKey("NonStrikerId");
+                        .HasForeignKey("NonStrikerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("IplAuction.Entities.Models.Player", "Striker")
                         .WithMany()
-                        .HasForeignKey("StrikerId");
+                        .HasForeignKey("StrikerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Bowler");
 

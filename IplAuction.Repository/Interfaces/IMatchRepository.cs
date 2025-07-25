@@ -10,4 +10,5 @@ public interface IMatchRepository : IGenericRepository<Match>
     Task<PaginatedResult<MatchResponse>> GetFilteredMatchAsync(MatchFilterParams filterParams);
 
     Task<MatchResponse> GetById(int id);
+    
 }

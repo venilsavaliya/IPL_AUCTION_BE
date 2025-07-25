@@ -40,6 +40,13 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         await _matchRepository.SaveChangesAsync();
     }
 
+    public async Task UpdateMatchInningNumber(int matchId, int inningNumber)
+    {
+        Match match = await _matchRepository.GetWithFilterAsync(m => m.Id == matchId && m.IsDeleted != true) ?? throw new NotFoundException(nameof(Match));
+        match.InningNumber = inningNumber;
+        await _matchRepository.SaveChangesAsync();
+    }
+
     public async Task DeleteMatch(int id)
     {
         Match match = await _matchRepository.GetWithFilterAsync(m => m.Id == id) ?? throw new NotFoundException(nameof(Match));
@@ -97,7 +104,7 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
                 MatchStatus = "Not Started",
                 TeamA = match.TeamA.Name,
                 TeamB = match.TeamB.Name,
-                InningNumber = 1,
+                InningNumber = match.InningNumber,
                 TotalRuns = 0,
                 TotalWickets = 0,
                 Overs = 0,
@@ -123,16 +130,21 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         double overs = double.Parse($"{completedOvers}.{ballsInCurrentOver}");
 
         // 5. Current batsmen (use StrikerId and NonStrikerId from InningState)
-        var inningState = await _inningStateService.GetByMatchIdAsync(matchId);
-        var currentInningState = inningState.FirstOrDefault(i => i.InningNumber == currentInning);
+        InningState? inningState = await _inningStateService.GetInningState(matchId, match.InningNumber);
+        // var currentInningState = inningState.FirstOrDefault(i => i.InningNumber == currentInning);
         var currentBatsmen = new List<BatsmanStatus>();
-        if (currentInningState != null)
+        if (inningState != null)
         {
-            var batsmanIds = new List<int> { currentInningState.StrikerId, currentInningState.NonStrikerId };
+            var batsmanIds = new List<int> { inningState.StrikerId??0, inningState.NonStrikerId??0 };
             foreach (var batsmanId in batsmanIds)
             {
+                if (batsmanId == 0)
+                {
+                    continue;
+                }
                 var batsmanBalls = inningBalls.Where(b => b.BatsmanId == batsmanId).ToList();
-                if (batsmanBalls.Count == 0 || batsmanBalls == null)
+
+                if (batsmanBalls.Count == 0 || batsmanBalls == null) // Player dont play any ball yet
                 {
                     // Try to get player name from PlayerService if not present in balls
                     var player = await _playerService.GetPlayerByIdAsync(batsmanId);
@@ -144,11 +156,12 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
                         Balls = 0,
                         Fours = 0,
                         Sixes = 0,
-                        IsOnStrike = batsmanId == currentInningState.StrikerId
+                        IsOnStrike = batsmanId == inningState.StrikerId
                     });
                     continue;
                 }
-                var batsman = batsmanBalls.FirstOrDefault()?.Batsman;
+                var batsman = batsmanBalls.First().Batsman;
+
                 currentBatsmen.Add(new BatsmanStatus
                 {
                     PlayerId = batsman.Id,
@@ -157,17 +170,18 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
                     Balls = batsmanBalls.Count(),
                     Fours = batsmanBalls.Count(b => b.RunsScored == 4),
                     Sixes = batsmanBalls.Count(b => b.RunsScored == 6),
-                    IsOnStrike = batsmanId == currentInningState.StrikerId
+                    IsOnStrike = batsmanId == inningState.StrikerId
                 });
             }
         }
 
         // 6. Current bowler (last bowler ID)
-        var lastBallForBowler = inningBalls.OrderByDescending(b => b.OverNumber).ThenByDescending(b => b.BallNumber).FirstOrDefault();
+        // var lastBallForBowler = inningBalls.OrderByDescending(b => b.OverNumber).ThenByDescending(b => b.BallNumber).FirstOrDefault();
+        // var lastBallForBowler = await _inningStateService.GetByMatchIdAsync(matchId);
         BowlerStatus currentBowler = null;
-        if (lastBallForBowler != null)
+        if (inningState!=null && inningState.BowlerId != 0)
         {
-            var bowlerTotalBalls = inningBalls.Where(b => b.BowlerId == lastBallForBowler.BowlerId).ToList();
+            var bowlerTotalBalls = inningBalls.Where(b => b.BowlerId == inningState.BowlerId).ToList();
             var bowler = bowlerTotalBalls.FirstOrDefault()?.Bowler;
             if (bowler != null)
             {

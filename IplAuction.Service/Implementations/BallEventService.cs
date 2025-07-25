@@ -26,13 +26,21 @@ public class BallEventService(IBallEventRepository ballEventRepository, IInningS
             {
                 await _inningStateService.SwapStrikeAsync(ball.MatchId, ball.InningNumber);
             }
-            // End of over: swap strike
-            // Count legal deliveries in this over
+            // End of over: swap strike and remove bowler
             var overBalls = await _ballEventRepository.GetAllWithFilterAsync(b => b.MatchId == ball.MatchId && b.InningNumber == ball.InningNumber && b.OverNumber == ball.OverNumber);
+            // Count legal deliveries in this over
             int legalDeliveries = overBalls.Count(b => b.ExtraType == null);
+            // If wicket, remove dismissed batsman
+            if (ball.WicketType != null && ball.DismissedPlayerId.HasValue)
+            {
+                await _inningStateService.RemoveBatsmanAsync(ball.MatchId, ball.InningNumber, ball.DismissedPlayerId.Value);
+            }
             if (legalDeliveries == 6)
             {
                 await _inningStateService.SwapStrikeAsync(ball.MatchId, ball.InningNumber);
+                // Remove bowler (set to null/0)
+                await _inningStateService.UpdateBowlerAsync(ball.MatchId, ball.InningNumber, null);
+
             }
         }
     }

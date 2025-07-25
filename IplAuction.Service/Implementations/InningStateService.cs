@@ -6,13 +6,11 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class InningStateService : IInningStateService
+public class InningStateService(IInningStateRepository repo, IMatchRepository matchRepository) : IInningStateService
 {
-    private readonly IInningStateRepository _repo;
-    public InningStateService(IInningStateRepository repo)
-    {
-        _repo = repo;
-    }
+    private readonly IInningStateRepository _repo = repo;
+
+    private readonly IMatchRepository _matchRepository = matchRepository;
 
     public async Task<InningState> GetByIdAsync(int id)
     {
@@ -26,6 +24,9 @@ public class InningStateService : IInningStateService
 
     public async Task<InningState> AddAsync(InningStateRequestModel state)
     {
+        var match = await _matchRepository.GetWithFilterAsync(m => m.Id == state.MatchId) ?? throw new NotFoundException(nameof(Match));
+        match.InningNumber = state.InningNumber;
+
         InningState inningState = new InningState
         {
             MatchId = state.MatchId,
@@ -40,9 +41,15 @@ public class InningStateService : IInningStateService
         return inningState;
     }
 
-    public async Task UpdateAsync(InningState state)
+    public async Task UpdateAsync(UpdateInningStateRequest state)
     {
-        _repo.Update(state);
+        var inningState = await _repo.GetWithFilterAsync(i => i.MatchId == state.MatchId && i.InningNumber == state.InningNumber) ?? throw new NotFoundException(nameof(InningState));
+        inningState.MatchId = state.MatchId;
+        inningState.InningNumber = state.InningNumber;
+        inningState.StrikerId = state.StrikerId;
+        inningState.NonStrikerId = state.NonStrikerId;
+        inningState.BowlerId = state.BowlerId;
+
         await _repo.SaveChangesAsync();
     }
 
@@ -66,5 +73,29 @@ public class InningStateService : IInningStateService
         state.NonStrikerId = temp;
         
         await _repo.SaveChangesAsync();
+    }
+
+    public async Task UpdateBowlerAsync(int matchId, int inningNumber, int? bowlerId)
+    {
+        var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
+            ?? throw new NotFoundException(nameof(InningState));
+        state.BowlerId = bowlerId ?? 0;
+        await _repo.SaveChangesAsync();
+    }
+
+    public async Task RemoveBatsmanAsync(int matchId, int inningNumber, int batsmanId)
+    {
+        var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
+            ?? throw new NotFoundException(nameof(InningState));
+        if (state.StrikerId == batsmanId)
+            state.StrikerId = 0;
+        else if (state.NonStrikerId == batsmanId)
+            state.NonStrikerId = 0;
+        await _repo.SaveChangesAsync();
+    }
+
+    public async Task<InningState?> GetInningState(int matchId, int inningNumber)
+    {
+        return await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber);
     }
 }
