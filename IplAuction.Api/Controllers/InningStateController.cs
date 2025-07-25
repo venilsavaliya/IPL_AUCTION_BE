@@ -15,6 +15,7 @@ public class InningStateController(IInningStateService service) : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _service.GetByIdAsync(id);
+        
         return Ok(result);
     }
 
@@ -33,7 +34,7 @@ public class InningStateController(IInningStateService service) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] InningState state)
+    public async Task<IActionResult> Update([FromBody] UpdateInningStateRequest state)
     {
         await _service.UpdateAsync(state);
         return Ok();
