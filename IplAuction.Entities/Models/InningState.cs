@@ -10,6 +10,8 @@ public class InningState
     public int? StrikerId { get; set; }
     public int? NonStrikerId { get; set; }
     public int? BowlerId { get; set; }
+    public int? BattingTeamId { get; set; }
+    public int? BowlingTeamId { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
@@ -17,4 +19,6 @@ public class InningState
     public Player Striker { get; set; } = null!;
     public Player NonStriker { get; set; } = null!;
     public Player Bowler { get; set; } = null!;
+    public Team BattingTeam { get; set; } = null!;
+    public Team BowlingTeam { get; set; } = null!;
 } 

@@ -1,3 +1,4 @@
+using IplAuction.Entities;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.InningState;
@@ -12,6 +13,8 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
 
     private readonly IMatchRepository _matchRepository = matchRepository;
 
+    // private readonly IBallEventService _ballEventService = ballEventService;
+
     public async Task<InningState> GetByIdAsync(int id)
     {
         return await _repo.GetWithFilterAsync(i => i.Id == id) ?? throw new NotFoundException(nameof(InningState));
@@ -22,7 +25,7 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         return await _repo.GetAllWithFilterAsync(i => i.MatchId == matchId);
     }
 
-    public async Task<InningState> AddAsync(InningStateRequestModel state)
+    public async Task AddAsync(InningStateRequestModel state)
     {
         var match = await _matchRepository.GetWithFilterAsync(m => m.Id == state.MatchId) ?? throw new NotFoundException(nameof(Match));
         match.InningNumber = state.InningNumber;
@@ -33,19 +36,29 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
             InningNumber = state.InningNumber,
             StrikerId = state.StrikerId,
             NonStrikerId = state.NonStrikerId,
-            BowlerId = state.BowlerId
+            BowlerId = state.BowlerId,
+            BattingTeamId = state.BattingTeamId,
+            BowlingTeamId = state.BowlingTeamId
         };
-        
+
         await _repo.AddAsync(inningState);
         await _repo.SaveChangesAsync();
-        return inningState;
     }
 
     public async Task UpdateAsync(UpdateInningStateRequest state)
     {
-        var inningState = await _repo.GetWithFilterAsync(i => i.MatchId == state.MatchId && i.InningNumber == state.InningNumber) ?? throw new NotFoundException(nameof(InningState));
+        var inningState = await _repo.GetWithFilterAsync(i => i.Id == state.Id) ?? throw new NotFoundException(nameof(InningState));
         inningState.MatchId = state.MatchId;
         inningState.InningNumber = state.InningNumber;
+
+        // Check Player Already Got Out Or Not
+
+        // List<int> outPlayers = await _ballEventService.GetOutPlayersListByMatchId(state.MatchId);
+        // if (outPlayers.Contains(state.StrikerId) || outPlayers.Contains(state.NonStrikerId))
+        // {
+        //     throw new Exception(Messages.PlayerAlreadyGotOut);
+        // }
+
         inningState.StrikerId = state.StrikerId;
         inningState.NonStrikerId = state.NonStrikerId;
         inningState.BowlerId = state.BowlerId;
@@ -71,7 +84,7 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         var temp = state.StrikerId;
         state.StrikerId = state.NonStrikerId;
         state.NonStrikerId = temp;
-        
+
         await _repo.SaveChangesAsync();
     }
 
@@ -79,7 +92,7 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
     {
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
             ?? throw new NotFoundException(nameof(InningState));
-        state.BowlerId = bowlerId ?? 0;
+        state.BowlerId = bowlerId;
         await _repo.SaveChangesAsync();
     }
 
@@ -88,9 +101,9 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
             ?? throw new NotFoundException(nameof(InningState));
         if (state.StrikerId == batsmanId)
-            state.StrikerId = 0;
+            state.StrikerId = null;
         else if (state.NonStrikerId == batsmanId)
-            state.NonStrikerId = 0;
+            state.NonStrikerId = null;
         await _repo.SaveChangesAsync();
     }
 

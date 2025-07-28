@@ -22,6 +22,16 @@ public class BallEventController(IBallEventService balleventService) : Controlle
         return Ok(response);
     }
 
+    [HttpGet("outplayerslist/{matchId}")]
+    public async Task<IActionResult> GetOutPlayersListByMatchId(int matchId)
+    {
+        var result = await _balleventService.GetOutPlayersListByMatchId(matchId);
+
+        var response = ApiResponseBuilder.With<List<int>>().StatusCode(200).SetData(result).Build();
+        
+        return Ok(response);
+    }
+
     // [HttpGet]
     // public async Task<IActionResult> GetMatchStatsByMatchId(int matchId)
     // {

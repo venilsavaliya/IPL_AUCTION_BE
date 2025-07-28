@@ -6,7 +6,12 @@ public class LiveMatchStatusResponse
     public string MatchStatus { get; set; } = null!;
     public string TeamA { get; set; } = null!;
     public string TeamB { get; set; } = null!;
+    public int TeamAId { get; set; }
+    public int TeamBId { get; set; }
+    public int BattingTeamId { get; set; }
+    public int BowlingTeamId { get; set; }
     public int InningNumber { get; set; }
+    public int InningStateId { get; set; }
     public int TotalRuns { get; set; }
     public int TotalWickets { get; set; }
     public double Overs { get; set; } // e.g. , 12.3
@@ -14,7 +19,7 @@ public class LiveMatchStatusResponse
     public double? RequiredRunRate { get; set; } // for 2nd innings
     public double RunRate { get; set; }
     public List<BatsmanStatus> CurrentBatsmen { get; set; } = [];
-    public BowlerStatus CurrentBowler { get; set; } = new BowlerStatus();
+    public BowlerStatus? CurrentBowler { get; set; } = new BowlerStatus();
     public List<BallSummary> RecentBalls { get; set; } = [];
 }
 

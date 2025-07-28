@@ -154,4 +154,14 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
             Name = p.Name
         }).ToList();
     }
+
+    public async Task<List<PlayerIdName>> GetPlayersByTeamIdAsync(int teamId)
+    {
+        var players = await _playerRepository.GetAllAsync();
+        return players.Where(p => !p.IsDeleted && p.TeamId == teamId).Select(p => new PlayerIdName
+        {
+            Id = p.Id,
+            Name = p.Name
+        }).ToList();
+    }
 }

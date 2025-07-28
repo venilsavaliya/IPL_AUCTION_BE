@@ -51,6 +51,15 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
+    // GET: api/player/team/{teamId}/players
+    [HttpGet("team/{teamId}/players")]
+    public async Task<IActionResult> GetPlayersByTeamId(int teamId)
+    {
+        var result = await _playerService.GetPlayersByTeamIdAsync(teamId);
+        var response = ApiResponseBuilder.With<List<PlayerIdName>>().StatusCode(200).SetData(result).Build();
+        return Ok(response);
+    }
+
     // POST: api/player
     [HttpPost]
     [Consumes("multipart/form-data")]

@@ -29,8 +29,8 @@ public class InningStateController(IInningStateService service) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] InningStateRequestModel state)
     {
-        var result = await _service.AddAsync(state);
-        return Ok(result);
+        await _service.AddAsync(state);
+        return Ok();
     }
 
     [HttpPut]

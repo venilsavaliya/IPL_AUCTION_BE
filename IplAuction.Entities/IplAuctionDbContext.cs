@@ -230,7 +230,16 @@ public class IplAuctionDbContext : DbContext
             .WithMany()
             .HasForeignKey(i => i.BowlerId);
         
-        
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.BattingTeam)
+            .WithMany()
+            .HasForeignKey(i => i.BattingTeamId);
+
+        modelBuilder.Entity<InningState>()
+            .HasOne(i => i.BowlingTeam)
+            .WithMany()
+            .HasForeignKey(i => i.BowlingTeamId);
+
         base.OnModelCreating(modelBuilder);
     }
 }

@@ -71,4 +71,13 @@ public class BallEventService(IBallEventRepository ballEventRepository, IInningS
                                         .ToList();
         return ballsOfLatestOver;
     }
+
+    public async Task<List<int>> GetOutPlayersListByMatchId(int matchId)
+    {
+        var balls = await _ballEventRepository.GetAllWithFilterAsync(b => b.MatchId == matchId && b.WicketType != null);
+
+        var playerIds = balls.Select(b => b.DismissedPlayerId ?? 0).ToList();
+
+        return playerIds;
+    }
 }

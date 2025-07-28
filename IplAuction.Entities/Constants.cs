@@ -10,6 +10,7 @@ public static class UserRoles
 
 public static class Messages
 {
+    public const string PlayerAlreadyGotOut = "Player Already Got Out";
     public const string UnexpectedError = "Unexpected Error Occured";
     public const string BadRequest = "Can Not Process Request";
     public const string UnAuthorize = "User Is UnAuthorize";

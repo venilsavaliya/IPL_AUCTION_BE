@@ -93,9 +93,12 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         if (match == null)
             throw new NotFoundException("Match not found");
 
+        InningState? inningState = await _inningStateService.GetInningState(matchId, match.InningNumber);
+
         // 2. Fetch all ball events for the match
         var allBalls = await _ballEventService.GetBallEventsForMatch(matchId);
-        if (allBalls == null || allBalls.Count == 0)
+
+        if (inningState == null)
         {
             // No balls bowled yet, return initial state
             return new LiveMatchStatusResponse
@@ -104,6 +107,9 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
                 MatchStatus = "Not Started",
                 TeamA = match.TeamA.Name,
                 TeamB = match.TeamB.Name,
+                TeamAId = match.TeamAId,
+                TeamBId = match.TeamBId,
+                InningStateId = 0,
                 InningNumber = match.InningNumber,
                 TotalRuns = 0,
                 TotalWickets = 0,
@@ -130,12 +136,12 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         double overs = double.Parse($"{completedOvers}.{ballsInCurrentOver}");
 
         // 5. Current batsmen (use StrikerId and NonStrikerId from InningState)
-        InningState? inningState = await _inningStateService.GetInningState(matchId, match.InningNumber);
+
         // var currentInningState = inningState.FirstOrDefault(i => i.InningNumber == currentInning);
         var currentBatsmen = new List<BatsmanStatus>();
         if (inningState != null)
         {
-            var batsmanIds = new List<int> { inningState.StrikerId??0, inningState.NonStrikerId??0 };
+            var batsmanIds = new List<int> { inningState.StrikerId ?? 0, inningState.NonStrikerId ?? 0 };
             foreach (var batsmanId in batsmanIds)
             {
                 if (batsmanId == 0)
@@ -179,17 +185,20 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         // var lastBallForBowler = inningBalls.OrderByDescending(b => b.OverNumber).ThenByDescending(b => b.BallNumber).FirstOrDefault();
         // var lastBallForBowler = await _inningStateService.GetByMatchIdAsync(matchId);
         BowlerStatus currentBowler = null;
-        if (inningState!=null && inningState.BowlerId != 0)
+        if (inningState != null && inningState.BowlerId != 0)
         {
             var bowlerTotalBalls = inningBalls.Where(b => b.BowlerId == inningState.BowlerId).ToList();
-            var bowler = bowlerTotalBalls.FirstOrDefault()?.Bowler;
-            if (bowler != null)
+
+            if (inningState.BowlerId != null && inningState.BowlerId != 0)
             {
+                var bowler = await _playerService.GetPlayerByIdAsync((int)inningState.BowlerId);
+
                 int bowlerOvers = bowlerTotalBalls.Count(b => b.ExtraType == null) / 6;
                 int bowlerBalls = bowlerTotalBalls.Count(b => b.ExtraType == null) % 6;
+                
                 currentBowler = new BowlerStatus
                 {
-                    PlayerId = bowler.Id,
+                    PlayerId = bowler.PlayerId,
                     Name = bowler.Name,
                     Overs = bowlerOvers + (bowlerBalls / 10.0),
                     RunsConceded = bowlerTotalBalls.Sum(b => b.RunsScored + b.ExtraRuns),
@@ -232,6 +241,10 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
             TeamA = match.TeamA.Name,
             TeamB = match.TeamB.Name,
             InningNumber = currentInning,
+            TeamAId = match.TeamAId,
+            TeamBId = match.TeamBId,
+            BattingTeamId = (int)inningState.BattingTeamId,
+            BowlingTeamId = (int)inningState.BowlingTeamId,
             TotalRuns = totalRuns,
             TotalWickets = totalWickets,
             Overs = overs,
@@ -240,7 +253,8 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
             RunRate = runRate,
             CurrentBatsmen = currentBatsmen,
             CurrentBowler = currentBowler,
-            RecentBalls = recentBalls
+            RecentBalls = recentBalls,
+            InningStateId = inningState.Id
         };
     }
 }

@@ -7,4 +7,6 @@ public class InningStateRequestModel
     public int StrikerId { get; set; }
     public int NonStrikerId { get; set; }
     public int BowlerId { get; set; }
+    public int BattingTeamId { get; set; }
+    public int BowlingTeamId { get; set; }
 }
