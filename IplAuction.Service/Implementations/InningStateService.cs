@@ -88,6 +88,8 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         await _repo.SaveChangesAsync();
     }
 
+
+
     public async Task UpdateBowlerAsync(int matchId, int inningNumber, int? bowlerId)
     {
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)

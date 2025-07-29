@@ -16,5 +16,6 @@ public interface IMatchService
 
     Task UpdateMatch(UpdateMatchRequest request);
     Task UpdateMatchInningNumber(int matchId, int inningNumber);
+    Task ChangeMatchInning(int matchId, int inningNumber);
     Task<LiveMatchStatusResponse> GetLiveMatchStatus(int matchId);
 }

@@ -82,6 +82,15 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         return await _matchRepository.GetById(id);
     }
 
+    public async Task ChangeMatchInning(int matchId, int inningNumber)
+    {
+        Match match = await _matchRepository.GetWithFilterAsync(m => m.Id == matchId && m.IsDeleted != true) ?? throw new NotFoundException(nameof(Match));
+        match.InningNumber = inningNumber;
+        await _matchRepository.SaveChangesAsync();
+    }
+    
+    
+
     public async Task<LiveMatchStatusResponse> GetLiveMatchStatus(int matchId)
     {
         // 1. Fetch match and teams
@@ -195,7 +204,7 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
 
                 int bowlerOvers = bowlerTotalBalls.Count(b => b.ExtraType == null) / 6;
                 int bowlerBalls = bowlerTotalBalls.Count(b => b.ExtraType == null) % 6;
-                
+
                 currentBowler = new BowlerStatus
                 {
                     PlayerId = bowler.PlayerId,

@@ -18,4 +18,5 @@ public interface IPlayerService
     Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId);
     Task<List<PlayerIdName>> GetAllPlayerIdNameAsync();
     Task<List<PlayerIdName>> GetPlayersByTeamIdAsync(int teamId);
+    Task<List<PlayerSummary>> GetPlayerSummaryAsync(int teamId);
 }

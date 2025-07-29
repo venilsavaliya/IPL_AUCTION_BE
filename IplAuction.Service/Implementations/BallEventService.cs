@@ -1,5 +1,7 @@
+using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.BallEvent;
+using IplAuction.Entities.ViewModels.InningState;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
@@ -9,6 +11,8 @@ public class BallEventService(IBallEventRepository ballEventRepository, IInningS
 {
     private readonly IBallEventRepository _ballEventRepository = ballEventRepository;
     private readonly IInningStateService _inningStateService = inningStateService;
+
+    // private readonly IMatchService _matchService = matchService;
 
     public async Task AddBall(AddBallEventRequest request)
     {
@@ -38,8 +42,26 @@ public class BallEventService(IBallEventRepository ballEventRepository, IInningS
             if (legalDeliveries == 6)
             {
                 await _inningStateService.SwapStrikeAsync(ball.MatchId, ball.InningNumber);
-                // Remove bowler (set to null/0)
+
                 await _inningStateService.UpdateBowlerAsync(ball.MatchId, ball.InningNumber, null);
+
+                if (request.OverNumber == 20 && ball.InningNumber == 1)
+                {
+                    InningState inningstate = await _inningStateService.GetInningState(ball.MatchId, ball.InningNumber) ?? throw new NotFoundException(nameof(InningState));
+
+                    InningStateRequestModel secondInning = new()
+                    {
+                        MatchId = ball.MatchId,
+                        InningNumber = 2,
+                        BattingTeamId = inningstate.BowlingTeamId != null ? (int)inningstate.BowlingTeamId : 0, // Inning Change So Swap The Batting And Bowling Team
+                        BowlingTeamId = inningstate.BattingTeamId != null ? (int)inningstate.BattingTeamId : 0,
+                    };
+
+                    await _inningStateService.AddAsync(secondInning);
+
+                    // await _matchService.ChangeMatchInning(ball.MatchId, 2);
+
+                }
 
             }
         }

@@ -164,4 +164,17 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
             Name = p.Name
         }).ToList();
     }
+
+    public async Task<List<PlayerSummary>> GetPlayerSummaryAsync(int teamId)
+    {
+        var players = await _playerRepository.GetAllWithFilterAsync(p => p.IsDeleted == false && p.TeamId == teamId, p => new PlayerSummary
+        {
+            Id = p.Id,
+            Name = p.Name,
+            ImageUrl = p.Image??"",
+            Skill = p.Skill
+        });
+
+        return players;
+    }
 }

@@ -31,6 +31,14 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("summary/{teamId}")]
+    public async Task<IActionResult> GetPlayerSummary(int teamId)
+    {
+        var result = await _playerService.GetPlayerSummaryAsync(teamId);
+        var response = ApiResponseBuilder.With<List<PlayerSummary>>().StatusCode(200).SetData(result).Build();
+        return Ok(response);
+    }
+
     // GET: api/player/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlayer(int id)
