@@ -20,4 +20,5 @@ public class Player
     public Team Team { get; set; }
     public ICollection<UserTeam> UserTeams { get; set; } = [];
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
+    public ICollection<PlayerMatchStates> PlayerMatchStates { get; set; } = [];
 }

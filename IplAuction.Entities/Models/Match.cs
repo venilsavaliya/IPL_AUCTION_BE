@@ -21,4 +21,5 @@ public class Match
     public ICollection<BallEvent> BallEvents { get; set; } = [];
 
     public ICollection<InningState> InningStates { get; set; } = [];
+    public ICollection<PlayerMatchStates> PlayerMatchStates { get; set; } = [];
 }

@@ -38,6 +38,8 @@ public class IplAuctionDbContext : DbContext
     public DbSet<BallEvent> BallEvents { get; set; }
 
     public DbSet<InningState> InningStates { get; set; }
+    
+    public DbSet<PlayerMatchStates> PlayerMatchStates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -166,7 +168,7 @@ public class IplAuctionDbContext : DbContext
         modelBuilder.Entity<ScoringRule>()
             .Property(sr => sr.EventType)
             .HasConversion<string>();
-        
+
         modelBuilder.Entity<BallEvent>()
             .HasOne(b => b.Match)
             .WithMany(m => m.BallEvents)
@@ -229,7 +231,7 @@ public class IplAuctionDbContext : DbContext
             .HasOne(i => i.Bowler)
             .WithMany()
             .HasForeignKey(i => i.BowlerId);
-        
+
         modelBuilder.Entity<InningState>()
             .HasOne(i => i.BattingTeam)
             .WithMany()
@@ -239,6 +241,16 @@ public class IplAuctionDbContext : DbContext
             .HasOne(i => i.BowlingTeam)
             .WithMany()
             .HasForeignKey(i => i.BowlingTeamId);
+
+        modelBuilder.Entity<PlayerMatchStates>()
+            .HasOne(pms => pms.Player)
+            .WithMany(p => p.PlayerMatchStates)
+            .HasForeignKey(pms => pms.PlayerId);
+
+        modelBuilder.Entity<PlayerMatchStates>()
+            .HasOne(pms => pms.Match)
+            .WithMany(m => m.PlayerMatchStates)
+            .HasForeignKey(pms => pms.MatchId);
 
         base.OnModelCreating(modelBuilder);
     }

@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250730081635_AddPlayerMatchState")]
+    partial class AddPlayerMatchState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,9 +447,6 @@ namespace IplAuction.Entities.Migrations
                     b.Property<int>("Stumpings")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Wickets")
                         .HasColumnType("integer");
 
@@ -689,7 +689,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 30, 8, 52, 21, 588, DateTimeKind.Utc).AddTicks(2152),
+                            CreatedAt = new DateTime(2025, 7, 30, 8, 16, 33, 499, DateTimeKind.Utc).AddTicks(1227),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -698,7 +698,7 @@ namespace IplAuction.Entities.Migrations
                             IsNotificationOn = true,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$B3DxruKtSLeCF2bQrroCi.1.hs6kI0Sd5BxL/845duW5gNHlqZayu",
+                            PasswordHash = "$2a$11$x4PbUy6SdRVvkYLSnyFvAur3D6hYXdYCla3yesmg04/7rVxjrW9Iy",
                             Role = "Admin"
                         });
                 });

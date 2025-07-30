@@ -71,11 +71,11 @@ public class BallEventService(IBallEventRepository ballEventRepository, IInningS
     {
         if (inningNumber.HasValue)
         {
-            return await _ballEventRepository.GetEagerLoadAllWithFilterAsync(b => b.MatchId == matchId && b.InningNumber == inningNumber.Value, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
+            return await _ballEventRepository.GetAllWithEagerLoadAndFilterAsync(b => b.MatchId == matchId && b.InningNumber == inningNumber.Value, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
         }
         else
         {
-            return await _ballEventRepository.GetEagerLoadAllWithFilterAsync(b => b.MatchId == matchId, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
+            return await _ballEventRepository.GetAllWithEagerLoadAndFilterAsync(b => b.MatchId == matchId, b => b.Bowler, b => b.Batsman, b => b.NonStriker);
         }
     }
 

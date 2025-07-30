@@ -43,7 +43,7 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         return await _dbSet.Where(filter).ToListAsync();
     }
 
-    public async Task<List<T>> GetEagerLoadAllWithFilterAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+    public async Task<List<T>> GetAllWithEagerLoadAndFilterAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
     {
         IQueryable<T> query = _dbSet;
 
