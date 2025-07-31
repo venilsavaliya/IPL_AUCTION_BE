@@ -32,6 +32,14 @@ public class PlayerMatchStateController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("match-points/{matchId}")]
+    public async Task<IActionResult> GetMatchPoints(int matchId)
+    {
+        MatchPointsResponseModel data = await _playerMatchStateService.GetMatchPoints(matchId);
+        var response = ApiResponseBuilder.With<MatchPointsResponseModel>().SetData(data).Build();
+        return Ok(response);
+    }
+
     [HttpPut]
     public async Task<IActionResult> UpdatePlayerMatchState(List<UpdatePlayerMatchStateRequest> request)
     {

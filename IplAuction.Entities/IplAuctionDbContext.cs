@@ -41,6 +41,8 @@ public class IplAuctionDbContext : DbContext
     
     public DbSet<PlayerMatchStates> PlayerMatchStates { get; set; }
 
+    public DbSet<Season> Seasons { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(new User()
@@ -252,6 +254,17 @@ public class IplAuctionDbContext : DbContext
             .WithMany(m => m.PlayerMatchStates)
             .HasForeignKey(pms => pms.MatchId);
 
+        modelBuilder.Entity<Match>()
+            .HasOne(m => m.Season)
+            .WithMany(s => s.Matches)
+            .HasForeignKey(m => m.SeasonId);    
+        
+        modelBuilder.Entity<Auction>()
+            .HasOne(a => a.Season)
+            .WithMany(s => s.Auctions)
+            .HasForeignKey(a => a.SeasonId);
+        
+       
         base.OnModelCreating(modelBuilder);
     }
 }

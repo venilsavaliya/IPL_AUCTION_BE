@@ -76,4 +76,22 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
 
         await _auctionParticipantRepo.SaveChangesAsync();
     }
+
+    // public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(int auctionId)
+    // {
+    //     List<AuctionParticipants> participants = await _auctionParticipantRepo.GetAllWithEagerLoadAndFilterAsync(ap => ap.AuctionId == auctionId, ap => ap.User.UserTeams);
+
+    //     var data = participants.Select(p=>
+    //     {
+    //         return new AuctionParticipantDetail
+    //         {
+    //             AuctionId = p.AuctionId,
+    //             UserId = p.UserId,
+    //             ImageUrl = p.User?.Image,
+    //             TotalPlayers = p.User?.UserTeams != null ? p.User.UserTeams.Count : 0,
+    //             UserName = p.User?.FirstName + p.User?.LastName,
+    //             Points = p.User
+    //         }
+    //     })
+    // }
 }

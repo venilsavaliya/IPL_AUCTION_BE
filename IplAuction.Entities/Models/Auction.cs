@@ -8,6 +8,8 @@ public class Auction
 
     public string Title { get; set; } = null!;
 
+    public int? SeasonId { get; set; }
+
     public int ManagerId { get; set; }
 
     public DateTime StartDate { get; set; }
@@ -38,6 +40,7 @@ public class Auction
 
     public ICollection<Bid> Bids { get; set; } = [];
 
+    public Season? Season { get; set; }
     public ICollection<UserTeam> UserTeams { get; set; } = [];
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
 }

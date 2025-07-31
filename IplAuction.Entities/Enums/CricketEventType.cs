@@ -15,6 +15,7 @@ public enum CricketEventType
     ThreeCatchHaul,     // 3 or more catches in match
     Stumping,
     DirectRunOut,
+    RunOut,
     AssistedRunOut,
 
     // Bowling Events

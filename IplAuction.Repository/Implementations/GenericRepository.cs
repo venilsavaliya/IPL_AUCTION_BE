@@ -87,8 +87,6 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         _dbSet.RemoveRange(entities);
     }
 
-
-
     public void Update(T entity)
     {
         _dbSet.Update(entity);
@@ -99,11 +97,14 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         _dbSet.Remove(entity);
     }
 
+    public void DeleteRange(IEnumerable<T> entities)
+    {
+        _dbSet.RemoveRange(entities);
+    }
+
     public async Task<bool> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync() > 0;
     }
-
-
 }
 

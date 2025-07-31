@@ -55,6 +55,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IInningStateService, InningStateService>();
         services.AddScoped<IPlayerMatchStateRepository, PlayerMatchStateRepository>();
         services.AddScoped<IPlayerMatchStateService, PlayerMatchStateService>();
+        services.AddScoped<ICalculatePlayerPointsService, CalculatePlayerPointsService>();
+
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddScoped<IUnitOfWork,UnitOfWork >();
 

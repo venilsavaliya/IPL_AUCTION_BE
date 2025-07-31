@@ -7,4 +7,5 @@ public interface IPlayerMatchStateService
     Task AddPlayerMatchState(AddPlayerMatchStateRequest request);
     Task<List<PlayerMatchStateResponse>> GetPlayerMatchStates(PlayerMatchStateRequestParams request);
     Task UpdatePlayerMatchState(List<UpdatePlayerMatchStateRequest> request);
+    Task<MatchPointsResponseModel> GetMatchPoints(int matchId);
 }
