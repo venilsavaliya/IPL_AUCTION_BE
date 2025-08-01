@@ -10,6 +10,7 @@ public class AuctionResponseModel
         Id = a.Id;
         ManagerId = a.ManagerId;
         StartDate = a.StartDate;
+        SeasonId = a.SeasonId;
         AuctionStatus = a.AuctionStatus;
         Title = a.Title;
         MaximumPurseSize = a.MaximumPurseSize;
@@ -22,6 +23,8 @@ public class AuctionResponseModel
     public int Id { get; set; }
 
     public string Title { get; set; } = null!;
+
+     public int SeasonId { get; set; }
 
     public int ManagerId { get; set; }
 

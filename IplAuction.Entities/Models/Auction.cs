@@ -8,7 +8,7 @@ public class Auction
 
     public string Title { get; set; } = null!;
 
-    public int? SeasonId { get; set; }
+    public int SeasonId { get; set; }
 
     public int ManagerId { get; set; }
 

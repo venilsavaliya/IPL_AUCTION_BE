@@ -36,6 +36,14 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
             }
         }
 
+        // Filtering By Season
+        if (filterParams.SeasonId != null)
+        {
+
+            query = query.Where(u => u.SeasonId == filterParams.SeasonId);
+
+        }
+
         //Filtering Date
         if (filterParams.FromDate.HasValue && filterParams.ToDate.HasValue)
         {
@@ -79,7 +87,7 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
             AuctionTitle = u.Title,
             AuctionStatus = u.AuctionStatus,
             StartTime = u.StartDate,
-            AmountRemaining =u.MaximumPurseSize - u.UserTeams.Where(ut => ut.UserId == filterParams.UserId).Sum(ut => ut.Price),
+            AmountRemaining = u.MaximumPurseSize - u.UserTeams.Where(ut => ut.UserId == filterParams.UserId).Sum(ut => ut.Price),
             TotalPlayer = u.UserTeams.Count(ut => ut.UserId == filterParams.UserId)
         });
 
@@ -111,9 +119,9 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         }
 
         // Sorting Computed Fields
-        var allowedCustomSort = new[] { "TotalPlayer", "AmountRemaining","AuctionTitle","StartTime"};
+        var allowedCustomSort = new[] { "TotalPlayer", "AmountRemaining", "AuctionTitle", "StartTime" };
 
-         var sortBy = allowedCustomSort.Contains(filterParams.SortBy) ? filterParams.SortBy : "AuctionId";
+        var sortBy = allowedCustomSort.Contains(filterParams.SortBy) ? filterParams.SortBy : "AuctionId";
         var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
         query = query.OrderBy($"{sortBy} {sortDirection}");
 

@@ -8,4 +8,6 @@ public class MatchRequest
 
     public DateTime StartDate { get; set; }
 
+    public int SeasonId { get; set; }
+
 }

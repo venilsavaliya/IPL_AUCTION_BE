@@ -22,4 +22,6 @@ public interface IAuctionParticipantService
 
     Task<List<AuctionTeamResponseModel>> GetAllJoinedTeams(int auctionId);
     Task DeductUserBalance(DeductBalanceRequest request);
+
+    Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(AuctionParticipantDetailRequestModel request);
 }

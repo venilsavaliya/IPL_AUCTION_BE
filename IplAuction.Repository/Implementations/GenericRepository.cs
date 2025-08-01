@@ -32,6 +32,17 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
 
         return await query.FirstOrDefaultAsync(filter);
     }
+    public T? GetWithFilter(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return query.FirstOrDefault(filter);
+    }
 
     public async Task<T1?> GetWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
     {
@@ -65,6 +76,16 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
     public async Task<List<T1>> GetAllWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
     {
         return await _dbSet.Where(filter).Select(selector).ToListAsync();
+    }
+
+    public List<T1> GetAllWithFilter<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
+    {
+        return _dbSet.Where(filter).Select(selector).ToList();
+    }
+
+    public async Task<List<T1>> GetAllAsync<T1>(Expression<Func<T, T1>> selector)
+    {
+        return await _dbSet.Select(selector).ToListAsync();
     }
 
     public async Task<T?> FindAsync(int id)

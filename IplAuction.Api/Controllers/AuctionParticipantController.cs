@@ -40,4 +40,14 @@ public class AuctionParticipantController(IAuctionParticipantService auctionPart
 
         return Ok(response);
     }
+
+    [HttpPost("detail")]
+    public async Task<IActionResult> GetAuctionPaticipantsDetail(AuctionParticipantDetailRequestModel request)
+    {
+        List<AuctionParticipantDetail> users = await _auctionParticipantService.GetAuctionParticipantDetails(request);
+
+        var response = ApiResponseBuilder.With<List<AuctionParticipantDetail>>().SetData(users).Build();
+
+        return Ok(response);
+    }
 }

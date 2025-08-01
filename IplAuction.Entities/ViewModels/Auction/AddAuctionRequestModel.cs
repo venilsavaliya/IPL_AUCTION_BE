@@ -6,6 +6,8 @@ public class AddAuctionRequestModel
 {
     public string Title { get; set; } = null!;
 
+    public int SeasonId { get; set; }
+
     public DateTime StartDate { get; set; }
 
     public int MinimumBidIncreament { get; set; }
@@ -14,7 +16,7 @@ public class AddAuctionRequestModel
 
     public int MaximumTeamsCanJoin { get; set; }
 
-    public bool AuctionMode { get; set; } 
+    public bool AuctionMode { get; set; }
 
     public List<int> ParticipantUserIds { get; set; } = []; 
 

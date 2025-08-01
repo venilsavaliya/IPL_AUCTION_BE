@@ -47,6 +47,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
                 Title = request.Title,
                 ManagerId = (int)UserId,
                 StartDate = request.StartDate,
+                SeasonId = request.SeasonId,
                 AuctionStatus = request.AuctionStatus,
                 MinimumBidIncreament = request.MinimumBidIncreament,
                 MaximumPurseSize = request.MaximumPurseSize,
@@ -119,8 +120,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     {
         int userId = _currentUser.UserId;
 
-
-
         UserResponseViewModel user = await _userService.GetByIdAsync(userId) ?? throw new NotFoundException(nameof(User));
 
         // Here Admin Can Fetch All the Auction And Manager Can Fetch The Auction Which Created By Him
@@ -155,7 +154,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         return teams;
     }
-
 
     public async Task UpdateAuctionAsync(UpdateAuctionRequestModel request)
     {
@@ -231,16 +229,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         await _auctionParticipantService.AddParticipantAsync(auction.Id, userId);
 
-        // AuctionParticipants auctionParticipants = new()
-        // {
-        //     UserId = (int)userId,
-        //     AuctionId = id
-        // };
-
-        // await _auctionParticipantRepo.AddAsync(auctionParticipants);
-
-        // await _auctionParticipantRepo.SaveChangesAsync();
-
         return true;
     }
 
@@ -285,44 +273,4 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         return userAuctions;
     }
-
-
-
-    // public async Task<PlayerResponseDetailModel> GetRandomUnAuctionedPlayer(int auctionId)
-    // {
-    //     IQueryable<AuctionPlayer> players = _auctionPlayerRepo.GetAllQueryableWithFilterAsync(p => p.IsAuctioned == false && p.AuctionId == auctionId);
-
-    //     AuctionPlayer auctionPlayer = await players.OrderBy(p => Guid.NewGuid()).FirstOrDefaultAsync() ?? throw new NotFoundException(nameof(AuctionPlayer));
-
-    //     // Player? player = await _playerRepository.GetWithFilterAsync(p => p.Id == auctionPlayer.PlayerId) ?? throw new NotFoundException(nameof(Player));
-
-    //     PlayerResponseDetailModel player = await _playerService.GetPlayerByIdAsync(auctionPlayer.Id);
-
-    //     // PlayerResponseModel response = new()
-    //     // {
-    //     //     PlayerId = player.Id,
-    //     //     BasePrice = player.BasePrice,
-    //     //     ImageUrl = player.Image,
-    //     //     Name = player.Name,
-    //     //     Skill = player.Skill,
-    //     //     Age = CalculateAge.CalculateAgeFromDbo(player.DateOfBirth),
-    //     //     Country = player.Country
-    //     // };
-
-    //     return player;
-    // }
-
-    // public async Task AddPlayerToAuction(ManageAuctionPlayerRequest request)
-    // {
-    //     await _auctionPlayerService.AddAuctionPlayer(request);
-    // }
-
-    // public async Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request)
-    // {
-    //     AuctionPlayer auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId) ?? throw new NotFoundException(nameof(AuctionPlayer));
-
-    //     _auctionPlayerRepo.Delete(auctionPlayer);
-
-    //     await _auctionRepository.SaveChangesAsync();
-    // }
 }

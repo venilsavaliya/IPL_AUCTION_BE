@@ -33,8 +33,14 @@ public class MatchRepository(IplAuctionDbContext context) : GenericRepository<Ma
             query = query.Where(u => u.StartDate >= fromDateUtc && u.StartDate <= toDateUtc);
         }
 
+        // Filtering Season 
+        if (filterParams.SeasonId != null)
+        {
+            query = query.Where(p => p.SeasonId == filterParams.SeasonId);
+        }
+
         // Sorting
-        var allowedSorts = new[] { "StartDate" };
+            var allowedSorts = new[] { "StartDate" };
         var sortBy = allowedSorts.Contains(filterParams.SortBy) ? filterParams.SortBy : "Id";
         var sortDirection = filterParams.SortDirection?.ToLower() == "asc" ? "asc" : "desc";
         query = query.OrderBy($"{sortBy} {sortDirection}");

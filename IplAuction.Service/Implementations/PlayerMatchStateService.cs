@@ -111,14 +111,14 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
         {
             int totalPoints = 0;
 
-            totalPoints += p.Fours * GetPoints(scoringRulesMap, CricketEventType.Four) + p.Fours * 4;
-            totalPoints += p.Sixes * GetPoints(scoringRulesMap, CricketEventType.Six) + p.Sixes * 6;
+            totalPoints += p.Fours * GetPoints(scoringRulesMap, CricketEventType.Four);
+            totalPoints += p.Sixes * GetPoints(scoringRulesMap, CricketEventType.Six);
             totalPoints += p.Runs * GetPoints(scoringRulesMap, CricketEventType.Run);
             totalPoints += p.Wickets * GetPoints(scoringRulesMap, CricketEventType.Wicket);
             totalPoints += p.Catches * GetPoints(scoringRulesMap, CricketEventType.Catch);
             totalPoints += p.Stumpings * GetPoints(scoringRulesMap, CricketEventType.Stumping);
             totalPoints += p.RunOuts * GetPoints(scoringRulesMap, CricketEventType.RunOut);
-            totalPoints += p.RunOuts * GetPoints(scoringRulesMap, CricketEventType.MaidenOver);
+            totalPoints += p.MaidenOvers * GetPoints(scoringRulesMap, CricketEventType.MaidenOver);
 
             return new PlayerMatchStatesForMatchPointsResponse
             {

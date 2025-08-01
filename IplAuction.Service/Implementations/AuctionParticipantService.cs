@@ -7,13 +7,15 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class AuctionParticipantService(IAuctionParticipantRepository auctionParticipantRepo) : IAuctionParticipantService
+public class AuctionParticipantService(IAuctionParticipantRepository auctionParticipantRepo, IMatchPointservice matchPointservice) : IAuctionParticipantService
 {
     private readonly IAuctionParticipantRepository _auctionParticipantRepo = auctionParticipantRepo;
 
+    private readonly IMatchPointservice _matchPointservice = matchPointservice;
+
     public async Task AddParticipantAsync(int auctionId, int userId)
-    {   
-        
+    {
+
 
         AuctionParticipants auctionParticipants = new()
         {
@@ -77,21 +79,28 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
         await _auctionParticipantRepo.SaveChangesAsync();
     }
 
-    // public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(int auctionId)
-    // {
-    //     List<AuctionParticipants> participants = await _auctionParticipantRepo.GetAllWithEagerLoadAndFilterAsync(ap => ap.AuctionId == auctionId, ap => ap.User.UserTeams);
+    // This Will Return List Of AuctionParticipants With Their Name And Total Points For that Season in Which Auction Held
+    public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(AuctionParticipantDetailRequestModel request)
+    {
+        List<AuctionParticipants> participants = await _auctionParticipantRepo.GetAllWithEagerLoadAndFilterAsync(ap => ap.AuctionId == request.AuctionId, ap => ap.User.UserTeams);
 
-    //     var data = participants.Select(p=>
-    //     {
-    //         return new AuctionParticipantDetail
-    //         {
-    //             AuctionId = p.AuctionId,
-    //             UserId = p.UserId,
-    //             ImageUrl = p.User?.Image,
-    //             TotalPlayers = p.User?.UserTeams != null ? p.User.UserTeams.Count : 0,
-    //             UserName = p.User?.FirstName + p.User?.LastName,
-    //             Points = p.User
-    //         }
-    //     })
-    // }
+        var task = participants.Select(async p =>
+        {
+            List<int> playerIds = p.User.UserTeams.Select(u => u.PlayerId).ToList();
+
+            return new AuctionParticipantDetail
+            {
+                AuctionId = p.AuctionId,
+                UserId = p.UserId,
+                ImageUrl = p.User?.Image,
+                TotalPlayers = p.User?.UserTeams != null ? p.User.UserTeams.Count : 0,
+                UserName = p.User?.FirstName + p.User?.LastName,
+                Points = await _matchPointservice.GetTotalPointsOfAllPlayersBySeasonId(playerIds, request.SeasonId)
+            };
+        }).ToList();
+
+        var data = await Task.WhenAll(task);
+
+        return data.ToList();
+    }
 }

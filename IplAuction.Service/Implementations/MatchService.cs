@@ -22,7 +22,8 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         {
             TeamAId = request.TeamAId,
             TeamBId = request.TeamBId,
-            StartDate = request.StartDate
+            StartDate = request.StartDate,
+            SeasonId = request.SeasonId
         };
 
         await _matchRepository.AddAsync(match);
@@ -36,6 +37,7 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         match.TeamAId = request.TeamAId;
         match.TeamBId = request.TeamBId;
         match.StartDate = request.StartDate;
+        match.SeasonId = request.SeasonId;
 
         await _matchRepository.SaveChangesAsync();
     }
@@ -88,8 +90,6 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         match.InningNumber = inningNumber;
         await _matchRepository.SaveChangesAsync();
     }
-    
-    
 
     public async Task<LiveMatchStatusResponse> GetLiveMatchStatus(int matchId)
     {
