@@ -37,6 +37,8 @@ public interface IAuctionService
 
     Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams);
 
+    Task<int> GetSeasonIdFromAuctionId(int auctionId);
+
     // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
 
     // Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);

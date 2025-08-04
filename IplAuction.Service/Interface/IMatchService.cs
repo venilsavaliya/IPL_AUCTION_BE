@@ -1,4 +1,5 @@
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.Match;
 
 namespace IplAuction.Service.Interface;
@@ -18,4 +19,7 @@ public interface IMatchService
     Task UpdateMatchInningNumber(int matchId, int inningNumber);
     Task ChangeMatchInning(int matchId, int inningNumber);
     Task<LiveMatchStatusResponse> GetLiveMatchStatus(int matchId);
+    Task<int> GetSeasonIdFromMatchId(int matchId);
+
+    Task<List<AuctionParticipantMantchDetail>> GetAuctionParticipantMantchDetailsAsync(int auctionId, int userId);
 }

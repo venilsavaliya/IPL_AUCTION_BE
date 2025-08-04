@@ -6,7 +6,7 @@ public class Match
 {
     public int Id { get; set; }
 
-    public int? SeasonId { get; set; }
+    public int SeasonId { get; set; }
 
     public int TeamAId { get; set; }
 

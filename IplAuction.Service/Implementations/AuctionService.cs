@@ -273,4 +273,11 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         return userAuctions;
     }
+
+    public async Task<int> GetSeasonIdFromAuctionId(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId && a.IsDeleted != true) ?? throw new NotFoundException(nameof(Auction));
+
+        return auction.SeasonId;
+    }
 }

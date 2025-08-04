@@ -149,6 +149,14 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         return Ok(response);
     }
 
+    [HttpGet("seasonId/{auctionId}")]
+    public async Task<IActionResult> GetSeasonIdFromAuctionId(int auctionId)
+    {
+        int seasonId = await _auctionService.GetSeasonIdFromAuctionId(auctionId);
+
+        return Ok(seasonId);
+    }
+
 
     // [HttpPost("/AddPlayer")]
     // public async Task<IActionResult> AddPlayerToAuction([FromBody] ManageAuctionPlayerRequest request)

@@ -79,4 +79,20 @@ public class MatchController(IMatchService matchService) : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet("seasonId/{matchId}")]
+    public async Task<IActionResult> GetSeasonIdFromAuctionId(int matchId)
+    {
+        int seasonId = await _matchService.GetSeasonIdFromMatchId(matchId);
+
+        return Ok(seasonId);
+    }
+
+    [HttpPost("AuctionParticipantMatches")]
+    public async Task<IActionResult> GetAuctionParticipantMatchDetailList(AuctionParticipantMatchListRequestModel request)
+    {
+        var result = await _matchService.GetAuctionParticipantMantchDetailsAsync(request.AuctionId, request.UserId);
+
+        return Ok(result);
+    }
 }

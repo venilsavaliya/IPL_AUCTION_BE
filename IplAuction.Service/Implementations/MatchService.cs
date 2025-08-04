@@ -1,6 +1,7 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.Match;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
@@ -265,5 +266,17 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
             RecentBalls = recentBalls,
             InningStateId = inningState.Id
         };
+    }
+
+    public async Task<int> GetSeasonIdFromMatchId(int matchId)
+    {
+        Match match = await _matchRepository.GetWithFilterAsync(a => a.Id == matchId && a.IsDeleted != true) ?? throw new NotFoundException(nameof(Match));
+
+        return match.SeasonId;
+    }
+
+    public async Task<List<AuctionParticipantMantchDetail>> GetAuctionParticipantMantchDetailsAsync(int auctionId, int userId)
+    {
+        return await _matchRepository.GetAuctionParticipantMantchDetailsAsync(auctionId, userId);
     }
 }

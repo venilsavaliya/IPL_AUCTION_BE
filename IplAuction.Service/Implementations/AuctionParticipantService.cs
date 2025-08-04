@@ -82,25 +82,27 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
     // This Will Return List Of AuctionParticipants With Their Name And Total Points For that Season in Which Auction Held
     public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(AuctionParticipantDetailRequestModel request)
     {
-        List<AuctionParticipants> participants = await _auctionParticipantRepo.GetAllWithEagerLoadAndFilterAsync(ap => ap.AuctionId == request.AuctionId, ap => ap.User.UserTeams);
+        // List<AuctionParticipants> participants = await _auctionParticipantRepo.GetAllWithEagerLoadAndFilterAsync(ap => ap.AuctionId == request.AuctionId, ap => ap.User.UserTeams);
 
-        var task = participants.Select(async p =>
-        {
-            List<int> playerIds = p.User.UserTeams.Select(u => u.PlayerId).ToList();
+        // var task = participants.Select(async p =>
+        // {
+        //     List<int> playerIds = p.User.UserTeams.Select(u => u.PlayerId).ToList();
 
-            return new AuctionParticipantDetail
-            {
-                AuctionId = p.AuctionId,
-                UserId = p.UserId,
-                ImageUrl = p.User?.Image,
-                TotalPlayers = p.User?.UserTeams != null ? p.User.UserTeams.Count : 0,
-                UserName = p.User?.FirstName + p.User?.LastName,
-                Points = await _matchPointservice.GetTotalPointsOfAllPlayersBySeasonId(playerIds, request.SeasonId)
-            };
-        }).ToList();
+        //     return new AuctionParticipantDetail
+        //     {
+        //         AuctionId = p.AuctionId,
+        //         UserId = p.UserId,
+        //         ImageUrl = p.User?.Image,
+        //         TotalPlayers = p.User?.UserTeams != null ? p.User.UserTeams.Count : 0,
+        //         UserName = p.User?.FirstName + p.User?.LastName,
+        //         Points = await _matchPointservice.GetTotalPointsOfAllPlayersBySeasonId(playerIds, request.SeasonId)
+        //     };
+        // }).ToList();
 
-        var data = await Task.WhenAll(task);
+        // var data = await Task.WhenAll(task);
 
-        return data.ToList();
+        // return data.ToList();
+
+        return await _auctionParticipantRepo.GetAuctionParticipantsDetailList(request);
     }
 }
