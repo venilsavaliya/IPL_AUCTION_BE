@@ -59,6 +59,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<ISeasonService, SeasonService>();
         services.AddScoped<IMatchPointservice, MatchPointService>();
         services.AddScoped<ICalculatePlayerPointsService, CalculatePlayerPointsService>();
+        services.AddScoped<IPlayerImportService, PlayerImportService>();
 
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.AddScoped<IUnitOfWork,UnitOfWork >();

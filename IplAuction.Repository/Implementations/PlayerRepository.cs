@@ -8,6 +8,7 @@ using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace IplAuction.Repository.Implementations;
 
@@ -73,7 +74,7 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
             ImageUrl = u.Image,
             TeamName = u.Team.Name,
             Skill = u.Skill,
-            Age = CalculateAge.CalculateAgeFromDbo(u.DateOfBirth),
+            Age = u.DateOfBirth != null ? CalculateAge.CalculateAgeFromDbo(u.DateOfBirth.Value) : 0,
             Country = u.Country,
             IsActive = u.IsActive,
             BasePrice = u.BasePrice
@@ -98,5 +99,11 @@ public class PlayerRepository(IplAuctionDbContext context) : GenericRepository<P
                         .Select(p => new PlayerResponseModel(p)).FirstOrDefaultAsync() ?? throw new NotFoundException(nameof(player));
 
         return player;
+    }
+
+    public Dictionary<string, int> GetPlayerNameIdDictionary()
+    {
+        var players = _context.Players.Where(p=>p.IsDeleted!=true).ToDictionary(p => p.Name.ToLower(), p => p.Id);
+        return players;
     }
 }

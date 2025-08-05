@@ -19,4 +19,5 @@ public interface IPlayerService
     Task<List<PlayerIdName>> GetAllPlayerIdNameAsync();
     Task<List<PlayerIdName>> GetPlayersByTeamIdAsync(int teamId);
     Task<List<PlayerSummary>> GetPlayerSummaryAsync(int teamId);
+    Dictionary<string, int> GetPlayerNameIdDictionary();
 }

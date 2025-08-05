@@ -50,4 +50,15 @@ public class AuctionParticipantController(IAuctionParticipantService auctionPart
 
         return Ok(response);
     }
+
+    [HttpPost("Alldetail")]
+
+     public async Task<IActionResult> GetAuctionPaticipantsAllDetail(AuctionParticipantAllDetailRequestModel request)
+    {
+        AuctionParticipantAllDetail user = await _auctionParticipantService.GetAllDetailOfAuctionParticipant(request);
+
+        var response = ApiResponseBuilder.With<AuctionParticipantAllDetail>().SetData(user).Build();
+
+        return Ok(response);
+    }
 }

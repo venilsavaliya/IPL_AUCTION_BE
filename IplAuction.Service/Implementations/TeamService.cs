@@ -2,9 +2,7 @@ using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
-using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.Team;
-using IplAuction.Entities.ViewModels.User;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
@@ -94,5 +92,10 @@ public class TeamService(ITeamRepository teamRepository, IFileStorageService fil
     public async Task<List<TeamPlayerResponse>> GetAllPlayersByTeamId(int id)
     {
         return await _teamRepository.GetAllPlayersByTeamId(id);
+    }
+
+    public Dictionary<string, int> GetTeamNameIdDictionary()
+    {
+        return _teamRepository.GetAllTeamNameIdDictionary();
     }
 }

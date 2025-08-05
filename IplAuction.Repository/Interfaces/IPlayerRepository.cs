@@ -11,5 +11,5 @@ public interface IPlayerRepository : IGenericRepository<Player>
     Task AddPlayersAsync(List<Player> players);
 
     Task<PlayerResponseModel> GetRadomUnAuctionedPlayer(int auctionId);
-   
+    Dictionary<string, int> GetPlayerNameIdDictionary();
 }

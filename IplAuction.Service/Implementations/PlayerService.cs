@@ -86,7 +86,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         return player;
     }
 
-    
+
 
     public async Task<PlayerResponseModel> GetPlayerByIdAsync(int id)
     {
@@ -144,7 +144,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
         return player;
     }
-    
+
     public async Task<List<PlayerIdName>> GetAllPlayerIdNameAsync()
     {
         var players = await _playerRepository.GetAllAsync();
@@ -171,10 +171,15 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         {
             Id = p.Id,
             Name = p.Name,
-            ImageUrl = p.Image??"",
+            ImageUrl = p.Image ?? "",
             Skill = p.Skill
         });
 
         return players;
+    }
+
+    public Dictionary<string, int> GetPlayerNameIdDictionary()
+    {
+        return _playerRepository.GetPlayerNameIdDictionary();
     }
 }

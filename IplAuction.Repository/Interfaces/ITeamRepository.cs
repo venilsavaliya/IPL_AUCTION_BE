@@ -10,4 +10,6 @@ public interface ITeamRepository : IGenericRepository<Team>
     Task<PaginatedResult<TeamResponseViewModel>> GetFilteredTeamsAsync(TeamFilterParam filterParams);
 
     Task<List<TeamPlayerResponse>> GetAllPlayersByTeamId(int id);
+
+    Dictionary<string, int> GetAllTeamNameIdDictionary();
 }

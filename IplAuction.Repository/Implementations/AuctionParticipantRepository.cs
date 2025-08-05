@@ -1,4 +1,3 @@
-using System.Data.Common;
 using IplAuction.Entities;
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
@@ -81,14 +80,13 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
 
         // Step 1: Load data first
         var participants = await _context.AuctionParticipants
-     .Where(ap => ap.AuctionId == auctionId)
-     .Include(ap => ap.User)
-         .ThenInclude(u => u.UserTeams)
-             .ThenInclude(ut => ut.Player)
-                 .ThenInclude(p => p.PlayerMatchStates)
-                     .ThenInclude(pms => pms.Match)
-     .ToListAsync();
-
+            .Where(ap => ap.AuctionId == auctionId)
+            .Include(ap => ap.User)
+                .ThenInclude(u => u.UserTeams)
+                    .ThenInclude(ut => ut.Player)
+                        .ThenInclude(p => p.PlayerMatchStates)
+                            .ThenInclude(pms => pms.Match)
+            .ToListAsync();
 
         // Step 2: Calculate points in-memory
         var result = participants.Select(ap =>
@@ -124,4 +122,128 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         return result;
     }
 
+    public async Task<AuctionParticipantAllDetail> GetAllDetailOfAuctionParticipant(AuctionParticipantAllDetailRequestModel request)
+    {
+        Auction auction = await _context.Auctions.FirstOrDefaultAsync(s => s.Id == request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        int seasonId = auction.SeasonId;
+
+        int totalParticipants = _context.AuctionParticipants.Where(ap => ap.AuctionId == request.AuctionId).Count();
+
+        int totalPlayers = _context.UserTeams.Where(ut => ut.UserId == request.UserId && ut.AuctionId == request.AuctionId).Count();
+
+        var resultData = _context.Users.Where(ap => ap.Id == request.UserId).Select(u => new AuctionParticipantAllDetail
+        {
+            AuctionId = request.AuctionId,
+            ImageUrl = u.Image,
+            UserId = request.UserId,
+            UserName = u.FirstName + " " + u.LastName,
+            BalanceLeft = u.AuctionParticipants.Where(ap => ap.AuctionId == request.AuctionId && ap.UserId == request.UserId).Select(ap => ap.PurseBalance).FirstOrDefault(),
+            TotalPlayers = totalPlayers,
+            TotalParticipants = totalParticipants,
+            Rank = 0,
+            Points = 0
+        }).FirstOrDefault() ?? new AuctionParticipantAllDetail();
+
+        var config = await _context.ScoringRules.ToDictionaryAsync(s => s.EventType, s => s.Points);
+
+        var userWiseData = await
+        (from ut in _context.UserTeams
+         join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+         where ut.AuctionId == request.AuctionId
+         group new { pms } by new { ut.UserId, ut.AuctionId } into g
+         select new
+         {
+             g.Key.UserId,
+             g.Key.AuctionId,
+             Fours = g.Sum(x => x.pms.Fours),
+             Sixes = g.Sum(x => x.pms.Sixes),
+             Wickets = g.Sum(x => x.pms.Wickets),
+             Catches = g.Sum(x => x.pms.Catches),
+             Stumpings = g.Sum(x => x.pms.Stumpings),
+             RunOuts = g.Sum(x => x.pms.RunOuts),
+             MaidenOvers = g.Sum(x => x.pms.MaidenOvers),
+             Runs = g.Sum(x => x.pms.Runs),
+         }
+        ).ToListAsync();
+
+        var userWiseTotalPoints = userWiseData.Select(x => new
+        {
+            x.UserId,
+            Points = x.Fours * config.GetValueOrDefault(CricketEventType.Four) +
+                        x.Sixes * config.GetValueOrDefault(CricketEventType.Six) +
+                        x.Wickets * config.GetValueOrDefault(CricketEventType.Wicket) +
+                        x.Catches * config.GetValueOrDefault(CricketEventType.Catch) +
+                        x.Stumpings * config.GetValueOrDefault(CricketEventType.Stumping) +
+                        x.RunOuts * config.GetValueOrDefault(CricketEventType.RunOut) +
+                        x.MaidenOvers * config.GetValueOrDefault(CricketEventType.MaidenOver) +
+                        x.Runs * config.GetValueOrDefault(CricketEventType.Run)
+        }).OrderByDescending(x => x.Points).ToList();
+
+        var index = 0;
+        var userWiseTotalPointsData = userWiseTotalPoints.Select(x =>
+        {
+            index++;
+            return new
+            {
+                x.UserId,
+                x.Points,
+                Rank = index
+            };
+        }).ToList();
+
+        var matchWiseTotalPointsData = await
+        (from ut in _context.UserTeams
+         where ut.UserId == request.UserId && ut.AuctionId == request.AuctionId
+         join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+         where pms.Match.SeasonId == seasonId
+         group new { pms } by new { pms.MatchId, ut.UserId, pms.PlayerId } into g
+         select new
+         {
+             g.Key.MatchId,
+             g.Key.UserId,
+             g.Key.PlayerId,
+             Fours = g.Sum(x => x.pms.Fours),
+             Sixes = g.Sum(x => x.pms.Sixes),
+             Wickets = g.Sum(x => x.pms.Wickets),
+             Catches = g.Sum(x => x.pms.Catches),
+             Stumpings = g.Sum(x => x.pms.Stumpings),
+             RunOuts = g.Sum(x => x.pms.RunOuts),
+             MaidenOvers = g.Sum(x => x.pms.MaidenOvers),
+             Runs = g.Sum(x => x.pms.Runs),
+         }
+        ).ToListAsync();
+
+        int bestScore = 0;
+
+        var matchWiseTotalPoints = matchWiseTotalPointsData.Select(x =>
+        {
+            int points = x.Fours * config.GetValueOrDefault(CricketEventType.Four) +
+                x.Sixes * config.GetValueOrDefault(CricketEventType.Six) +
+                x.Wickets * config.GetValueOrDefault(CricketEventType.Wicket) +
+                x.Catches * config.GetValueOrDefault(CricketEventType.Catch) +
+                x.Stumpings * config.GetValueOrDefault(CricketEventType.Stumping) +
+                x.RunOuts * config.GetValueOrDefault(CricketEventType.RunOut) +
+                x.MaidenOvers * config.GetValueOrDefault(CricketEventType.MaidenOver) +
+                x.Runs * config.GetValueOrDefault(CricketEventType.Run);
+
+            if (x.UserId == request.UserId && points > bestScore)
+            {
+                bestScore = points;
+            }
+
+            return new
+            {
+                x.MatchId,
+                x.UserId,
+                Points = points
+            };
+        }).ToList();
+
+        resultData.Points = userWiseTotalPoints.Where(x => x.UserId == request.UserId).Select(x => x.Points).FirstOrDefault();
+        resultData.BestScore = bestScore;
+        resultData.Rank = userWiseTotalPointsData.Where(x => x.UserId == request.UserId).Select(x => x.Rank).FirstOrDefault();
+
+        return resultData;
+    }
 }

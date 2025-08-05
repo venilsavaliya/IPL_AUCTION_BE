@@ -23,7 +23,7 @@ public class PlayerResponseModel : PlayerModel
         Name = p.Name;
         ImageUrl = p.Image;
         BasePrice = p.BasePrice;
-        Age = CalculateAge.CalculateAgeFromDbo(p.DateOfBirth);
+        Age = p.DateOfBirth != null ? CalculateAge.CalculateAgeFromDbo(p.DateOfBirth.Value) : 0 ;
         Country = p.Country;
         IsActive = p.IsActive;
         Skill = p.Skill;
@@ -35,7 +35,7 @@ public class PlayerResponseModel : PlayerModel
 public class PlayerResponseDetailModel : PlayerModel
 {
     public int TeamId { get; set; }
-    public DateOnly DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 }
 
 public class PlayerIdName

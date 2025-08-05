@@ -7,9 +7,11 @@ namespace IplAuction.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PlayerController(IPlayerService playerService) : ControllerBase
+public class PlayerController(IPlayerService playerService, IPlayerImportService playerImportService) : ControllerBase
 {
     private readonly IPlayerService _playerService = playerService;
+
+    private readonly IPlayerImportService _playerImportService = playerImportService;
 
     [HttpPost("filter")]
     public async Task<IActionResult> GetPlayers([FromBody] PlayerFilterParams filterParams)
@@ -112,11 +114,20 @@ public class PlayerController(IPlayerService playerService) : ControllerBase
         return Ok(response);
     }
 
-    // [HttpPost("import-csv")]
-    // public async Task<IActionResult> ImportCsv(IFormFile file)
-    // {
-    //     await _playerService.ImportPlayersFromCsvAsync(file);
+    [HttpPost("import-csv")]
+    public async Task<IActionResult> ImportPlayersFromCsv(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("CSV file is required.");
 
-    //     return Ok(new { Message = "Import successful" });
-    // }
+        using var stream = file.OpenReadStream();
+        using var reader = new StreamReader(stream);
+        var result = await _playerImportService.ProcessCsvAsync(reader);
+
+        if (result.Errors.Any())
+            return BadRequest(result); // Return all errors at once
+
+        return Ok("Players imported successfully.");
+    }
+
 }

@@ -1,4 +1,5 @@
 using IplAuction.Entities.DTOs;
+using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.Match;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -93,6 +94,8 @@ public class MatchController(IMatchService matchService) : ControllerBase
     {
         var result = await _matchService.GetAuctionParticipantMantchDetailsAsync(request.AuctionId, request.UserId);
 
-        return Ok(result);
+        var response = ApiResponseBuilder.With<List<AuctionParticipantMantchDetail>>().SetData(result).Build();
+
+        return Ok(response);
     }
 }

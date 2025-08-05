@@ -19,4 +19,6 @@ public interface ITeamService
     Task<PaginatedResult<TeamResponseViewModel>> GetTeamsAsync(TeamFilterParam filterParams);
 
     Task<List<TeamPlayerResponse>> GetAllPlayersByTeamId(int id);
+
+    Dictionary<string, int> GetTeamNameIdDictionary();
 }
