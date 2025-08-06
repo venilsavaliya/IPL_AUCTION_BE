@@ -53,11 +53,21 @@ public class AuctionParticipantController(IAuctionParticipantService auctionPart
 
     [HttpPost("Alldetail")]
 
-     public async Task<IActionResult> GetAuctionPaticipantsAllDetail(AuctionParticipantAllDetailRequestModel request)
+    public async Task<IActionResult> GetAuctionPaticipantsAllDetail(AuctionParticipantAllDetailRequestModel request)
     {
         AuctionParticipantAllDetail user = await _auctionParticipantService.GetAllDetailOfAuctionParticipant(request);
 
         var response = ApiResponseBuilder.With<AuctionParticipantAllDetail>().SetData(user).Build();
+
+        return Ok(response);
+    }
+
+    [HttpPost("PlayersAndDetail")]
+    public async Task<IActionResult> GetAuctionParticipantPlayers(ParticipantPlayerRequestModel request)
+    {
+        AuctionParticipantPlayerResponseModel result = await _auctionParticipantService.GetParticipantsPlayerListAndDetail(request);
+
+        var response = ApiResponseBuilder.With<AuctionParticipantPlayerResponseModel>().SetData(result).Build();
 
         return Ok(response);
     }

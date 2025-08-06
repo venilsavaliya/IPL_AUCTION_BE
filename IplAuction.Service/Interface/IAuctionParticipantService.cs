@@ -12,6 +12,7 @@ public interface IAuctionParticipantService
 
     Task RemoveParticipantsAsync(List<AuctionParticipants> auctionParticipants);
     Task<List<AuctionParticipants>> GetParticipantsByUserIdsAsync(int auctionid, List<int> auctionParticipants);
+    
     Task<List<AuctionParticipants>> GetParticipantsByAuctionIdAsync(int auctionid);
 
     Task<List<UserResponseViewModel>> GetAuctionParticipantsByAuctionId(int auctionid);
@@ -21,9 +22,12 @@ public interface IAuctionParticipantService
     Task<AuctionParticipantResponseModel> GetAuctionParticipant(AuctionParticipantRequestModel requestModel);
 
     Task<List<AuctionTeamResponseModel>> GetAllJoinedTeams(int auctionId);
+
     Task DeductUserBalance(DeductBalanceRequest request);
 
     Task<List<AuctionParticipantDetail>> GetAuctionParticipantDetails(AuctionParticipantDetailRequestModel request);
+
     Task<AuctionParticipantAllDetail> GetAllDetailOfAuctionParticipant(AuctionParticipantAllDetailRequestModel request);
 
+    Task<AuctionParticipantPlayerResponseModel> GetParticipantsPlayerListAndDetail(ParticipantPlayerRequestModel request);
 }

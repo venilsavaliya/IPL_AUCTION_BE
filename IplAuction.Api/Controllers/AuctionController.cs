@@ -157,24 +157,13 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         return Ok(seasonId);
     }
 
+    [HttpPost("mark-completed/{auctionId}")]
+    public async Task<IActionResult> MarkAuctionAsCompleted(int auctionId)
+    {
+        await _auctionService.MarkAuctionAsCompleted(auctionId);
 
-    // [HttpPost("/AddPlayer")]
-    // public async Task<IActionResult> AddPlayerToAuction([FromBody] ManageAuctionPlayerRequest request)
-    // {
-    //     await _auctionService.AddPlayerToAuction(request);
+        var response = ApiResponseBuilder.Create(200);
 
-    //     var response = ApiResponseBuilder.Create(200);
-
-    //     return Ok(response);
-    // }
-
-    // [HttpDelete("/RemovePlayer")]
-    // public async Task<IActionResult> RemovePlayerFromAuction([FromBody] ManageAuctionPlayerRequest request)
-    // {
-    //     await _auctionService.RemovePlayerFromAuction(request);
-
-    //     var response = ApiResponseBuilder.Create(200);
-
-    //     return Ok(response);
-    // }
+        return Ok(response);
+    }
 }

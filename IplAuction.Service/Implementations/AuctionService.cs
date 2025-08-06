@@ -280,4 +280,15 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         return auction.SeasonId;
     }
+
+    public async Task MarkAuctionAsCompleted(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId && a.IsDeleted != true) ?? throw new NotFoundException(nameof(Auction));
+
+        auction.AuctionStatus = AuctionStatus.Completed;
+
+        _auctionRepository.Update(auction);
+
+        await _auctionRepository.SaveChangesAsync();
+    }
 }

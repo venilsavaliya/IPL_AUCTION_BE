@@ -1,5 +1,4 @@
 using IplAuction.Entities.DTOs;
-using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Auction;
 using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
@@ -39,7 +38,5 @@ public interface IAuctionService
 
     Task<int> GetSeasonIdFromAuctionId(int auctionId);
 
-    // Task AddPlayerToAuction(ManageAuctionPlayerRequest request);
-
-    // Task RemovePlayerFromAuction(ManageAuctionPlayerRequest request);
+    Task MarkAuctionAsCompleted(int auctionId);
 }

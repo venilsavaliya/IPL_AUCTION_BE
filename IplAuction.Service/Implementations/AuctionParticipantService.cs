@@ -89,5 +89,10 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
     {
         return await _auctionParticipantRepo.GetAllDetailOfAuctionParticipant(request);
     }
+
+    public async Task<AuctionParticipantPlayerResponseModel> GetParticipantsPlayerListAndDetail(ParticipantPlayerRequestModel request)
+    {
+        return await _auctionParticipantRepo.GetParticipantsPlayerListAndDetail(request);
+    }
     
 }
