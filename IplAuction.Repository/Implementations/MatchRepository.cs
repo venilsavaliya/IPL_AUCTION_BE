@@ -173,7 +173,24 @@ public class MatchRepository(IplAuctionDbContext context) : GenericRepository<Ma
             }
         ).ToListAsync();
 
-        var totalPointsPerMatch = data.GroupBy(x => x.MatchId)
+        var allMatchData = await (
+            from pms in _context.PlayerMatchStates
+            where pms.Match.SeasonId == seasonId
+            select new
+            {
+                pms.MatchId,
+                pms.Fours,
+                pms.Sixes,
+                pms.Runs,
+                pms.Wickets,
+                pms.RunOuts,
+                pms.MaidenOvers,
+                pms.Stumpings,
+                pms.Catches
+            }
+        ).ToListAsync();
+
+        var totalPointsPerMatch = allMatchData.GroupBy(x => x.MatchId)
         .Select(g => new
         {
             MatchId = g.Key,

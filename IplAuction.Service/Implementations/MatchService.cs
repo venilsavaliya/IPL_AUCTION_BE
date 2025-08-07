@@ -147,7 +147,6 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
 
         // 5. Current batsmen (use StrikerId and NonStrikerId from InningState)
 
-        // var currentInningState = inningState.FirstOrDefault(i => i.InningNumber == currentInning);
         var currentBatsmen = new List<BatsmanStatus>();
         if (inningState != null)
         {
@@ -192,9 +191,7 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
         }
 
         // 6. Current bowler (last bowler ID)
-        // var lastBallForBowler = inningBalls.OrderByDescending(b => b.OverNumber).ThenByDescending(b => b.BallNumber).FirstOrDefault();
-        // var lastBallForBowler = await _inningStateService.GetByMatchIdAsync(matchId);
-        BowlerStatus currentBowler = null;
+        BowlerStatus? currentBowler = null;
         if (inningState != null && inningState.BowlerId != 0)
         {
             var bowlerTotalBalls = inningBalls.Where(b => b.BowlerId == inningState.BowlerId).ToList();
@@ -253,8 +250,8 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
             InningNumber = currentInning,
             TeamAId = match.TeamAId,
             TeamBId = match.TeamBId,
-            BattingTeamId = (int)inningState.BattingTeamId,
-            BowlingTeamId = (int)inningState.BowlingTeamId,
+            BattingTeamId = inningState?.BattingTeamId!= null ? (int)inningState.BattingTeamId : 0,
+            BowlingTeamId = inningState?.BowlingTeamId!= null ? (int)inningState.BowlingTeamId : 0,
             TotalRuns = totalRuns,
             TotalWickets = totalWickets,
             Overs = overs,
@@ -264,7 +261,7 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
             CurrentBatsmen = currentBatsmen,
             CurrentBowler = currentBowler,
             RecentBalls = recentBalls,
-            InningStateId = inningState.Id
+            InningStateId = inningState?.Id!=null ? inningState.Id :0
         };
     }
 

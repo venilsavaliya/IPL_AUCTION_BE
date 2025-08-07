@@ -148,9 +148,9 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         var config = await _context.ScoringRules.ToDictionaryAsync(s => s.EventType, s => s.Points);
 
         var userWiseData = await
-        (from ut in _context.UserTeams
+        (from ut in _context.UserTeams where ut.AuctionId == request.AuctionId
          join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
-         where ut.AuctionId == request.AuctionId
+         where pms.Match.SeasonId == seasonId
          group new { pms } by new { ut.UserId, ut.AuctionId } into g
          select new
          {
@@ -240,7 +240,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
             };
         }).ToList();
 
-        resultData.Points = userWiseTotalPoints.Where(x => x.UserId == request.UserId).Select(x => x.Points).FirstOrDefault();
+        resultData.Points = matchWiseTotalPoints.Where(x => x.UserId == request.UserId).Sum(x => x.Points);
         resultData.BestScore = bestScore;
         resultData.Rank = userWiseTotalPointsData.Where(x => x.UserId == request.UserId).Select(x => x.Rank).FirstOrDefault();
 

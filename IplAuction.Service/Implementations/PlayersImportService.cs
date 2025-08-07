@@ -144,103 +144,118 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
         return result;
     }
 
-   
+
     public async Task<CsvImportResult> ProcessImportAsync(IFormFile file)
-{
-    var result = new CsvImportResult();
-    var playersToAdd = new List<Player>();
-    Dictionary<string, int> teams = _teamService.GetTeamNameIdDictionary();
-    Dictionary<string, int> players = _playerService.GetPlayerNameIdDictionary();
-
-    var extension = Path.GetExtension(file.FileName).ToLower();
-
-    if (extension == ".csv")
     {
-        using var reader = new StreamReader(file.OpenReadStream());
-        return await ProcessCsvAsync(reader); // Keep this separate for CSV
-    }
-    else if (extension == ".xlsx" || extension == ".xls")
-    {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; 
+        var result = new CsvImportResult();
+        var playersToAdd = new List<Player>();
+        Dictionary<string, int> teams = _teamService.GetTeamNameIdDictionary();
+        Dictionary<string, int> players = _playerService.GetPlayerNameIdDictionary();
 
-        using var stream = new MemoryStream();
-        await file.CopyToAsync(stream);
+        var extension = Path.GetExtension(file.FileName).ToLower();
 
-        using var package = new ExcelPackage(stream);
-        var worksheet = package.Workbook.Worksheets[0];
+        ExcelPackage.License.SetNonCommercialOrganization("Demo Project");
 
-        if (worksheet.Dimension == null)
+        if (extension == ".csv")
         {
-            result.Errors.Add("Excel file is empty or corrupted.");
-            return result;
+            using var reader = new StreamReader(file.OpenReadStream());
+            return await ProcessCsvAsync(reader); // Keep this separate for CSV
         }
-
-        int rowCount = worksheet.Dimension.Rows;
-        int colCount = worksheet.Dimension.Columns;
-
-        // Read headers from first row
-        var headers = new List<string>();
-        for (int col = 1; col <= colCount; col++)
-            headers.Add(worksheet.Cells[1, col].Text.Trim().ToLower());
-
-        // Helper to get column index by name
-        int GetIndex(string columnName) => headers.IndexOf(columnName.ToLower()) + 1;
-
-        for (int row = 2; row <= rowCount; row++)
+        else if (extension == ".xlsx" || extension == ".xls")
         {
-            string GetColumnValue(string columnName)
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
+
+            using var package = new ExcelPackage(stream);
+            var worksheet = package.Workbook.Worksheets[0];
+
+            if (worksheet.Dimension == null)
             {
-                int index = GetIndex(columnName);
-                return index > 0 ? worksheet.Cells[row, index].Text.Trim() : "";
+                result.Errors.Add("Excel file is empty or corrupted.");
+                return result;
             }
 
-            string name = GetColumnValue("name");
-            string skillStr = GetColumnValue("skill");
-            string teamName = GetColumnValue("team").ToLower();
-            string dobStr = GetColumnValue("dateofbirth");
-            string country = GetColumnValue("country");
-            string basePriceStr = GetColumnValue("baseprice");
+            int rowCount = worksheet.Dimension.Rows;
+            int colCount = worksheet.Dimension.Columns;
 
-            // Validation
-            if (string.IsNullOrWhiteSpace(name))
-                result.Errors.Add($"Row {row}: Name is required.");
-            if (string.IsNullOrWhiteSpace(country))
-                result.Errors.Add($"Row {row}: Country is required.");
-            if (!Enum.TryParse<PlayerSkill>(skillStr, out var skill))
-                result.Errors.Add($"Row {row}: Invalid skill '{skillStr}'.");
-            var teamId = teams.GetValueOrDefault(teamName);
-            if (teamId == 0)
-                result.Errors.Add($"Row {row}: Team '{teamName}' not found.");
+            // Read headers from first row
+            var headers = new List<string>();
+            for (int col = 1; col <= colCount; col++)
+                headers.Add(worksheet.Cells[1, col].Text.Trim().ToLower());
 
-            DateOnly? dob = null;
-            if (!string.IsNullOrWhiteSpace(dobStr))
+            // Helper to get column index by name
+            int GetIndex(string columnName) => headers.IndexOf(columnName.ToLower()) + 1;
+
+            for (int row = 2; row <= rowCount; row++)
             {
-                if (DateOnly.TryParse(dobStr, out var parsedDob))
-                    dob = parsedDob;
-                else
-                    result.Errors.Add($"Row {row}: Invalid date of birth '{dobStr}'.");
-            }
-
-            if (!decimal.TryParse(basePriceStr, out var basePrice))
-                result.Errors.Add($"Row {row}: Invalid base price '{basePriceStr}'.");
-
-            // Add or update only if no errors
-            if (!result.Errors.Any(e => e.StartsWith($"Row {row}:")))
-            {
-                int playerId = players.GetValueOrDefault(name.ToLower());
-
-                if (playerId != 0)
+                string GetColumnValue(string columnName)
                 {
-                    var existingPlayer = await _playerRepository.GetWithFilterAsync(p => p.Id == playerId);
-                    if (existingPlayer != null)
+                    int index = GetIndex(columnName);
+                    return index > 0 ? worksheet.Cells[row, index].Text.Trim() : "";
+                }
+
+                string name = GetColumnValue("name");
+                string skillStr = GetColumnValue("skill");
+                string teamName = GetColumnValue("team").ToLower();
+                string dobStr = GetColumnValue("dateofbirth");
+                string country = GetColumnValue("country");
+                string basePriceStr = GetColumnValue("baseprice");
+
+                // Validation
+                if (string.IsNullOrWhiteSpace(name))
+                    result.Errors.Add($"Row {row}: Name is required.");
+                if (string.IsNullOrWhiteSpace(country))
+                    result.Errors.Add($"Row {row}: Country is required.");
+                if (!Enum.TryParse<PlayerSkill>(skillStr, out var skill))
+                    result.Errors.Add($"Row {row}: Invalid skill '{skillStr}'.");
+                var teamId = teams.GetValueOrDefault(teamName);
+                if (teamId == 0)
+                    result.Errors.Add($"Row {row}: Team '{teamName}' not found.");
+
+                DateOnly? dob = null;
+                if (!string.IsNullOrWhiteSpace(dobStr))
+                {
+                    if (DateOnly.TryParse(dobStr, out var parsedDob))
+                        dob = DateOnly.Parse(dobStr);
+                    else
+                        result.Errors.Add($"Row {row}: Invalid date of birth '{dobStr}'.");
+                }
+
+                if (!decimal.TryParse(basePriceStr, out var basePrice))
+                    result.Errors.Add($"Row {row}: Invalid base price '{basePriceStr}'.");
+
+                // Add or update only if no errors
+                if (!result.Errors.Any(e => e.StartsWith($"Row {row}:")))
+                {
+                    int playerId = players.GetValueOrDefault(name.ToLower());
+
+                    if (playerId != 0)
                     {
-                        existingPlayer.Name = name;
-                        existingPlayer.Skill = skill;
-                        existingPlayer.TeamId = teamId;
-                        existingPlayer.DateOfBirth = dob;
-                        existingPlayer.Country = country;
-                        existingPlayer.BasePrice = basePrice;
-                        await _playerRepository.SaveChangesAsync();
+                        var existingPlayer = await _playerRepository.GetWithFilterAsync(p => p.Id == playerId);
+                        if (existingPlayer != null)
+                        {
+                            existingPlayer.Name = name;
+                            existingPlayer.Skill = skill;
+                            existingPlayer.TeamId = teamId;
+                            existingPlayer.DateOfBirth = dob;
+                            existingPlayer.Country = country;
+                            existingPlayer.BasePrice = basePrice;
+                            await _playerRepository.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            playersToAdd.Add(new Player
+                            {
+                                Name = name,
+                                Skill = skill,
+                                TeamId = teamId,
+                                DateOfBirth = dob,
+                                Country = country,
+                                IsActive = true,
+                                BasePrice = basePrice
+                            });
+                        }
                     }
                     else
                     {
@@ -255,41 +270,27 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
                             BasePrice = basePrice
                         });
                     }
-                }
-                else
-                {
-                    playersToAdd.Add(new Player
-                    {
-                        Name = name,
-                        Skill = skill,
-                        TeamId = teamId,
-                        DateOfBirth = dob,
-                        Country = country,
-                        IsActive = true,
-                        BasePrice = basePrice
-                    });
-                }
 
-                result.SuccessfulInserts++;
+                    result.SuccessfulInserts++;
+                }
             }
+
+            result.TotalRows = rowCount - 1;
+
+            if (result.Errors.Count == 0 && playersToAdd.Any())
+            {
+                await _playerRepository.AddRangeAsync(playersToAdd);
+                await _playerRepository.SaveChangesAsync();
+            }
+
+            return result;
         }
-
-        result.TotalRows = rowCount - 1;
-
-        if (result.Errors.Count == 0 && playersToAdd.Any())
+        else
         {
-            await _playerRepository.AddRangeAsync(playersToAdd);
-            await _playerRepository.SaveChangesAsync();
+            result.Errors.Add("Unsupported file type. Only .csv, .xlsx, and .xls are allowed.");
+            return result;
         }
-
-        return result;
     }
-    else
-    {
-        result.Errors.Add("Unsupported file type. Only .csv, .xlsx, and .xls are allowed.");
-        return result;
-    }
-}
     public List<CsvValidationError> ValidateCsvRows(List<PlayerCsvModel> players)
     {
         var errors = new List<CsvValidationError>();
@@ -316,5 +317,31 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
 
         return errors;
     }
+
+
+    public async Task ReadExcelAsync(IFormFile file)
+    {
+        ExcelPackage.License.SetNonCommercialOrganization("Demo Project");
+
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        stream.Position = 0;
+
+        using var package = new ExcelPackage(stream);
+        var worksheet = package.Workbook.Worksheets[0]; // First sheet
+
+        int rowCount = worksheet.Dimension.Rows;
+        int colCount = worksheet.Dimension.Columns;
+
+        for (int row = 1; row <= rowCount; row++)
+        {
+            for (int col = 1; col <= colCount; col++)
+            {
+                string cellValue = worksheet.Cells[row, col].Text;
+                Console.WriteLine($"Row {row}, Col {col}: {cellValue}");
+            }
+        }
+    }
+
 }
 

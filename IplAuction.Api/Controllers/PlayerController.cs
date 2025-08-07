@@ -130,4 +130,12 @@ public class PlayerController(IPlayerService playerService, IPlayerImportService
         return Ok("Players imported successfully.");
     }
 
+    [HttpPost("upload-excel")]
+    public async Task<IActionResult> UploadExcel(IFormFile file)
+    {
+        await _playerImportService.ReadExcelAsync(file);
+        return Ok("Excel processed.");
+    }
+
+
 }
