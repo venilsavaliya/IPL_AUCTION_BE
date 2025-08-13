@@ -12,7 +12,6 @@ public class EmailService(IConfiguration configuration) : IEmailService
     public bool SendEmail(string toEmail, string subject, string htmlMessage)
     {
         var emailSettings = _configuration.GetSection("EmailSettings");
-        // ServicePointManager.CheckCertificateRevocationList = false;
 
         var emailMessage = new MimeMessage();
         emailMessage.From.Add(MailboxAddress.Parse(emailSettings["FromEmail"]));

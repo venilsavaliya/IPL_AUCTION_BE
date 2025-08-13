@@ -1,5 +1,4 @@
 using IplAuction.Entities.DTOs;
-using IplAuction.Entities.ViewModels;
 using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -31,5 +30,4 @@ public class NotificationController(INotificationService notificationService) : 
 
         return Ok(response);
     }
-
- }
+}

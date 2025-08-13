@@ -1,9 +1,9 @@
+namespace IplAuction.Service.Implementations;
+
 using System.Security.Claims;
 using IplAuction.Entities;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Http;
-
-namespace IplAuction.Service.Implementations;
 
 public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {

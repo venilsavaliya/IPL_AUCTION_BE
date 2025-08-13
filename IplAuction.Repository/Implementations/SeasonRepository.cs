@@ -6,5 +6,4 @@ namespace IplAuction.Repository.Implementations;
 
 public class SeasonRepository(IplAuctionDbContext context) : GenericRepository<Season>(context), ISeasonRepository
 {
-    
 }

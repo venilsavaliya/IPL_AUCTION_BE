@@ -1,6 +1,4 @@
 using System.Linq.Expressions;
-using IplAuction.Entities;
-using IplAuction.Entities.DTOs;
 
 namespace IplAuction.Repository.Interfaces;
 

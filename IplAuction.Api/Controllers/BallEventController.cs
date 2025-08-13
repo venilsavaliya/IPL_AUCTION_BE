@@ -31,12 +31,4 @@ public class BallEventController(IBallEventService balleventService) : Controlle
         
         return Ok(response);
     }
-
-    // [HttpGet]
-    // public async Task<IActionResult> GetMatchStatsByMatchId(int matchId)
-    // {
-    //     var result = await _balleventService.GetMatchStatsByMatchId(matchId);
-    //     var response = ApiResponseBuilder.With<List<MatchStats>>().StatusCode(200).SetData(result).Build();
-    //     return Ok(response);
-    // }
 }

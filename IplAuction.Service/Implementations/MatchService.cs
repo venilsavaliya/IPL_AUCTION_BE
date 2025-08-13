@@ -16,7 +16,6 @@ public class MatchService(IMatchRepository matchRepository, IBallEventService ba
     private readonly IPlayerService _playerService = playerService;
     private readonly IInningStateService _inningStateService = inningStateService;
 
-
     public async Task AddMatch(MatchRequest request)
     {
         Match match = new()

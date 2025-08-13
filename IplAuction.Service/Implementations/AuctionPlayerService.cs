@@ -1,4 +1,4 @@
-using IplAuction.Entities.Exceptions;
+using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.AuctionPlayer;
 using IplAuction.Repository.Interfaces;
@@ -22,6 +22,20 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
         await _auctionPlayerRepo.SaveChangesAsync();
     }
 
+    public async Task MarkPlayerSold(AddAuctionPlayerRequest request)
+    {
+        var entity = new AuctionPlayer
+        {
+            AuctionId = request.AuctionId,
+            PlayerId = request.PlayerId,
+            IsAuctioned = true,
+            IsSold = true,
+        };
+
+        await _auctionPlayerRepo.AddAsync(entity);
+        await _auctionPlayerRepo.SaveChangesAsync();
+    }
+
     public async Task<List<int>> GetAllAuctionedPlayerIds(int auctionId)
     {
         var auctionPlayers = await _auctionPlayerRepo.GetAllWithFilterAsync(ap => ap.AuctionId == auctionId);
@@ -30,12 +44,32 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
 
     public async Task MarkPlayerUnsold(AddAuctionPlayerRequest request)
     {
-        AuctionPlayer auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId) ?? throw new NotFoundException(nameof(AuctionPlayer));
+        AuctionPlayer? auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId);
 
-        auctionPlayer.IsSold = false;
+        if (auctionPlayer == null)
+        {
+            var entity = new AuctionPlayer
+            {
+                AuctionId = request.AuctionId,
+                PlayerId = request.PlayerId,
+                IsSold = true,
+                IsAuctioned = true
+            };
 
-        auctionPlayer.IsAuctioned = true;
+            await _auctionPlayerRepo.AddAsync(entity);
+        }
+        else
+        {
+            auctionPlayer.IsSold = false;
+
+            auctionPlayer.IsAuctioned = true;
+        }
 
         await _auctionPlayerRepo.SaveChangesAsync();
+    }
+
+    public PaginatedResult<AuctionPlayerDetail> GetAuctionPlayerDetailList(AuctionPlayerFilterParams request)
+    {
+        return _auctionPlayerRepo.GetAuctionPlayerDetailList(request);
     }
 }

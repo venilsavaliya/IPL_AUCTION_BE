@@ -4,6 +4,8 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
+// INFO : THIS SERVICE IS NO LONGER IN USE
+
 public class InMemoryBidQueueSevice : IBidQueueService
 {
     private readonly ConcurrentQueue<PlaceBidRequestModel> _queue = new();

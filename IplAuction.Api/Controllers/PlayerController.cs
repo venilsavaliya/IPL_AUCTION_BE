@@ -120,8 +120,6 @@ public class PlayerController(IPlayerService playerService, IPlayerImportService
         if (file == null || file.Length == 0)
             return BadRequest("CSV file is required.");
 
-        // using var stream = file.OpenReadStream();
-        // using var reader = new StreamReader(stream);
         var result = await _playerImportService.ProcessImportAsync(file);
 
         if (result.Errors.Any())
@@ -129,13 +127,4 @@ public class PlayerController(IPlayerService playerService, IPlayerImportService
 
         return Ok("Players imported successfully.");
     }
-
-    [HttpPost("upload-excel")]
-    public async Task<IActionResult> UploadExcel(IFormFile file)
-    {
-        await _playerImportService.ReadExcelAsync(file);
-        return Ok("Excel processed.");
-    }
-
-
 }

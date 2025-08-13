@@ -6,5 +6,4 @@ namespace IplAuction.Repository.Implementations;
 
 public class NotificationRepository(IplAuctionDbContext context) : GenericRepository<Notification>(context), INotificationRepository
 {
-    
 }

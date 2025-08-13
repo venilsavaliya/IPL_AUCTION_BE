@@ -43,5 +43,4 @@ public class SeasonService(ISeasonRepository seasonRepository) : ISeasonService
 
         await _seasonRepository.SaveChangesAsync();
     }
-
 }

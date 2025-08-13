@@ -1,19 +1,16 @@
-using IplAuction.Entities;
+namespace IplAuction.Service.Implementations;
+
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.InningState;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 
-namespace IplAuction.Service.Implementations;
-
 public class InningStateService(IInningStateRepository repo, IMatchRepository matchRepository) : IInningStateService
 {
     private readonly IInningStateRepository _repo = repo;
 
     private readonly IMatchRepository _matchRepository = matchRepository;
-
-    // private readonly IBallEventService _ballEventService = ballEventService;
 
     public async Task<InningState> GetByIdAsync(int id)
     {
@@ -50,15 +47,6 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         var inningState = await _repo.GetWithFilterAsync(i => i.Id == state.Id) ?? throw new NotFoundException(nameof(InningState));
         inningState.MatchId = state.MatchId;
         inningState.InningNumber = state.InningNumber;
-
-        // Check Player Already Got Out Or Not
-
-        // List<int> outPlayers = await _ballEventService.GetOutPlayersListByMatchId(state.MatchId);
-        // if (outPlayers.Contains(state.StrikerId) || outPlayers.Contains(state.NonStrikerId))
-        // {
-        //     throw new Exception(Messages.PlayerAlreadyGotOut);
-        // }
-
         inningState.StrikerId = state.StrikerId;
         inningState.NonStrikerId = state.NonStrikerId;
         inningState.BowlerId = state.BowlerId;
@@ -80,6 +68,7 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
     {
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
             ?? throw new NotFoundException(nameof(InningState));
+
         // Swap striker and non-striker
         var temp = state.StrikerId;
         state.StrikerId = state.NonStrikerId;
@@ -88,13 +77,13 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
         await _repo.SaveChangesAsync();
     }
 
-
-
     public async Task UpdateBowlerAsync(int matchId, int inningNumber, int? bowlerId)
     {
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
             ?? throw new NotFoundException(nameof(InningState));
+
         state.BowlerId = bowlerId;
+
         await _repo.SaveChangesAsync();
     }
 
@@ -102,10 +91,12 @@ public class InningStateService(IInningStateRepository repo, IMatchRepository ma
     {
         var state = await _repo.GetWithFilterAsync(i => i.MatchId == matchId && i.InningNumber == inningNumber)
             ?? throw new NotFoundException(nameof(InningState));
+
         if (state.StrikerId == batsmanId)
             state.StrikerId = null;
         else if (state.NonStrikerId == batsmanId)
             state.NonStrikerId = null;
+
         await _repo.SaveChangesAsync();
     }
 

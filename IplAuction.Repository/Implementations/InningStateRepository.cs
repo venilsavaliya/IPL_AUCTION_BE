@@ -6,5 +6,4 @@ namespace IplAuction.Repository.Implementations;
 
 public class InningStateRepository(IplAuctionDbContext context) : GenericRepository<InningState>(context), IInningStateRepository
 {
-
 } 

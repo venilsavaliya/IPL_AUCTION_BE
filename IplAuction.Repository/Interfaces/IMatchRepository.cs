@@ -13,5 +13,4 @@ public interface IMatchRepository : IGenericRepository<Match>
     Task<MatchResponse> GetById(int id);
 
     Task<List<AuctionParticipantMantchDetail>> GetAuctionParticipantMantchDetailsAsync(int auctionId, int userId);
-    
 }

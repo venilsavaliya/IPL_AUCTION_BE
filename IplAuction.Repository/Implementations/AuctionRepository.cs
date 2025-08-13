@@ -39,9 +39,7 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         // Filtering By Season
         if (filterParams.SeasonId != null)
         {
-
             query = query.Where(u => u.SeasonId == filterParams.SeasonId);
-
         }
 
         //Filtering Date

@@ -10,7 +10,6 @@ namespace IplAuction.Service.Interface;
 
 public interface IAuctionService
 {
-
     Task<List<AuctionResponseModel>> GetAllAuctionAsync();
 
     Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams);
@@ -32,7 +31,10 @@ public interface IAuctionService
     Task SetCurrentPlayerForAuction(AuctionPlayerRequest request);
 
     Task RemoveCurrentPlayerFromAuction(int auctionId);
+
     Task MarkPlayerSold(AddUserTeamRequestModel request);
+
+    Task MarkPlayerUnSold(AddAuctionPlayerRequest request);
 
     Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams);
 

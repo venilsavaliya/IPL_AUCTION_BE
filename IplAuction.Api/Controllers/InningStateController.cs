@@ -1,4 +1,3 @@
-using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.InningState;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;

@@ -11,19 +11,38 @@ public static class IQueryableExtensions
        this IQueryable<TEntity> source,
        PaginationParams paginationParams,
        Expression<Func<TEntity, TViewModel>> selector)
-    {
-        var count = await source.CountAsync();
-        var items = await source
-            .Skip(paginationParams.Skip)
-            .Take(paginationParams.PageSize)
-            .Select(selector)
-            .ToListAsync();
-
-        return new PaginatedResult<TViewModel>
         {
-            Items = items,
-            TotalCount = count,
-        };
-    }
+            var count = await source.CountAsync();
+            var items = await source
+                .Skip(paginationParams.Skip)
+                .Take(paginationParams.PageSize)
+                .Select(selector)
+                .ToListAsync();
+
+            return new PaginatedResult<TViewModel>
+            {
+                Items = items,
+                TotalCount = count,
+            };
+        }
+
+    public static PaginatedResult<TViewModel> ToPaginatedList<TEntity, TViewModel>(
+       this IQueryable<TEntity> source,
+       PaginationParams paginationParams,
+       Expression<Func<TEntity, TViewModel>> selector)
+        {
+            var count = source.Count();
+            var items = source
+                .Skip(paginationParams.Skip)
+                .Take(paginationParams.PageSize)
+                .Select(selector)
+                .ToList();
+
+            return new PaginatedResult<TViewModel>
+            {
+                Items = items,
+                TotalCount = count,
+            };
+        }
 }
 

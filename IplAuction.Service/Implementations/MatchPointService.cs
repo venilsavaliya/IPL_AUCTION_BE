@@ -1,6 +1,5 @@
 using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
-using IplAuction.Entities.Migrations;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.ScoringRules;
 using IplAuction.Repository.Interfaces;
@@ -8,20 +7,14 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class MatchPointService(IMatchRepository matchRepository, IScoringRuleRepository scoringRuleRepository, IPlayerMatchStateRepository playerMatchStateRepository, IScoringRulesService scoringRulesService) : IMatchPointservice
+public class MatchPointService(IPlayerMatchStateRepository playerMatchStateRepository, IScoringRulesService scoringRulesService) : IMatchPointservice
 {
-
-    private readonly IMatchRepository _matchRepository = matchRepository;
-
-    private readonly IScoringRuleRepository _scoringRuleRepository = scoringRuleRepository;
-
     private readonly IScoringRulesService _scoringRulesService = scoringRulesService;
 
     private readonly IPlayerMatchStateRepository _playerMatchStateRepository = playerMatchStateRepository;
+
     public async Task<int> GetTotalPointsOfAllPlayersBySeasonId(List<int> players, int seasonId)
     {
-
-
         int totalPoints = 0;
         foreach (int playerId in players)
         {
@@ -33,7 +26,6 @@ public class MatchPointService(IMatchRepository matchRepository, IScoringRuleRep
         }
 
         return totalPoints;
-
     }
 
     public async Task<int> GetPointOfPlayerInMatch(int playerId, int matchId)

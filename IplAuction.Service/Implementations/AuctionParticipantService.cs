@@ -15,8 +15,6 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
 
     public async Task AddParticipantAsync(int auctionId, int userId)
     {
-
-
         AuctionParticipants auctionParticipants = new()
         {
             UserId = userId,
@@ -33,6 +31,7 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
         await _auctionParticipantRepo.AddRangeAsync(auctionParticipants);
         await _auctionParticipantRepo.SaveChangesAsync();
     }
+
     public async Task RemoveParticipantsAsync(List<AuctionParticipants> auctionParticipants)
     {
         _auctionParticipantRepo.RemoveRange(auctionParticipants);
@@ -94,5 +93,4 @@ public class AuctionParticipantService(IAuctionParticipantRepository auctionPart
     {
         return await _auctionParticipantRepo.GetParticipantsPlayerListAndDetail(request);
     }
-    
 }

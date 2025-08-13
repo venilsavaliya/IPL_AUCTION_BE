@@ -7,20 +7,17 @@ namespace IplAuction.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PlayerMatchStateController : ControllerBase
+public class PlayerMatchStateController(IPlayerMatchStateService playerMatchStateService) : ControllerBase
 {
-    private readonly IPlayerMatchStateService _playerMatchStateService;
-
-    public PlayerMatchStateController(IPlayerMatchStateService playerMatchStateService)
-    {
-        _playerMatchStateService = playerMatchStateService;
-    }
+    private readonly IPlayerMatchStateService _playerMatchStateService = playerMatchStateService;
 
     [HttpPost]
     public async Task<IActionResult> AddPlayerMatchState(AddPlayerMatchStateRequest request)
     {
         await _playerMatchStateService.AddPlayerMatchState(request);
+
         var response = ApiResponseBuilder.Create(200);
+
         return Ok(response);
     }
 
@@ -28,7 +25,9 @@ public class PlayerMatchStateController : ControllerBase
     public async Task<IActionResult> GetPlayerMatchStates(PlayerMatchStateRequestParams request)
     {
         List<PlayerMatchStateResponse> data = await _playerMatchStateService.GetPlayerMatchStates(request);
+
         var response = ApiResponseBuilder.With<List<PlayerMatchStateResponse>>().SetData(data).Build();
+
         return Ok(response);
     }
 
@@ -36,7 +35,9 @@ public class PlayerMatchStateController : ControllerBase
     public async Task<IActionResult> GetMatchPoints(int matchId)
     {
         MatchPointsResponseModel data = await _playerMatchStateService.GetMatchPoints(matchId);
+
         var response = ApiResponseBuilder.With<MatchPointsResponseModel>().SetData(data).Build();
+
         return Ok(response);
     }
 
@@ -44,7 +45,9 @@ public class PlayerMatchStateController : ControllerBase
     public async Task<IActionResult> UpdatePlayerMatchState(List<UpdatePlayerMatchStateRequest> request)
     {
         await _playerMatchStateService.UpdatePlayerMatchState(request);
+
         var response = ApiResponseBuilder.Create(200);
+        
         return Ok(response);
     }
 }

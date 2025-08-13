@@ -1,6 +1,4 @@
-using System.Net;
 using System.Text.Json;
-using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
 using Microsoft.AspNetCore.Http;

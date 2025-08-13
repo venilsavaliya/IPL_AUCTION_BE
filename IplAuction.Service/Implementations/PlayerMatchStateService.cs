@@ -30,6 +30,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
             Catches = request.Catches,
             Stumpings = request.Stumpings,
         };
+        
         await _playerMatchStateRepository.AddAsync(playerMatchState);
         await _playerMatchStateRepository.SaveChangesAsync();
     }

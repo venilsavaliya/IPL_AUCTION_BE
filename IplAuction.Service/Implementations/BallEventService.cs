@@ -7,12 +7,12 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
+// INFO : THIS SERVICE IS NO LONGER IN USE 
+
 public class BallEventService(IBallEventRepository ballEventRepository, IInningStateService inningStateService) : IBallEventService
 {
     private readonly IBallEventRepository _ballEventRepository = ballEventRepository;
     private readonly IInningStateService _inningStateService = inningStateService;
-
-    // private readonly IMatchService _matchService = matchService;
 
     public async Task AddBall(AddBallEventRequest request)
     {

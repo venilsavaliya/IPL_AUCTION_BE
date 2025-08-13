@@ -52,6 +52,16 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
         return Ok(response);
     }
 
+    [HttpPost("player/mark-unsold")]
+    public async Task<IActionResult> MarkPlayerUnSold([FromBody] AddAuctionPlayerRequest request)
+    {
+        await _auctionService.MarkPlayerUnSold(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
     [HttpPost]
     // [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> CreateAuction([FromBody] AddAuctionRequestModel request)

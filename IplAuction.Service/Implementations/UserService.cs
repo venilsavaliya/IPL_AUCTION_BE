@@ -58,7 +58,7 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
         user.Gender = model.Gender;
         if (model.Image != null)
         {
-            var imageUrl = await _fileStorageService.UploadFileAsync(model.Image);
+            var imageUrl = await _fileStorageService.UploadFileAsync(model.Image,UploadPaths.Users,user.Id);
             user.Image = imageUrl;
         }
         await _userRepository.SaveChangesAsync();
@@ -113,8 +113,6 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
             Gender = request.Gender
         };
 
-        // user.Role = request is AddUserRequestModel ? ((request as AddUserRequestModel)?.Role ?? UserRole.User) : UserRole.User;
-
         if (request is AddUserRequestModel addUserRequest)
         {
             user.Role = addUserRequest.Role;
@@ -129,7 +127,7 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
 
         if (request.Image != null)
         {
-            user.Image = await _fileStorageService.UploadFileAsync(request.Image);
+            user.Image = await _fileStorageService.UploadFileAsync(request.Image,UploadPaths.Users,user.Id);
         }
 
         await _userRepository.AddAsync(user);
@@ -146,6 +144,4 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
 
         await _userRepository.SaveChangesAsync();
     }
-
-    
 }

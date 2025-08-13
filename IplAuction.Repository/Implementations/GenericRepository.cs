@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using IplAuction.Entities;
-using IplAuction.Entities.DTOs;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +15,6 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
         return await _dbSet.ToListAsync();
     }
 
-    // public async Task<PaginatedResult<T>> GetPagedAsync(PaginationParams paginationParams)
-    // {
-    //     return await _dbSet.AsQueryable().ToPaginatedListAsync<T,>(paginationParams);
-    // }
-
     public async Task<T?> GetWithFilterAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
     {
         IQueryable<T> query = _dbSet;
@@ -32,6 +26,7 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
 
         return await query.FirstOrDefaultAsync(filter);
     }
+
     public T? GetWithFilter(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
     {
         IQueryable<T> query = _dbSet;
@@ -70,9 +65,7 @@ public class GenericRepository<T>(IplAuctionDbContext context) : IGenericReposit
     {
         return _dbSet.Where(filter);
     }
-
-
-
+    
     public async Task<List<T1>> GetAllWithFilterAsync<T1>(Expression<Func<T, bool>> filter, Expression<Func<T, T1>> selector)
     {
         return await _dbSet.Where(filter).Select(selector).ToListAsync();

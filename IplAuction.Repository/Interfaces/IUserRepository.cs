@@ -8,5 +8,4 @@ public interface IUserRepository : IGenericRepository<User>
 {
     Task AddRefreshTokenAsync(User user, RefreshToken refreshToken);
     Task<PaginatedResult<UserResponseViewModel>> GetFilteredUsersAsync(UserFilterParam filterParams);
-
 }

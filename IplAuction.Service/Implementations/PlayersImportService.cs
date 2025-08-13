@@ -144,7 +144,6 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
         return result;
     }
 
-
     public async Task<CsvImportResult> ProcessImportAsync(IFormFile file)
     {
         var result = new CsvImportResult();
@@ -291,6 +290,7 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
             return result;
         }
     }
+
     public List<CsvValidationError> ValidateCsvRows(List<PlayerCsvModel> players)
     {
         var errors = new List<CsvValidationError>();
@@ -312,36 +312,9 @@ public class PlayerImportService(IPlayerRepository playerRepository, ITeamServic
             if (p.BasePrice == null || p.BasePrice <= 0)
                 errors.Add(new CsvValidationError { RowNumber = rowNum, FieldName = "BasePrice", ErrorMessage = "Valid BasePrice is required." });
 
-            // You can skip DateOfBirth and ImageUrl
         }
 
         return errors;
     }
-
-
-    public async Task ReadExcelAsync(IFormFile file)
-    {
-        ExcelPackage.License.SetNonCommercialOrganization("Demo Project");
-
-        using var stream = new MemoryStream();
-        await file.CopyToAsync(stream);
-        stream.Position = 0;
-
-        using var package = new ExcelPackage(stream);
-        var worksheet = package.Workbook.Worksheets[0]; // First sheet
-
-        int rowCount = worksheet.Dimension.Rows;
-        int colCount = worksheet.Dimension.Columns;
-
-        for (int row = 1; row <= rowCount; row++)
-        {
-            for (int col = 1; col <= colCount; col++)
-            {
-                string cellValue = worksheet.Cells[row, col].Text;
-                Console.WriteLine($"Row {row}, Col {col}: {cellValue}");
-            }
-        }
-    }
-
 }
 

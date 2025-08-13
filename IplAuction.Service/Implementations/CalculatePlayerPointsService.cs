@@ -3,5 +3,4 @@ namespace IplAuction.Service.Implementations;
 
 public class CalculatePlayerPointsService : ICalculatePlayerPointsService
 {
-   
 }

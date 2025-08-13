@@ -98,11 +98,26 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             Message = string.Format(Messages.PlayerSoldToUser, player.Name)
         };
 
+        AddAuctionPlayerRequest auctionPlayer = new()
+        {
+            AuctionId = request.AuctionId,
+            PlayerId = request.PlayerId
+        };
+
+        await _auctionPlayerService.MarkPlayerSold(auctionPlayer);
+
         await _notificationService.AddNotification(notification);
 
         await _notificationService.SendNotificationToUserAsync(request.UserId.ToString(), notification);
 
         await _userTeamService.AddUserTeam(request);
+    }
+
+    public async Task MarkPlayerUnSold(AddAuctionPlayerRequest request)
+    {
+        await RemoveCurrentPlayerFromAuction(request.AuctionId);
+
+        await _auctionPlayerService.MarkPlayerUnsold(request);
     }
 
     public async Task<bool> DeleteAuctionAsync(int id)
@@ -137,7 +152,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
     public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)
     {
-
         return await _auctionRepository.GetFilteredAuctionsAsync(filterParams);
     }
 
@@ -212,8 +226,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
             await _unitOfWork.RollbackAsync();
             throw;
         }
-
-
     }
 
     public async Task<bool> JoinAuctionAsync(int id)

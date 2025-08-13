@@ -1,6 +1,4 @@
-using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
-using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.Notification;
 using IplAuction.Entities.ViewModels.User;
 using IplAuction.Service.Interface;
@@ -8,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IplAuction.Api.Controllers;
-
 
 [ApiController]
 [Route("api/[controller]")]
@@ -88,6 +85,4 @@ public class UserController(IUserService userService) : ControllerBase
 
         return Ok(response);
     }
-
-    
 }

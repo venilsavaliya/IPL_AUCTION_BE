@@ -1,6 +1,5 @@
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
-using IplAuction.Entities.ViewModels.Player;
 using IplAuction.Entities.ViewModels.Team;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Mvc;

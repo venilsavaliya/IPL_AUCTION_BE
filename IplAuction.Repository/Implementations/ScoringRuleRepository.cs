@@ -31,8 +31,6 @@ public class ScoringRuleRepository(IplAuctionDbContext context, IUnitOfWork unit
                 if (dbDict.TryGetValue(item.EventType, out var rule))
                 {
                     rule.Points = item.Points;
-                    // rule.EventType = item.EventType;
-                    // _context.ScoringRules.Update(rule);
                 }
             }
 

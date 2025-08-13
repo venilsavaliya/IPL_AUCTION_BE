@@ -1,3 +1,4 @@
+using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Team;
 using IplAuction.Entities.Exceptions;
@@ -16,21 +17,31 @@ public class TeamService(ITeamRepository teamRepository, IFileStorageService fil
 
     public async Task AddTeamAsync(TeamRequest team)
     {
-        string? imageUrl = null;
 
-        if (team.Image != null)
-        {
-            imageUrl = await _fileStorage.UploadFileAsync(team.Image);
-        }
         Team newTeam = new()
         {
             Name = team.Name,
-            Image = imageUrl
         };
 
         await _teamRepository.AddAsync(newTeam);
 
         await _teamRepository.SaveChangesAsync();
+
+        Team? existingTeam = await _teamRepository.GetWithFilterAsync(t => t.Id == newTeam.Id && t.IsDeleted != true);
+
+        if (existingTeam != null)
+        {
+            string? imageUrl = null;
+
+            if (team.Image != null)
+            {
+                imageUrl = await _fileStorage.UploadFileAsync(team.Image, UploadPaths.Teams, newTeam.Id);
+            }
+
+            existingTeam.Image = imageUrl;
+
+            await _teamRepository.SaveChangesAsync();
+        }
     }
 
     public async Task<List<TeamResponseViewModel>> GetAllTeamAsync()
@@ -66,7 +77,7 @@ public class TeamService(ITeamRepository teamRepository, IFileStorageService fil
 
         if (team.Image != null)
         {
-            imageUrl = await _fileStorage.UploadFileAsync(team.Image);
+            imageUrl = await _fileStorage.UploadFileAsync(team.Image, UploadPaths.Teams, existingTeam.Id);
         }
 
         existingTeam.Name = team.Name;

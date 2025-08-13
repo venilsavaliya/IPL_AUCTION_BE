@@ -2,14 +2,12 @@ using IplAuction.Entities;
 using IplAuction.Entities.Configurations;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.DTOs.Auth;
-using IplAuction.Entities.Enums;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Helper;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels;
 using IplAuction.Entities.ViewModels.Auth;
 using IplAuction.Entities.ViewModels.User;
-using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -141,7 +139,7 @@ public class AuthService(IJwtService jwtService,
 
         var jwtToken = _jwtService.GeneratePasswordResetToken(request.Email, 60 * 24);
 
-        var url = "<a>http://localhost:5173/resetPassword?token=" + jwtToken + "</a>";
+        var url = string.Format(Messages.ResetPasswordUrl, jwtToken);
 
         bool isMailSent = _emailservice.SendEmail(request.Email, "Reset Password", url);
 
@@ -160,8 +158,10 @@ public class AuthService(IJwtService jwtService,
         }
 
         var user1 = await _userService.GetByIdAsync(int.Parse(user.Id??"0")) ?? throw new NotFoundException(nameof(User));
+        
         user.ImageUrl = user1.Image;
         user.IsNotificationOn = user1.IsNotificationOn;
+
         return user;
     }
 }

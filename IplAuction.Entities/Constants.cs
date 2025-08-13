@@ -61,10 +61,10 @@ public static class Messages
     public const string BidWillProcess = "Bid Will be Processed";
     public const string InsufficientBalance = "You Don't Have Sufficient Balance";
     public const string RegistrationOver = "Registration Time Is Over";
-
     public const string Congratulations = "Congratulations!";
-    
     public const string PlayerSoldToUser = "{0} has been sold to you";
+    public const string ResetPasswordUrl = "<a href=\"http://localhost:5173/resetPassword?token={0}\">Click here to reset password</a>";
+
 }
 
 public static class JwtClaims
@@ -73,4 +73,11 @@ public static class JwtClaims
     public const string Email = "Email";
     public const string Role = "Role";
     public const string Name = "Name";
+}
+
+public static class UploadPaths
+{
+    public const string Players = "players";
+    public const string Teams = "teams";
+    public const string Users = "users";
 }

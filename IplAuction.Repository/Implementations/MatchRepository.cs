@@ -205,34 +205,33 @@ public class MatchRepository(IplAuctionDbContext context) : GenericRepository<Ma
         }).ToDictionary(x => x.MatchId, x => x.Points);
 
         var result = matches.Select(x =>
- {
-     var userPoints = userPointsPerMatch.GetValueOrDefault(x.MatchId);
-     var totalPoints = totalPointsPerMatch.GetValueOrDefault(x.MatchId);
+        {
+            var userPoints = userPointsPerMatch.GetValueOrDefault(x.MatchId);
+            var totalPoints = totalPointsPerMatch.GetValueOrDefault(x.MatchId);
 
-     // Get all users' points for this match
-     var usersInMatch = allUserPointsPerMatch
-         .Where(kvp => kvp.Key.MatchId == x.MatchId)
-         .OrderByDescending(kvp => kvp.Value)
-         .ToList();
+            // Get all users' points for this match
+            var usersInMatch = allUserPointsPerMatch
+                .Where(kvp => kvp.Key.MatchId == x.MatchId)
+                .OrderByDescending(kvp => kvp.Value)
+                .ToList();
 
-     // Assign rank based on position (starting at 1)
-     var rank = usersInMatch
-         .Select((kvp, index) => new { kvp.Key.UserId, Rank = index + 1 })
-         .FirstOrDefault(r => r.UserId == userId)?.Rank ?? 0;
+            // Assign rank based on position (starting at 1)
+            var rank = usersInMatch
+                .Select((kvp, index) => new { kvp.Key.UserId, Rank = index + 1 })
+                .FirstOrDefault(r => r.UserId == userId)?.Rank ?? 0;
 
-     return new AuctionParticipantMantchDetail
-     {
-         MatchId = x.MatchId,
-         Date = x.Date,
-         TeamName = x.TeamName,
-         UserPoints = userPoints,
-         Share = totalPoints > 0
-             ? Math.Round(userPoints * 100.0 / totalPoints, 2)
-             : 0,
-         Rank = rank
-     };
- }).ToList();
-
+            return new AuctionParticipantMantchDetail
+            {
+                MatchId = x.MatchId,
+                Date = x.Date,
+                TeamName = x.TeamName,
+                UserPoints = userPoints,
+                Share = totalPoints > 0
+                    ? Math.Round(userPoints * 100.0 / totalPoints, 2)
+                    : 0,
+                Rank = rank
+            };
+        }).ToList();
 
         return result;
     }

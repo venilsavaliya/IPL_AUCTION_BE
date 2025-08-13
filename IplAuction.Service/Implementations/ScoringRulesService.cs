@@ -1,4 +1,3 @@
-using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.ScoringRules;
 using IplAuction.Repository.Interfaces;
 using IplAuction.Service.Interface;
@@ -17,5 +16,4 @@ public class ScoringRulesService(IScoringRuleRepository scoringRuleRepository) :
     {
         await _scoringRuleRepository.UpdateScoringRules(request);
     }
-
 }

@@ -1,4 +1,3 @@
-using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.ViewModels.Bid;
 using IplAuction.Service.Interface;
@@ -16,9 +15,6 @@ public class BidController(IBidService bidService, IBidQueueService bidQueueServ
     [HttpPost("place")]
     public async Task<IActionResult> PlaceBid([FromBody] PlaceBidRequestModel request)
     {
-        // _bidQueueService.Enqueue(request);
-
-        // return StatusCode(200, Messages.BidWillProcess);
         await _bidService.PlaceOfflineBid(request);
 
         var response = ApiResponseBuilder.Create(200);

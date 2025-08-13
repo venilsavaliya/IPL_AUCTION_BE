@@ -21,4 +21,23 @@ public class AuctionPlayerController(IAuctionPlayerService auctionPlayerService)
         return Ok(response);
     }
 
+    [HttpPost("mark-unsold")]
+    public async Task<IActionResult> MarkPlayerUnsold([FromBody] AddAuctionPlayerRequest request)
+    {
+        await _auctionPlayerService.MarkPlayerUnsold(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
+
+    [HttpPost("playerList")]
+    public IActionResult GetPlayerDetailList([FromBody] AuctionPlayerFilterParams request)
+    {
+        var result = _auctionPlayerService.GetAuctionPlayerDetailList(request);
+
+        var response = ApiResponseBuilder.With<PaginatedResult<AuctionPlayerDetail>>().SetData(result).Build();
+
+        return Ok(response);
+    }
 }

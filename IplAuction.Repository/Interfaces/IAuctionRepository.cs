@@ -11,5 +11,4 @@ public interface IAuctionRepository : IGenericRepository<Auction>
     Task<AuctionResponseModel> GetAuctionById(int id);
     Task<PaginatedResult<AuctionResponseModel>> GetFilteredAuctionsAsync(AuctionFilterParam filterParams);
     Task<PaginatedResult<UserAuctionResponseModel>> GetUsersAuctions(UserAuctionFilterParam filterParams);
-
 }

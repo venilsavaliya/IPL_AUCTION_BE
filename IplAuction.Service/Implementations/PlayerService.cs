@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
+using IplAuction.Entities;
 using IplAuction.Entities.DTOs;
 using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
@@ -19,13 +20,6 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
     public async Task AddPlayerAsync(AddPlayerRequest player)
     {
-        string? imageUrl = "";
-
-        if (player.Image != null)
-        {
-            imageUrl = await _fileStorageService.UploadFileAsync(player.Image);
-        }
-
         Player NewPlayer = new()
         {
             Name = player.Name,
@@ -34,13 +28,28 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
             Skill = player.Skill,
             BasePrice = player.BasePrice,
             TeamId = player.TeamId,
-            Image = !string.IsNullOrEmpty(imageUrl) ? imageUrl : null,
             CreatedAt = DateTime.UtcNow,
         };
 
         await _playerRepository.AddAsync(NewPlayer);
 
         await _playerRepository.SaveChangesAsync();
+
+        string? imageUrl = "";
+
+        if (player.Image != null)
+        {
+            imageUrl = await _fileStorageService.UploadFileAsync(player.Image, UploadPaths.Players, NewPlayer.Id);
+        }
+
+        Player? existingPlayer = await _playerRepository.GetWithFilterAsync(p => p.Id == NewPlayer.Id);
+
+        if (existingPlayer != null)
+        {
+            existingPlayer.Image = !string.IsNullOrEmpty(imageUrl) ? imageUrl : null;
+
+            await _playerRepository.SaveChangesAsync();
+        }
     }
 
     public async Task ImportPlayersFromCsvAsync(IFormFile file)
@@ -86,8 +95,6 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
         return player;
     }
 
-
-
     public async Task<PlayerResponseModel> GetPlayerByIdAsync(int id)
     {
         PlayerResponseModel player = await _playerRepository.GetWithFilterAsync(p => p.IsDeleted == false && p.Id == id, p => new PlayerResponseModel(p)) ?? throw new NotFoundException(nameof(Player));
@@ -101,7 +108,7 @@ public class PlayerService(IFileStorageService fileStorageService, IPlayerReposi
 
         if (player.Image != null)
         {
-            var imageUrl = await _fileStorageService.UploadFileAsync(player.Image);
+            var imageUrl = await _fileStorageService.UploadFileAsync(player.Image,UploadPaths.Players,existingPlayer.Id);
             existingPlayer.Image = imageUrl;
         }
 

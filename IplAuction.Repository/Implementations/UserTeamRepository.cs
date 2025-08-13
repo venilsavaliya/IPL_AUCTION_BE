@@ -1,6 +1,5 @@
 using IplAuction.Entities;
 using IplAuction.Entities.Models;
-using IplAuction.Entities.ViewModels.User;
 using IplAuction.Entities.ViewModels.UserTeam;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +22,4 @@ public class UserTeamRepository(IplAuctionDbContext context) : GenericRepository
 
         return userTeams;
     }
-
-    
 }

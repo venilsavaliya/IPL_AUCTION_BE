@@ -7,6 +7,5 @@ public interface IBidService
 {
     Task<ApiResponse<object>> PlaceBid(PlaceBidRequestModel request);
     Task PlaceOfflineBid(PlaceBidRequestModel request);
-
     Task<BidResponseModel> GetLatestBidByAuctionId(LatestBidRequestModel request);
 }
