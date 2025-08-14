@@ -33,6 +33,11 @@ public class GlobalExceptionMiddleware
             context.Response.StatusCode = 400;
             await WriteResponse(context, ex.Message, 400);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            context.Response.StatusCode = 401;
+            await WriteResponse(context, ex.Message, 401);
+        }
         catch (Exception ex)
         {
             context.Response.StatusCode = 500;

@@ -52,7 +52,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
                 MinimumBidIncreament = request.MinimumBidIncreament,
                 MaximumPurseSize = request.MaximumPurseSize,
                 MaximumTeamsCanJoin = request.MaximumTeamsCanJoin,
-                ModeOfAuction = request.AuctionMode
+                ModeOfAuction = false // FALSE for making it offline only for now else request.AuctionMode
             };
 
             await _auctionRepository.AddAsync(auction);
@@ -172,6 +172,11 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
     public async Task UpdateAuctionAsync(UpdateAuctionRequestModel request)
     {
         Auction? auction = await _auctionRepository.GetWithFilterAsync(a => a.IsDeleted == false && a.Id == request.Id) ?? throw new NotFoundException(nameof(Auction));
+
+        if (auction.AuctionStatus != AuctionStatus.Scheduled)
+        {
+            throw new Exception(ExceptionMessages.CanNotUpdateAuction);
+        }
 
         await _unitOfWork.BeginTransactionAsync();
 

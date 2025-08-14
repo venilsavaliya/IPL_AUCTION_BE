@@ -8,6 +8,11 @@ public static class UserRoles
     public const string User = "User";
 }
 
+public static class ExceptionMessages
+{
+    public const string CanNotUpdateAuction = "Can Not Update This Auction.";
+}
+
 public static class Messages
 {
     public const string PlayerAlreadyGotOut = "Player Already Got Out";
