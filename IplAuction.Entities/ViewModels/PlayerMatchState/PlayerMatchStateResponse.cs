@@ -18,12 +18,12 @@ public class PlayerMatchStateResponse
         Catches = p.Catches;
         Stumpings = p.Stumpings;
         RunOuts = p.RunOuts;
+        OrderNumber = p.OrderNumber;
     }
     public int Id { get; set; }
     public int PlayerId { get; set; }
     public string Name { get; set; } = string.Empty;
     public int MatchId { get; set; }
-
     public int TeamId { get; set; }
     public int Fours { get; set; }
     public int Sixes { get; set; }
@@ -33,4 +33,5 @@ public class PlayerMatchStateResponse
     public int Catches { get; set; }
     public int Stumpings { get; set; }
     public int RunOuts { get; set; }
+    public int OrderNumber { get; set; }
 }

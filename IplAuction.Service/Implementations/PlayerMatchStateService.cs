@@ -29,8 +29,9 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
             MaidenOvers = request.MaidenOvers,
             Catches = request.Catches,
             Stumpings = request.Stumpings,
+            OrderNumber = request.OrderNumber
         };
-        
+
         await _playerMatchStateRepository.AddAsync(playerMatchState);
         await _playerMatchStateRepository.SaveChangesAsync();
     }
@@ -38,7 +39,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
     public async Task<List<PlayerMatchStateResponse>> GetPlayerMatchStates(PlayerMatchStateRequestParams request)
     {
         List<PlayerMatchStates> data = await _playerMatchStateRepository.GetAllWithEagerLoadAndFilterAsync(p => p.MatchId == request.MatchId && p.TeamId == request.TeamId, p => p.Player);
-        List<PlayerMatchStateResponse> response = data.Select(p => new PlayerMatchStateResponse(p)).ToList();
+        List<PlayerMatchStateResponse> response = data.Select(p => new PlayerMatchStateResponse(p)).OrderBy(p => p.OrderNumber).ToList();
         return response;
     }
 
@@ -65,6 +66,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
                 existingPlayer.Catches = item.Catches;
                 existingPlayer.Stumpings = item.Stumpings;
                 existingPlayer.RunOuts = item.RunOuts;
+                existingPlayer.OrderNumber = item.OrderNumber;
             }
         }
 
@@ -83,6 +85,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
             Catches = p.Catches,
             Stumpings = p.Stumpings,
             RunOuts = p.RunOuts,
+            OrderNumber = p.OrderNumber
         }).ToList();
 
         await _playerMatchStateRepository.AddRangeAsync(newPlayers);
@@ -100,8 +103,8 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
     {
         MatchResponse match = await _matchService.GetMatchById(matchId);
 
-        List<PlayerMatchStates> teamAplayerMatchStates = await _playerMatchStateRepository.GetAllWithEagerLoadAndFilterAsync(p => p.MatchId == matchId && p.TeamId == match.TeamAId,p=>p.Player);
-        List<PlayerMatchStates> teamBplayerMatchStates = await _playerMatchStateRepository.GetAllWithEagerLoadAndFilterAsync(p => p.MatchId == matchId && p.TeamId == match.TeamBId,p=>p.Player);
+        List<PlayerMatchStates> teamAplayerMatchStates = await _playerMatchStateRepository.GetAllWithEagerLoadAndFilterAsync(p => p.MatchId == matchId && p.TeamId == match.TeamAId, p => p.Player);
+        List<PlayerMatchStates> teamBplayerMatchStates = await _playerMatchStateRepository.GetAllWithEagerLoadAndFilterAsync(p => p.MatchId == matchId && p.TeamId == match.TeamBId, p => p.Player);
 
         List<ScoringRuleResponse> scoringRules = await _scoringRuleService.GetAllScoringRules();
 
@@ -134,11 +137,12 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
                 Stumpings = p.Stumpings,
                 RunOuts = p.RunOuts,
                 ImageUrl = p.Player?.Image,
-                Name = p.Player?.Name??"N/A",
-                TotalPoints = totalPoints
+                Name = p.Player?.Name ?? "N/A",
+                TotalPoints = totalPoints,
+                OrderNumber = p.OrderNumber
             };
 
-        }).ToList();
+        }).OrderBy(p=> p.OrderNumber).ToList();
 
         List<PlayerMatchStatesForMatchPointsResponse> teamBPlayers = teamBplayerMatchStates.Select(p =>
         {
@@ -167,11 +171,12 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
                 Stumpings = p.Stumpings,
                 RunOuts = p.RunOuts,
                 ImageUrl = p.Player?.Image,
-                Name = p.Player?.Name??"N/A",
-                TotalPoints = totalPoints
+                Name = p.Player?.Name ?? "N/A",
+                TotalPoints = totalPoints,
+                OrderNumber = p.OrderNumber
             };
 
-        }).ToList();
+        }).OrderBy(p=> p.OrderNumber).ToList();
 
         MatchPointsResponseModel matchPointsResponse = new()
         {

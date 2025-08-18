@@ -264,8 +264,6 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         auction.CurrentPlayerId = request.PlayerId;
 
-        _auctionRepository.Update(auction);
-
         await _auctionRepository.SaveChangesAsync();
     }
 

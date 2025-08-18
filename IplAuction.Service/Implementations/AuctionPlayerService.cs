@@ -24,16 +24,28 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
 
     public async Task MarkPlayerSold(AddAuctionPlayerRequest request)
     {
-        var entity = new AuctionPlayer
-        {
-            AuctionId = request.AuctionId,
-            PlayerId = request.PlayerId,
-            IsAuctioned = true,
-            IsSold = true,
-        };
+        AuctionPlayer? existingAuctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId);
 
-        await _auctionPlayerRepo.AddAsync(entity);
-        await _auctionPlayerRepo.SaveChangesAsync();
+        if (existingAuctionPlayer != null)
+        {
+            existingAuctionPlayer.IsAuctioned = true;
+            existingAuctionPlayer.IsSold = true;
+
+            await _auctionPlayerRepo.SaveChangesAsync();
+        }
+        else
+        {
+            var entity = new AuctionPlayer
+            {
+                AuctionId = request.AuctionId,
+                PlayerId = request.PlayerId,
+                IsAuctioned = true,
+                IsSold = true,
+            };
+
+            await _auctionPlayerRepo.AddAsync(entity);
+            await _auctionPlayerRepo.SaveChangesAsync();
+        }
     }
 
     public async Task<List<int>> GetAllAuctionedPlayerIds(int auctionId)

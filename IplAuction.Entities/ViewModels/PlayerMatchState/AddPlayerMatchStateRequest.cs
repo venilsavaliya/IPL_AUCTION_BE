@@ -4,7 +4,7 @@ public class AddPlayerMatchStateRequest
 {
     public int PlayerId { get; set; }
     public int MatchId { get; set; }
-    public int TeamId{ get; set; }
+    public int TeamId { get; set; }
     public int Fours { get; set; }
     public int Sixes { get; set; }
     public int Runs { get; set; }
@@ -13,4 +13,5 @@ public class AddPlayerMatchStateRequest
     public int Catches { get; set; }
     public int Stumpings { get; set; }
     public int RunOuts { get; set; }
+    public int OrderNumber { get; set; }
 }

@@ -14,7 +14,7 @@ public class PlayerMatchStates
     public int Catches {get;set;}
     public int Stumpings {get;set;}
     public int RunOuts {get;set;}
-   
-    public Player Player { get; set; }
-    public Match Match { get; set; }
+    public int OrderNumber { get; set; }
+    public Player Player { get; set; } = null!;
+    public Match Match { get; set; } = null!;
 }
