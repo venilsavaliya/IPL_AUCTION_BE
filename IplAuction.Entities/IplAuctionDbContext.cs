@@ -61,18 +61,9 @@ public class IplAuctionDbContext : DbContext
             new ScoringRule { Id = 1, EventType = CricketEventType.Run, Points = 1 },
             new ScoringRule { Id = 2, EventType = CricketEventType.Four, Points = 1 },
             new ScoringRule { Id = 3, EventType = CricketEventType.Six, Points = 2 },
-            new ScoringRule { Id = 4, EventType = CricketEventType.HalfCentury, Points = 4 },
-            new ScoringRule { Id = 5, EventType = CricketEventType.Century, Points = 8 },
-            new ScoringRule { Id = 6, EventType = CricketEventType.Duck, Points = -2 },
             new ScoringRule { Id = 7, EventType = CricketEventType.Catch, Points = 8 },
-            new ScoringRule { Id = 8, EventType = CricketEventType.ThreeCatchHaul, Points = 4 },
             new ScoringRule { Id = 9, EventType = CricketEventType.Stumping, Points = 12 },
-            new ScoringRule { Id = 10, EventType = CricketEventType.DirectRunOut, Points = 12 },
-            new ScoringRule { Id = 11, EventType = CricketEventType.AssistedRunOut, Points = 6 },
             new ScoringRule { Id = 12, EventType = CricketEventType.Wicket, Points = 25 },
-            new ScoringRule { Id = 13, EventType = CricketEventType.ThreeWicketHaul, Points = 4 },
-            new ScoringRule { Id = 14, EventType = CricketEventType.FourWicketHaul, Points = 8 },
-            new ScoringRule { Id = 15, EventType = CricketEventType.FiveWicketHaul, Points = 16 },
             new ScoringRule { Id = 16, EventType = CricketEventType.MaidenOver, Points = 12 }
         );
 
