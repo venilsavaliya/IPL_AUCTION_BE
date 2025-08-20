@@ -34,7 +34,17 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, ICurrentUse
 
             request.UserId = userId;
         }
-    
+
         return await _userTeamRepository.GetUserTeams(request);
+    }
+
+    public async Task<List<UserTeamOfMatchResponseModel>> GetUserTeamOfMatch(UserTeamOfMatchRequestModel request)
+    {
+        return await _userTeamRepository.GetUserTeamOfMatch(request);
+    }
+
+    public async Task<List<UserTeam>> GetUserTeamsByPlayerIds(List<int> ids)
+    {
+        return await _userTeamRepository.GetUserTeamsByPlayerIds(ids);
     }
 }

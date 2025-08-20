@@ -30,4 +30,14 @@ public class UserTeamController(IUserTeamService userTeamService) : ControllerBa
 
         return Ok(response);
     }
+
+    [HttpPost("matchTeamPlayers")]
+    public async Task<IActionResult> GetAllTeamPlayersOfMatch(UserTeamOfMatchRequestModel request)
+    {
+        var teams = await _userTeamService.GetUserTeamOfMatch(request);
+
+        var response = ApiResponseBuilder.With<List<UserTeamOfMatchResponseModel>>().SetData(teams).Build();
+
+        return Ok(response);
+    }
 }

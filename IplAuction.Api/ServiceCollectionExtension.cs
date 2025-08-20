@@ -60,9 +60,11 @@ public static class ServiceCollectionExtension
         services.AddScoped<IMatchPointservice, MatchPointService>();
         services.AddScoped<ICalculatePlayerPointsService, CalculatePlayerPointsService>();
         services.AddScoped<IPlayerImportService, PlayerImportService>();
+        services.AddScoped<IUserTeamMatchRepository, UserTeamMatchRepository>();
+        services.AddScoped<IUserTeamMatchService, UserTeamMatchService>();
 
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
-        services.AddScoped<IUnitOfWork,UnitOfWork >();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

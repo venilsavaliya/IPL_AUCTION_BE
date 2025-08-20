@@ -6,7 +6,7 @@ public class Player
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
-    public PlayerSkill Skill { get; set; } 
+    public PlayerSkill Skill { get; set; }
     public int TeamId { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public bool IsActive { get; set; } = true;
@@ -21,4 +21,5 @@ public class Player
     public ICollection<UserTeam> UserTeams { get; set; } = [];
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
     public ICollection<PlayerMatchStates> PlayerMatchStates { get; set; } = [];
+     public ICollection<UserTeamMatch> UserTeamMatches { get; set; } = [];
 }

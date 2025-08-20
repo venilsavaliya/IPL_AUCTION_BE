@@ -7,6 +7,15 @@ public class UserTeamRequestModel
     public int AuctionId { get; set; }
 }
 
+public class UserTeamOfMatchRequestModel
+{
+    public int UserId { get; set; }
+
+    public int AuctionId { get; set; }
+
+    public int MatchId { get; set; }
+}
+
 public class AddUserTeamRequestModel : UserTeamRequestModel
 {
     public int PlayerId { get; set; }

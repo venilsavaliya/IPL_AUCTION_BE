@@ -43,6 +43,8 @@ public class IplAuctionDbContext : DbContext
 
     public DbSet<Season> Seasons { get; set; }
 
+    public DbSet<UserTeamMatch> UserTeamMatches { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(new User()
@@ -254,7 +256,26 @@ public class IplAuctionDbContext : DbContext
             .HasOne(a => a.Season)
             .WithMany(s => s.Auctions)
             .HasForeignKey(a => a.SeasonId);
-        
+
+        modelBuilder.Entity<UserTeamMatch>()
+            .HasOne(ut => ut.User)
+            .WithMany(u => u.UserTeamMatches)
+            .HasForeignKey(ut => ut.UserId);
+
+        modelBuilder.Entity<UserTeamMatch>()
+            .HasOne(ut => ut.Auction)
+            .WithMany(u => u.UserTeamMatches)
+            .HasForeignKey(ut => ut.AuctionId);
+
+        modelBuilder.Entity<UserTeamMatch>()
+            .HasOne(ut => ut.Player)
+            .WithMany(u => u.UserTeamMatches)
+            .HasForeignKey(ut => ut.PlayerId);
+
+        modelBuilder.Entity<UserTeamMatch>()
+            .HasOne(ut => ut.Match)
+            .WithMany(u => u.UserTeamMatches)
+            .HasForeignKey(ut => ut.MatchId);
        
         base.OnModelCreating(modelBuilder);
     }

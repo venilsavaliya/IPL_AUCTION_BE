@@ -18,18 +18,12 @@ public class User
     public bool IsNotificationOn { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = null;
-
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-
     public ICollection<Auction> ManagedAuction { get; set; } = [];
-
     public ICollection<AuctionParticipants> AuctionParticipants { get; set; } = [];
-
     public ICollection<Bid> Bids { get; set; } = [];
-
     public ICollection<Notification> Notifications { get; set; } = [];
-
     public ICollection<UserTeam> UserTeams { get; set; } = [];
-
     public ICollection<AuctionPlayer> AuctionPlayers { get; set; } = [];
+    public ICollection<UserTeamMatch> UserTeamMatches { get; set; } = [];
 }

@@ -8,11 +8,13 @@ using IplAuction.Entities.Enums;
 
 namespace IplAuction.Service.Implementations;
 
-public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStateRepository, IMatchService matchService, IScoringRulesService scoringRulesService) : IPlayerMatchStateService
+public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStateRepository, IMatchService matchService, IScoringRulesService scoringRulesService, IUserTeamMatchService userTeamMatchService, IUserTeamService userTeamService) : IPlayerMatchStateService
 {
 
     private readonly IPlayerMatchStateRepository _playerMatchStateRepository = playerMatchStateRepository;
     private readonly IMatchService _matchService = matchService;
+    private readonly IUserTeamService _userTeamService = userTeamService;
+    private readonly IUserTeamMatchService _userTeamMatchService = userTeamMatchService;
     private readonly IScoringRulesService _scoringRuleService = scoringRulesService;
 
     public async Task AddPlayerMatchState(AddPlayerMatchStateRequest request)
@@ -72,6 +74,8 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
 
         //  Handle Adds
 
+        int matchId = request.FirstOrDefault(p => p.Id == 0)?.MatchId ?? 0;
+
         var newPlayers = request.Where(p => p.Id == 0).Select(p => new PlayerMatchStates
         {
             PlayerId = p.PlayerId,
@@ -87,6 +91,26 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
             RunOuts = p.RunOuts,
             OrderNumber = p.OrderNumber
         }).ToList();
+
+        if (matchId != 0)
+        {
+            List<int> newPlayersIds = newPlayers.Select(p => p.PlayerId).ToList();
+
+            List<UserTeam> userTeams = await _userTeamService.GetUserTeamsByPlayerIds(newPlayersIds);
+
+            var userTeamMatches = userTeams.Select(u =>
+            {
+                return new UserTeamMatch
+                {
+                    AuctionId = u.AuctionId,
+                    PlayerId = u.PlayerId,
+                    UserId = u.UserId,
+                    MatchId = matchId
+                };
+            }).ToList();
+
+            await _userTeamMatchService.AddUserTeamMatches(userTeamMatches);
+        }
 
         await _playerMatchStateRepository.AddRangeAsync(newPlayers);
 
@@ -142,7 +166,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
                 OrderNumber = p.OrderNumber
             };
 
-        }).OrderBy(p=> p.OrderNumber).ToList();
+        }).OrderBy(p => p.OrderNumber).ToList();
 
         List<PlayerMatchStatesForMatchPointsResponse> teamBPlayers = teamBplayerMatchStates.Select(p =>
         {
@@ -176,7 +200,7 @@ public class PlayerMatchStateService(IPlayerMatchStateRepository playerMatchStat
                 OrderNumber = p.OrderNumber
             };
 
-        }).OrderBy(p=> p.OrderNumber).ToList();
+        }).OrderBy(p => p.OrderNumber).ToList();
 
         MatchPointsResponseModel matchPointsResponse = new()
         {

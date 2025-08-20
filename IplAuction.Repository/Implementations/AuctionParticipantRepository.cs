@@ -69,59 +69,121 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         return participant;
     }
 
+    // public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantsDetailList(AuctionParticipantDetailRequestModel request)
+    // {
+    //     var auctionId = request.AuctionId;
+    //     var seasonId = request.SeasonId;
+
+    //     // Load config in memory
+    //     var config = await _context.ScoringRules
+    //         .ToDictionaryAsync(c => c.EventType, c => c.Points);
+
+    //     // Step 1: Load data first
+    //     var participants = await _context.AuctionParticipants
+    //         .Where(ap => ap.AuctionId == auctionId)
+    //         .Include(ap => ap.User)
+    //             .ThenInclude(u => u.UserTeams)
+    //                 .ThenInclude(ut => ut.Player)
+    //                     .ThenInclude(p => p.PlayerMatchStates)
+    //                         .ThenInclude(pms => pms.Match)
+    //         .ToListAsync();
+
+    //     // Step 2: Calculate points in-memory
+    //     var result = participants.Select(ap =>
+    //     {
+    //         var playerStats = ap.User?.UserTeamMatches?
+    //             .Where(ut => ut.Player != null && ut.Player.PlayerMatchStates != null && ut.AuctionId == auctionId)
+    //             .SelectMany(ut => ut.Player.PlayerMatchStates
+    //                 .Where(pms => pms.Match != null && pms.Match.SeasonId == seasonId))
+    //             ?? [];
+
+    //         var points = playerStats.Sum(pms =>
+    //             (pms.Runs * config.GetValueOrDefault(CricketEventType.Run)) +
+    //             (pms.Fours * config.GetValueOrDefault(CricketEventType.Four)) +
+    //             (pms.Sixes * config.GetValueOrDefault(CricketEventType.Six)) +
+    //             (pms.Wickets * config.GetValueOrDefault(CricketEventType.Wicket)) +
+    //             (pms.Catches * config.GetValueOrDefault(CricketEventType.Catch)) +
+    //             (pms.Stumpings * config.GetValueOrDefault(CricketEventType.Stumping)) +
+    //             (pms.RunOuts * config.GetValueOrDefault(CricketEventType.RunOut)) +
+    //             (pms.MaidenOvers * config.GetValueOrDefault(CricketEventType.MaidenOver))
+    //         );
+
+    //         return new AuctionParticipantDetail
+    //         {
+    //             AuctionId = ap.AuctionId,
+    //             UserId = ap.UserId,
+    //             UserName = ap.User?.FirstName + " " + ap.User?.LastName,
+    //             ImageUrl = ap.User?.Image,
+    //             TotalPlayers = ap.User != null ? ap.User.UserTeams.Count(ut => ut.AuctionId == auctionId) : 0,
+    //             Points = points
+    //         };
+    //     }).OrderByDescending(r => r.Points).ToList();
+
+    //     return result;
+    // }
+
     public async Task<List<AuctionParticipantDetail>> GetAuctionParticipantsDetailList(AuctionParticipantDetailRequestModel request)
     {
         var auctionId = request.AuctionId;
         var seasonId = request.SeasonId;
 
-        // Load config in memory
-        var config = await _context.ScoringRules
-            .ToDictionaryAsync(c => c.EventType, c => c.Points);
+        var config = await _context.ScoringRules.ToDictionaryAsync(s => s.EventType, s => s.Points);
 
-        // Step 1: Load data first
-        var participants = await _context.AuctionParticipants
-            .Where(ap => ap.AuctionId == auctionId)
-            .Include(ap => ap.User)
-                .ThenInclude(u => u.UserTeams)
-                    .ThenInclude(ut => ut.Player)
-                        .ThenInclude(p => p.PlayerMatchStates)
-                            .ThenInclude(pms => pms.Match)
-            .ToListAsync();
-
-        // Step 2: Calculate points in-memory
-        var result = participants.Select(ap =>
+        var auctionParticipantsList = _context.AuctionParticipants.Where(ap => ap.AuctionId == auctionId).Select(ap => new AuctionParticipantDetail
         {
-            var playerStats = ap.User?.UserTeams?
-                .Where(ut => ut.Player != null && ut.Player.PlayerMatchStates != null && ut.AuctionId == auctionId)
-                .SelectMany(ut => ut.Player.PlayerMatchStates
-                    .Where(pms => pms.Match != null && pms.Match.SeasonId == seasonId))
-                ?? [];
+            AuctionId = ap.AuctionId,
+            UserId = ap.UserId,
+            ImageUrl = ap.User.Image,
+            UserName = ap.User.FirstName + " " + ap.User.LastName,
+            TotalPlayers = ap.User.UserTeams.Count(ut => ut.UserId == ap.UserId && ut.AuctionId == ap.AuctionId),
+            Points = 0,
+        }).ToList();
 
-            var points = playerStats.Sum(pms =>
-                (pms.Runs * config.GetValueOrDefault(CricketEventType.Run)) +
-                (pms.Fours * config.GetValueOrDefault(CricketEventType.Four)) +
-                (pms.Sixes * config.GetValueOrDefault(CricketEventType.Six)) +
-                (pms.Wickets * config.GetValueOrDefault(CricketEventType.Wicket)) +
-                (pms.Catches * config.GetValueOrDefault(CricketEventType.Catch)) +
-                (pms.Stumpings * config.GetValueOrDefault(CricketEventType.Stumping)) +
-                (pms.RunOuts * config.GetValueOrDefault(CricketEventType.RunOut)) +
-                (pms.MaidenOvers * config.GetValueOrDefault(CricketEventType.MaidenOver))
-            );
+        var auctionParticipantsPointsData = await (from ap in _context.AuctionParticipants
+                                                   where ap.AuctionId == auctionId
+                                                   join ut in _context.UserTeamMatches on ap.UserId equals ut.UserId
+                                                   where ut.AuctionId == auctionId
+                                                   join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+                                                   where pms.Match.SeasonId == seasonId
+                                                   group new { ap, ut, pms } by new { ap.UserId, ap.AuctionId, ap.User.FirstName, ap.User.LastName, ap.User.Image } into g
+                                                   select new
+                                                   {
+                                                       g.Key.UserId,
+                                                       Fours = g.Sum(x => x.pms.Fours),
+                                                       Sixes = g.Sum(x => x.pms.Sixes),
+                                                       Wickets = g.Sum(x => x.pms.Wickets),
+                                                       Catches = g.Sum(x => x.pms.Catches),
+                                                       Stumpings = g.Sum(x => x.pms.Stumpings),
+                                                       RunOuts = g.Sum(x => x.pms.RunOuts),
+                                                       MaidenOvers = g.Sum(x => x.pms.MaidenOvers),
+                                                       Runs = g.Sum(x => x.pms.Runs),
+                                                   }).ToListAsync();
 
-            return new AuctionParticipantDetail
-            {
-                AuctionId = ap.AuctionId,
-                UserId = ap.UserId,
-                UserName = ap.User?.FirstName + " " + ap.User?.LastName,
-                ImageUrl = ap.User?.Image,
-                TotalPlayers = ap.User != null ? ap.User.UserTeams.Count(ut => ut.AuctionId == auctionId) : 0,
-                Points = points
-            };
-        }).OrderByDescending(r => r.Points).ToList();
+        var userWiseTotalPoints = auctionParticipantsPointsData.Select(x => new
+        {
+            x.UserId,
+            Points = x.Fours * config.GetValueOrDefault(CricketEventType.Four) +
+                       x.Sixes * config.GetValueOrDefault(CricketEventType.Six) +
+                       x.Wickets * config.GetValueOrDefault(CricketEventType.Wicket) +
+                       x.Catches * config.GetValueOrDefault(CricketEventType.Catch) +
+                       x.Stumpings * config.GetValueOrDefault(CricketEventType.Stumping) +
+                       x.RunOuts * config.GetValueOrDefault(CricketEventType.RunOut) +
+                       x.MaidenOvers * config.GetValueOrDefault(CricketEventType.MaidenOver) +
+                       x.Runs * config.GetValueOrDefault(CricketEventType.Run)
+        }).OrderByDescending(x => x.Points).ToDictionary(x => x.UserId, x => x.Points);
 
-        return result;
+        auctionParticipantsList = auctionParticipantsList.Select(ap => new AuctionParticipantDetail
+        {
+            AuctionId = ap.AuctionId,
+            ImageUrl = ap.ImageUrl,
+            TotalPlayers = ap.TotalPlayers,
+            UserName = ap.UserName,
+            Points = userWiseTotalPoints.GetValueOrDefault(ap.UserId, 0),
+            UserId = ap.UserId,
+        }).OrderByDescending(ap => ap.Points).ToList();
+
+        return auctionParticipantsList;
     }
-
     public async Task<AuctionParticipantAllDetail> GetAllDetailOfAuctionParticipant(AuctionParticipantAllDetailRequestModel request)
     {
         Auction auction = await _context.Auctions.FirstOrDefaultAsync(s => s.Id == request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
@@ -148,7 +210,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         var config = await _context.ScoringRules.ToDictionaryAsync(s => s.EventType, s => s.Points);
 
         var userWiseData = await
-        (from ut in _context.UserTeams where ut.AuctionId == request.AuctionId
+        (from ut in _context.UserTeamMatches
+         where ut.AuctionId == request.AuctionId
          join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
          where pms.Match.SeasonId == seasonId
          group new { pms } by new { ut.UserId, ut.AuctionId } into g
@@ -193,7 +256,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         }).ToList();
 
         var matchWiseTotalPointsData = await
-        (from ut in _context.UserTeams
+        (from ut in _context.UserTeamMatches
          where ut.UserId == request.UserId && ut.AuctionId == request.AuctionId
          join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
          where pms.Match.SeasonId == seasonId
@@ -266,7 +329,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         var config = await _context.ScoringRules.ToDictionaryAsync(x => x.EventType, x => x.Points);
 
         var playersStates = await (
-                from ut in _context.UserTeams
+                from ut in _context.UserTeamMatches
                 where ut.UserId == request.UserId && ut.AuctionId == request.AuctionId
                 join pms in _context.PlayerMatchStates
                     on ut.PlayerId equals pms.PlayerId into pmsGroup
@@ -309,23 +372,38 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
             };
         }).ToDictionary(x => x.PlayerId, x => x.Points);
 
+        List<ParticipantsPlayer> tempParticipantsCurrentPlayers = await _context.UserTeams.Where(ap => ap.UserId == request.UserId && ap.AuctionId == request.AuctionId).Select(x =>
+             new ParticipantsPlayer
+             {
+                 PlayerId = x.PlayerId,
+                 PlayerImage = x.Player.Image,
+                 PlayerName = x.Player.Name,
+                 PlayerPrice = (int)x.Player.BasePrice,
+                 PlayerBoughtPrice = x.Price,
+                 PlayerSkill = x.Player.Skill,
+                 PlayerPoints = 0,
+                 PlayersTotalMatches = x.Player.PlayerMatchStates.Count(x => x.Match.SeasonId == seasonId)
+             }).ToListAsync();
 
-        List<ParticipantsPlayer> tempParticipantsPlayers = await _context.UserTeams.Where(ap => ap.UserId == request.UserId && ap.AuctionId == request.AuctionId).Select(x =>
+        List<ParticipantsPlayer> tempParticipantsAllTimePlayers = await _context.UserTeamMatches.Where(ap => ap.UserId == request.UserId && ap.AuctionId == request.AuctionId).Select(x =>
+             new ParticipantsPlayer
+             {
+                 PlayerId = x.PlayerId,
+                 PlayerImage = x.Player.Image,
+                 PlayerName = x.Player.Name,
+                 PlayerPrice = (int)x.Player.BasePrice,
+                 PlayerBoughtPrice = x.User.UserTeams
+                    .Where(u => u.UserId == x.UserId && u.PlayerId == x.PlayerId && u.AuctionId == x.AuctionId)
+                    .Select(u => (int?)u.Price)    // make it nullable int
+                    .FirstOrDefault() ?? 0,
+                 PlayerSkill = x.Player.Skill,
+                 PlayerPoints = 0,
+                 PlayersTotalMatches = x.Player.PlayerMatchStates.Count(x => x.Match.SeasonId == seasonId)
+             }).ToListAsync();
 
-            new ParticipantsPlayer
-            {
-                PlayerId = x.PlayerId,
-                PlayerImage = x.Player.Image,
-                PlayerName = x.Player.Name,
-                PlayerPrice = (int)x.Player.BasePrice,
-                PlayerBoughtPrice = x.Price,
-                PlayerSkill = x.Player.Skill,
-                PlayerPoints = 0,
-                PlayersTotalMatches = x.Player.PlayerMatchStates.Count(x => x.Match.SeasonId == seasonId)
-            }
-        ).ToListAsync();
+        List<ParticipantsPlayer> participantsAllPlayer = tempParticipantsCurrentPlayers.UnionBy(tempParticipantsAllTimePlayers, p => p.PlayerId).ToList();
 
-        List<ParticipantsPlayer> participantPlayersList = tempParticipantsPlayers.Select(x => new ParticipantsPlayer
+        List<ParticipantsPlayer> participantPlayersList = participantsAllPlayer.Select(x => new ParticipantsPlayer
         {
             PlayerId = x.PlayerId,
             PlayerImage = x.PlayerImage,
