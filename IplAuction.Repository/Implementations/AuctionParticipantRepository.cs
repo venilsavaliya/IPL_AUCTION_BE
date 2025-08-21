@@ -4,6 +4,7 @@ using IplAuction.Entities.Exceptions;
 using IplAuction.Entities.Models;
 using IplAuction.Entities.ViewModels.AuctionParticipant;
 using IplAuction.Entities.ViewModels.User;
+using IplAuction.Entities.ViewModels.UserTeam;
 using IplAuction.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -403,6 +404,14 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
 
         List<ParticipantsPlayer> participantsAllPlayer = tempParticipantsCurrentPlayers.UnionBy(tempParticipantsAllTimePlayers, p => p.PlayerId).ToList();
 
+        // Create dictiory to find out which player join the team and which player left the team after reshuffling round
+        var userTeams = _context.UserTeams.Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.IsReshuffled == true);
+        Dictionary<int, bool> reshuffledPlayers = userTeams.Select(ut => new ReshuffledPlayer
+        {
+            PlayerId = ut.PlayerId,
+            IsJoined = ut.ReshuffledStatus
+        }).ToDictionary(ut => ut.PlayerId, ut => ut.IsJoined);
+
         List<ParticipantsPlayer> participantPlayersList = participantsAllPlayer.Select(x => new ParticipantsPlayer
         {
             PlayerId = x.PlayerId,
@@ -412,7 +421,9 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
             PlayerPoints = playersPoint.GetValueOrDefault(x.PlayerId),
             PlayerPrice = x.PlayerPrice,
             PlayerSkill = x.PlayerSkill,
-            PlayersTotalMatches = x.PlayersTotalMatches
+            PlayersTotalMatches = x.PlayersTotalMatches,
+            IsReshuffled = reshuffledPlayers.ContainsKey(x.PlayerId),
+            IsJoined = reshuffledPlayers.GetValueOrDefault(x.PlayerId,false)
         }).ToList();
 
         data.TotalPoints = totalPoints;

@@ -25,7 +25,7 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
                                 x => x.t2Group.DefaultIfEmpty(),
                                 (x, t2) => new { x.t1, t2 }
                             ).GroupJoin(
-                                _context.UserTeams.Include(ut => ut.User).Where(ut => ut.AuctionId == auctionId),
+                                _context.UserTeams.Include(ut => ut.User).Where(ut => ut.AuctionId == auctionId && (ut.IsReshuffled == true && ut.ReshuffledStatus == false || ut.IsReshuffled == false && ut.ReshuffledStatus == true)),
                                 x => x.t1.Id,
                                 t3 => t3.PlayerId,
                                 (x, t3Group) => new { x.t1, x.t2, t3Group }
@@ -39,8 +39,9 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
                                     }
                             ).AsEnumerable().Select(x =>
                                {
+                                   bool isReshuffledStatus = x.t3?.IsReshuffled??false && x.t2?.IsAuctioned == false;
                                    bool isAuctioned = x.t2?.IsAuctioned ?? false;
-                                   var status = isAuctioned
+                                   var status = isReshuffledStatus ? AuctionPlayerStatus.Reshuffled : isAuctioned
                                        ? (x.t2?.IsSold ?? false ? AuctionPlayerStatus.Sold : AuctionPlayerStatus.UnSold)
                                        : AuctionPlayerStatus.UnAuctioned;
 
@@ -56,6 +57,24 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
                                }
                             ).AsQueryable();
 
+        // var query = (from p in _context.Players
+        //              join
+        //                     ap in _context.AuctionPlayers
+        //                     on p.Id equals ap.PlayerId into apgroup
+        //              from ap in apgroup.DefaultIfEmpty()
+        //              where ap.AuctionId == auctionId
+        //              join
+        //              ut in _context.UserTeams on ap.PlayerId equals ut.PlayerId
+        //              where ut.AuctionId == auctionId
+        //              select new AuctionPlayerDetail
+        //              {
+        //                  PlayerId = p.Id,
+        //                  PlayerName = p.Name,
+        //                  PlayerSkill = p.Skill,
+        //                  Status = ap != null ? ap.IsAuctioned ? ap.IsSold ? AuctionPlayerStatus.Sold : AuctionPlayerStatus.UnSold : AuctionPlayerStatus.UnAuctioned : AuctionPlayerStatus.UnAuctioned,
+        //                     SoldPrice = ut != null ? ut.Price : 0,
+        //                  SoldTo = ut != null ? ut.User.FirstName + " " + ut.User.LastName : null
+        //              }).AsQueryable();
 
         // Player Name Filter
 

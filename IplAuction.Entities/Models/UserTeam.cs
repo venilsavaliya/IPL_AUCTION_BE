@@ -12,6 +12,10 @@ public class UserTeam
 
     public int Price { get; set; }
 
+    public bool IsReshuffled { get; set;} 
+
+    public bool ReshuffledStatus { get; set; }
+
     public User User { get; set; } = null!;
 
     public Auction Auction { get; set; } = null!;

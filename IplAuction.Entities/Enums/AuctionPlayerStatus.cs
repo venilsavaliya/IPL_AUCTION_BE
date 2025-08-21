@@ -6,5 +6,7 @@ public enum AuctionPlayerStatus
 
     UnSold,
 
-    UnAuctioned
+    UnAuctioned,
+
+    Reshuffled
 }

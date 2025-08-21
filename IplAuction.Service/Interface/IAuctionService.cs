@@ -41,4 +41,6 @@ public interface IAuctionService
     Task<int> GetSeasonIdFromAuctionId(int auctionId);
 
     Task MarkAuctionAsCompleted(int auctionId);
+
+    Task MarkStatusToReshuffling(int auctionId);
 }

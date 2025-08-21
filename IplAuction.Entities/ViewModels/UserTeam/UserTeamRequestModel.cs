@@ -21,4 +21,6 @@ public class AddUserTeamRequestModel : UserTeamRequestModel
     public int PlayerId { get; set; }
 
     public int Price { get; set; }
+
+    public bool IsReshuffledPlayer { get; set; }
 }

@@ -12,4 +12,8 @@ public interface IUserTeamService
     Task<List<UserTeam>> GetUserTeamsByPlayerIds(List<int> ids);
 
     Task<List<UserTeamOfMatchResponseModel>> GetUserTeamOfMatch(UserTeamOfMatchRequestModel request);
+
+    Task ReshufflePlayers(List<ReshufflePlayerRequest> request);
+
+    Task<Dictionary<int, bool>> GetReshuffledPlayerDictionaryByUserId(ReshuffledPlayerOfUserRequestModel request);
 }

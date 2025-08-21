@@ -17,6 +17,7 @@ public class Auction
     public int CurrentBid { get; set; } = 0;
     public bool ModeOfAuction { get; set; } = false;
     public int CurrentPlayerId { get; set; }
+    public bool IsReshuffled { get; set; } = false;
     public DateTime? UpdatedAt { get; set; }
     public bool IsDeleted { get; set; } = false;
     public User Manager { get; set; } = null!;

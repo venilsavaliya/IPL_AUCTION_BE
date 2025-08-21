@@ -8,4 +8,5 @@ public interface IUserTeamRepository : IGenericRepository<UserTeam>
     Task<List<UserTeamResponseModel>> GetUserTeams(UserTeamRequestModel request);
     Task<List<UserTeam>> GetUserTeamsByPlayerIds(List<int> ids);
     Task<List<UserTeamOfMatchResponseModel>> GetUserTeamOfMatch(UserTeamOfMatchRequestModel request);
+    Task ReshufflePlayers(List<ReshufflePlayerRequest> request);
 }

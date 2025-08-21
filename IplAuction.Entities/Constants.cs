@@ -11,6 +11,8 @@ public static class UserRoles
 public static class ExceptionMessages
 {
     public const string CanNotUpdateAuction = "Can Not Update This Auction.";
+    public const string AuctionAlreadyReshuffled = "Auction Has Been Already Reshuffled Once.";
+    public const string AuctionStatusIsNotReshuffling = "Auction Is Not In Reshuffling Mode.";
 }
 
 public static class Messages

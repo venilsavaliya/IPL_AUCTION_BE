@@ -3,6 +3,7 @@ using System;
 using IplAuction.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IplAuction.Entities.Migrations
 {
     [DbContext(typeof(IplAuctionDbContext))]
-    partial class IplAuctionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250821054656_AddFieldInAuction")]
+    partial class AddFieldInAuction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -668,7 +671,7 @@ namespace IplAuction.Entities.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 8, 21, 6, 59, 6, 174, DateTimeKind.Utc).AddTicks(9126),
+                            CreatedAt = new DateTime(2025, 8, 21, 5, 46, 54, 219, DateTimeKind.Utc).AddTicks(345),
                             DateOfBirth = new DateOnly(1991, 12, 12),
                             Email = "admin@tatvasoft.com",
                             FirstName = "Admin",
@@ -677,7 +680,7 @@ namespace IplAuction.Entities.Migrations
                             IsNotificationOn = true,
                             LastName = "",
                             MobileNumber = "1234567890",
-                            PasswordHash = "$2a$11$F1cTRdMQVk7gjjgQyCn.Wud72iv2tAnFWZmFmh21McbCCjSVFpW0y",
+                            PasswordHash = "$2a$11$SpvxLVRdEl/5NTmFKBRsoeognHdhVRlHoln/3DT5Wm9s1sUixes9G",
                             Role = "Admin"
                         });
                 });
@@ -693,17 +696,11 @@ namespace IplAuction.Entities.Migrations
                     b.Property<int>("AuctionId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsReshuffled")
-                        .HasColumnType("boolean");
-
                     b.Property<int>("PlayerId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Price")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("ReshuffledStatus")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

@@ -18,7 +18,9 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, ICurrentUse
             UserId = request.UserId,
             AuctionId = request.AuctionId,
             PlayerId = request.PlayerId,
-            Price = request.Price
+            Price = request.Price,
+            IsReshuffled = request.IsReshuffledPlayer,
+            ReshuffledStatus = request.IsReshuffledPlayer
         };
 
         await _userTeamRepository.AddAsync(userTeam);
@@ -46,5 +48,23 @@ public class UserTeamService(IUserTeamRepository userTeamRepository, ICurrentUse
     public async Task<List<UserTeam>> GetUserTeamsByPlayerIds(List<int> ids)
     {
         return await _userTeamRepository.GetUserTeamsByPlayerIds(ids);
+    }
+
+    public async Task ReshufflePlayers(List<ReshufflePlayerRequest> request)
+    {
+        await _userTeamRepository.ReshufflePlayers(request);
+    }
+
+    public async Task<Dictionary<int,bool>> GetReshuffledPlayerDictionaryByUserId(ReshuffledPlayerOfUserRequestModel request)
+    {
+        List<UserTeam> userTeams = await _userTeamRepository.GetAllWithFilterAsync(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.IsReshuffled == true);
+
+        Dictionary<int,bool> reshuffledPlayers = userTeams.Select(ut => new ReshuffledPlayer
+        {
+            PlayerId = ut.PlayerId,
+            IsJoined = ut.ReshuffledStatus
+        }).ToDictionary(p=>p.PlayerId,p=>p.IsJoined);
+
+        return reshuffledPlayers;
     }
 }

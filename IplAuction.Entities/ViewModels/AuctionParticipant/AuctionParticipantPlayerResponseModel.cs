@@ -21,4 +21,6 @@ public class ParticipantsPlayer
     public PlayerSkill PlayerSkill { get; set; }
     public int PlayerBoughtPrice { get; set; }
     public int PlayersTotalMatches { get; set; }
+    public bool IsReshuffled { get; set; }
+    public bool IsJoined { get; set; }
 }

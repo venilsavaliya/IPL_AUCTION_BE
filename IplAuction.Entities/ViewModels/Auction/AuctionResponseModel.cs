@@ -18,13 +18,14 @@ public class AuctionResponseModel
         ParticipantsUserIds = a.AuctionParticipants.Select(ap => ap.UserId).ToList();
         MaximumTeamsCanJoin = a.MaximumTeamsCanJoin;
         AuctionMode = a.ModeOfAuction;
+        IsReshuffled = a.IsReshuffled;
     }
 
     public int Id { get; set; }
 
     public string Title { get; set; } = null!;
 
-     public int SeasonId { get; set; }
+    public int SeasonId { get; set; }
 
     public int ManagerId { get; set; }
 
@@ -41,4 +42,6 @@ public class AuctionResponseModel
     public AuctionStatus AuctionStatus { get; set; } = AuctionStatus.Scheduled;
 
     public bool AuctionMode { get; set; }
+    
+    public bool IsReshuffled { get; set; }
 }

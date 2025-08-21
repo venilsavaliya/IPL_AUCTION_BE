@@ -91,6 +91,8 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         PlayerResponseModel player = await _playerService.GetPlayerByIdAsync(request.PlayerId);
 
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == request.AuctionId) ?? throw new NotFoundException(nameof(Auction));
+
         AddNotificationRequest notification = new()
         {
             UserId = request.UserId,
@@ -101,7 +103,7 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         AddAuctionPlayerRequest auctionPlayer = new()
         {
             AuctionId = request.AuctionId,
-            PlayerId = request.PlayerId
+            PlayerId = request.PlayerId,
         };
 
         await _auctionPlayerService.MarkPlayerSold(auctionPlayer);
@@ -109,6 +111,11 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         await _notificationService.AddNotification(notification);
 
         await _notificationService.SendNotificationToUserAsync(request.UserId.ToString(), notification);
+
+        if (auction.AuctionStatus == AuctionStatus.Reshuffling)
+        {
+            request.IsReshuffledPlayer = true;
+        }
 
         await _userTeamService.AddUserTeam(request);
     }
@@ -148,6 +155,21 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
         });
 
         return auctions;
+    }
+
+    public async Task MarkStatusToReshuffling(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        if (auction.IsReshuffled == true)
+        {
+            throw new Exception(ExceptionMessages.AuctionAlreadyReshuffled);
+        }
+
+        auction.IsReshuffled = true;
+        auction.AuctionStatus = AuctionStatus.Reshuffling;
+
+        await _auctionRepository.SaveChangesAsync();
     }
 
     public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)

@@ -84,4 +84,10 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
     {
         return _auctionPlayerRepo.GetAuctionPlayerDetailList(request);
     }
+
+    // public async Task<AuctionPlayer?> GetExistingAuctionPlayer(AddAuctionPlayerRequest request)
+    // {
+    //     AuctionPlayer? ap = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId);
+    // }
+   
 }
