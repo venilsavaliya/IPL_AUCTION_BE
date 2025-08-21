@@ -40,4 +40,14 @@ public class UserTeamController(IUserTeamService userTeamService) : ControllerBa
 
         return Ok(response);
     }
+
+    [HttpPost("ReshufflePlayers")]
+    public async Task<IActionResult> ReshufflePlayers(List<ReshufflePlayerRequest> request)
+    {
+        await _userTeamService.ReshufflePlayers(request);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
 }

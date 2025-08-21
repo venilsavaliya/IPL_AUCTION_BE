@@ -176,4 +176,14 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
 
         return Ok(response);
     }
+
+    [HttpPost("mark-reshuffled/{auctionId}")]
+    public async Task<IActionResult> MarkAuctionAsReshuffled(int auctionId)
+    {
+        await _auctionService.MarkStatusToReshuffling(auctionId);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
 }
