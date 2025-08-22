@@ -136,7 +136,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
             UserId = ap.UserId,
             ImageUrl = ap.User.Image,
             UserName = ap.User.FirstName + " " + ap.User.LastName,
-            TotalPlayers = ap.User.UserTeams.Count(ut => ut.UserId == ap.UserId && ut.AuctionId == ap.AuctionId),
+            TotalPlayers = ap.User.UserTeams.Count(ut => ut.UserId == ap.UserId && ut.AuctionId == request.AuctionId && ((ut.IsReshuffled == true && ut.ReshuffledStatus == true) || (ut.IsReshuffled == false && ut.ReshuffledStatus == false))),
             Points = 0,
         }).ToList();
 
@@ -144,7 +144,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
                                                    where ap.AuctionId == auctionId
                                                    join ut in _context.UserTeamMatches on ap.UserId equals ut.UserId
                                                    where ut.AuctionId == auctionId
-                                                   join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+                                                   join pms in _context.PlayerMatchStates on new { ut.PlayerId, ut.MatchId }
+                                                                    equals new { pms.PlayerId, pms.MatchId }
                                                    where pms.Match.SeasonId == seasonId
                                                    group new { ap, ut, pms } by new { ap.UserId, ap.AuctionId, ap.User.FirstName, ap.User.LastName, ap.User.Image } into g
                                                    select new
@@ -193,7 +194,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
 
         int totalParticipants = _context.AuctionParticipants.Where(ap => ap.AuctionId == request.AuctionId).Count();
 
-        int totalPlayers = _context.UserTeams.Where(ut => ut.UserId == request.UserId && ut.AuctionId == request.AuctionId).Count();
+        int totalPlayers = _context.UserTeams.Count(ut => ut.UserId == request.UserId && ut.AuctionId == request.AuctionId && ((ut.IsReshuffled == true && ut.ReshuffledStatus == true) || (ut.IsReshuffled == false && ut.ReshuffledStatus == false)));
 
         var resultData = _context.Users.Where(ap => ap.Id == request.UserId).Select(u => new AuctionParticipantAllDetail
         {
@@ -213,7 +214,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         var userWiseData = await
         (from ut in _context.UserTeamMatches
          where ut.AuctionId == request.AuctionId
-         join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+         join pms in _context.PlayerMatchStates on new { ut.PlayerId, ut.MatchId }
+            equals new { pms.PlayerId, pms.MatchId }
          where pms.Match.SeasonId == seasonId
          group new { pms } by new { ut.UserId, ut.AuctionId } into g
          select new
@@ -259,7 +261,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         var matchWiseTotalPointsData = await
         (from ut in _context.UserTeamMatches
          where ut.UserId == request.UserId && ut.AuctionId == request.AuctionId
-         join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+         join pms in _context.PlayerMatchStates on new { ut.PlayerId, ut.MatchId }
+            equals new { pms.PlayerId, pms.MatchId }
          where pms.Match.SeasonId == seasonId
          group new { pms } by new { pms.MatchId, ut.UserId, pms.PlayerId } into g
          select new
@@ -322,7 +325,7 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         {
             UserId = request.UserId,
             TotalAmountSpent = auction.MaximumPurseSize - x.PurseBalance,
-            TotalPlayers = x.User.UserTeams.Count(ut => ut.UserId == request.UserId && ut.AuctionId == request.AuctionId),
+            TotalPlayers = x.User.UserTeams.Count(ut => ut.UserId == request.UserId && ut.AuctionId == request.AuctionId && ((ut.IsReshuffled == true && ut.ReshuffledStatus == true) || (ut.IsReshuffled == false && ut.ReshuffledStatus == false))),
             TotalPoints = 0,
             ParticipantsPlayers = new List<ParticipantsPlayer>()
         }).FirstOrDefaultAsync() ?? throw new NotFoundException(nameof(AuctionParticipants));
@@ -333,7 +336,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
                 from ut in _context.UserTeamMatches
                 where ut.UserId == request.UserId && ut.AuctionId == request.AuctionId
                 join pms in _context.PlayerMatchStates
-                    on ut.PlayerId equals pms.PlayerId into pmsGroup
+                    on new { ut.PlayerId, ut.MatchId }
+                equals new { pms.PlayerId, pms.MatchId } into pmsGroup
                 from pms in pmsGroup.DefaultIfEmpty() // <-- left join
                 where pms == null || pms.Match.SeasonId == seasonId
                 group new { pms } by new { ut.PlayerId } into g
@@ -351,8 +355,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
                 }
             ).ToListAsync();
 
-
         int totalPoints = 0;
+        
         var playersPoint = playersStates.Select(x =>
         {
             var Points = x.Fours * config.GetValueOrDefault(CricketEventType.Four) +
@@ -405,11 +409,18 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
         List<ParticipantsPlayer> participantsAllPlayer = tempParticipantsCurrentPlayers.UnionBy(tempParticipantsAllTimePlayers, p => p.PlayerId).ToList();
 
         // Create dictiory to find out which player join the team and which player left the team after reshuffling round
-        var userTeams = _context.UserTeams.Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.IsReshuffled == true);
-        Dictionary<int, bool> reshuffledPlayers = userTeams.Select(ut => new ReshuffledPlayer
+        var reshuffledJoinedPlayer = _context.UserTeams.Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.IsReshuffled == true && ut.ReshuffledStatus == true);
+        Dictionary<int, bool> reshuffledJoinedPlayersDictionary = reshuffledJoinedPlayer.Select(ut => new ReshuffledPlayer
         {
             PlayerId = ut.PlayerId,
-            IsJoined = ut.ReshuffledStatus
+            IsJoined = true
+        }).ToDictionary(ut => ut.PlayerId, ut => ut.IsJoined);
+
+        var reshuffledOutPlayer = _context.UserTeams.Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.IsReshuffled == true && ut.ReshuffledStatus == false);
+        Dictionary<int, bool> reshuffledOutPlayersDictionary = reshuffledOutPlayer.Select(ut => new ReshuffledPlayer
+        {
+            PlayerId = ut.PlayerId,
+            IsJoined = false
         }).ToDictionary(ut => ut.PlayerId, ut => ut.IsJoined);
 
         List<ParticipantsPlayer> participantPlayersList = participantsAllPlayer.Select(x => new ParticipantsPlayer
@@ -422,8 +433,9 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
             PlayerPrice = x.PlayerPrice,
             PlayerSkill = x.PlayerSkill,
             PlayersTotalMatches = x.PlayersTotalMatches,
-            IsReshuffled = reshuffledPlayers.ContainsKey(x.PlayerId),
-            IsJoined = reshuffledPlayers.GetValueOrDefault(x.PlayerId,false)
+            IsReshuffled = reshuffledJoinedPlayersDictionary.ContainsKey(x.PlayerId) || reshuffledOutPlayersDictionary.ContainsKey(x.PlayerId),
+            IsJoined = reshuffledJoinedPlayersDictionary.ContainsKey(x.PlayerId),
+            IsLeave = reshuffledOutPlayersDictionary.ContainsKey(x.PlayerId)
         }).ToList();
 
         data.TotalPoints = totalPoints;

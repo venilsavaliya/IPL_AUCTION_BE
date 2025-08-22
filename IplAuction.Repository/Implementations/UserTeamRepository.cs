@@ -27,7 +27,7 @@ public class UserTeamRepository(IplAuctionDbContext context) : GenericRepository
 
     public async Task<List<UserTeamOfMatchResponseModel>> GetUserTeamOfMatch(UserTeamOfMatchRequestModel request)
     {
-        List<UserTeamOfMatchResponseModel> userTeamsOfMatch = _context.UserTeamMatches.Include(ut => ut.Player).Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId).Select(ut => new UserTeamOfMatchResponseModel
+        List<UserTeamOfMatchResponseModel> userTeamsOfMatch = _context.UserTeamMatches.Include(ut => ut.Player).Where(ut => ut.AuctionId == request.AuctionId && ut.UserId == request.UserId && ut.MatchId == request.MatchId).Select(ut => new UserTeamOfMatchResponseModel
         {
             PlayerId = ut.PlayerId,
             Name = ut.Player.Name,
@@ -41,7 +41,8 @@ public class UserTeamRepository(IplAuctionDbContext context) : GenericRepository
             Image = ut.Player.Image ?? ""
         }).ToList();
 
-        return userTeamsOfMatch.UnionBy(currentUserTeam, ut => ut.PlayerId).ToList();
+        // return userTeamsOfMatch.UnionBy(currentUserTeam, ut => ut.PlayerId).ToList();
+        return userTeamsOfMatch;
     }
 
     public async Task<List<UserTeam>> GetUserTeamsByPlayerIds(List<int> ids)

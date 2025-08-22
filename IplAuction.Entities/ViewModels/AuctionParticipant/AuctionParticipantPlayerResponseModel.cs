@@ -23,4 +23,5 @@ public class ParticipantsPlayer
     public int PlayersTotalMatches { get; set; }
     public bool IsReshuffled { get; set; }
     public bool IsJoined { get; set; }
+    public bool IsLeave { get; set; }
 }

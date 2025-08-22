@@ -83,9 +83,10 @@ public class MatchRepository(IplAuctionDbContext context) : GenericRepository<Ma
         }).ToList();
 
         var allUsersData = await (
-            from ut in _context.UserTeams
-            join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+            from ut in _context.UserTeamMatches
             where ut.AuctionId == auctionId
+            join pms in _context.PlayerMatchStates on new { ut.PlayerId, ut.MatchId }
+            equals new { pms.PlayerId, pms.MatchId }
             select new
             {
                 pms.MatchId,
@@ -122,9 +123,10 @@ public class MatchRepository(IplAuctionDbContext context) : GenericRepository<Ma
      .ToDictionary(x => (x.MatchId, x.UserId), x => x.UserPoints);
 
         var data = await (
-            from ut in _context.UserTeams
-            join pms in _context.PlayerMatchStates on ut.PlayerId equals pms.PlayerId
+            from ut in _context.UserTeamMatches
             where ut.AuctionId == auctionId && ut.UserId == userId
+            join pms in _context.PlayerMatchStates on new { ut.PlayerId, ut.MatchId }
+            equals new { pms.PlayerId, pms.MatchId }
             select new
             {
                 pms.MatchId,

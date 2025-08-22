@@ -53,7 +53,7 @@ public class AuctionParticipantController(IAuctionParticipantService auctionPart
 
     [HttpPost("Alldetail")]
 
-    public async Task<IActionResult> GetAuctionPaticipantsAllDetail(AuctionParticipantAllDetailRequestModel request)
+    public async Task<IActionResult> GetAuctionParticipantsAllDetail(AuctionParticipantAllDetailRequestModel request)
     {
         AuctionParticipantAllDetail user = await _auctionParticipantService.GetAllDetailOfAuctionParticipant(request);
 

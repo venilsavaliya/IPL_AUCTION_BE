@@ -12,14 +12,25 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
 
     public async Task AddAuctionPlayer(AddAuctionPlayerRequest request)
     {
-        var entity = new AuctionPlayer
+        AuctionPlayer? auctionPlayer = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.PlayerId == request.PlayerId && ap.AuctionId == request.AuctionId);
+        if (auctionPlayer != null)
         {
-            AuctionId = request.AuctionId,
-            PlayerId = request.PlayerId
-        };
+            auctionPlayer.IsAuctioned = false;
+            auctionPlayer.IsSold = false;
 
-        await _auctionPlayerRepo.AddAsync(entity);
-        await _auctionPlayerRepo.SaveChangesAsync();
+            await _auctionPlayerRepo.SaveChangesAsync();
+        }
+        else
+        {
+            var entity = new AuctionPlayer
+            {
+                AuctionId = request.AuctionId,
+                PlayerId = request.PlayerId
+            };
+
+            await _auctionPlayerRepo.AddAsync(entity);
+            await _auctionPlayerRepo.SaveChangesAsync();
+        }
     }
 
     public async Task MarkPlayerSold(AddAuctionPlayerRequest request)
@@ -89,5 +100,5 @@ public class AuctionPlayerService(IAuctionPlayerRepository auctionPlayerRepo) : 
     // {
     //     AuctionPlayer? ap = await _auctionPlayerRepo.GetWithFilterAsync(ap => ap.AuctionId == request.AuctionId && ap.PlayerId == request.PlayerId);
     // }
-   
+
 }
