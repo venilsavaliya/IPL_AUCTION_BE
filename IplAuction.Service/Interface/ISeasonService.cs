@@ -8,4 +8,6 @@ public interface ISeasonService
     Task<List<SeasonResponseModel>> GetAllSeasons();
     Task AddSeason(SeasonRequestModel request);
     Task UpdateSeason(UpdateSeasonRequest request);
+    Task StartSeason(int id);
+    Task<SeasonStatusResponseModel> GetSeasonStartStatus(int id);
 }

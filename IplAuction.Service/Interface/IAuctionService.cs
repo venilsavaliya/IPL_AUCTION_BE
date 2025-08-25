@@ -34,6 +34,8 @@ public interface IAuctionService
 
     Task MarkPlayerSold(AddUserTeamRequestModel request);
 
+    Task MarkStatusToStart(int auctionId);
+
     Task MarkPlayerUnSold(AddAuctionPlayerRequest request);
 
     Task<PaginatedResult<UserAuctionResponseModel>> GetAllJoinedAuctionsOfUser(UserAuctionFilterParam filterParams);

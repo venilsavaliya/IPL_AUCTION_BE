@@ -8,16 +8,18 @@ using IplAuction.Service.Interface;
 
 namespace IplAuction.Service.Implementations;
 
-public class MatchService(IMatchRepository matchRepository, IBallEventService ballEventService, IPlayerService playerService, IInningStateService inningStateService) : IMatchService
+public class MatchService(IMatchRepository matchRepository, IBallEventService ballEventService,ISeasonService seasonService, IPlayerService playerService, IInningStateService inningStateService) : IMatchService
 {
 
     private readonly IMatchRepository _matchRepository = matchRepository;
     private readonly IBallEventService _ballEventService = ballEventService;
     private readonly IPlayerService _playerService = playerService;
     private readonly IInningStateService _inningStateService = inningStateService;
+    private readonly ISeasonService _seasonService = seasonService;
 
     public async Task AddMatch(MatchRequest request)
     {
+        await _seasonService.StartSeason(request.SeasonId);
         Match match = new()
         {
             TeamAId = request.TeamAId,

@@ -54,4 +54,15 @@ public class SeasonController(ISeasonService seasonService) : ControllerBase
 
         return Ok(response);
     }
+
+    // GET: api/season/status/:id
+    [HttpGet("status/{id}")]
+    public async Task<IActionResult> GetSeasonStatus(int id)
+    {
+        SeasonStatusResponseModel result = await _seasonService.GetSeasonStartStatus(id);
+
+        var response = ApiResponseBuilder.With<SeasonStatusResponseModel>().SetData(result).Build();
+
+        return Ok(response);
+    }
 }       

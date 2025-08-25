@@ -73,23 +73,32 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
                          PlayerName = p.Name,
                          PlayerSkill = p.Skill,
                          Status =
-    (ut != null && ap != null && ut.IsReshuffled && !ap.IsAuctioned)
-        ? AuctionPlayerStatus.Reshuffled
-        : (ap == null
-            ? AuctionPlayerStatus.UnAuctioned
-            : (ap.IsAuctioned
-                ? (ap.IsSold ? AuctionPlayerStatus.Sold : AuctionPlayerStatus.UnSold)
-                : AuctionPlayerStatus.UnAuctioned)),
+            (ut != null && ap != null && ut.IsReshuffled && !ap.IsAuctioned)
+                ? AuctionPlayerStatus.Reshuffled
+                : (ap == null
+                    ? AuctionPlayerStatus.UnAuctioned
+                    : (ap.IsAuctioned
+                        ? (ap.IsSold ? AuctionPlayerStatus.Sold : AuctionPlayerStatus.UnSold)
+                        : AuctionPlayerStatus.UnAuctioned)),
                          SoldPrice = ut != null ? ut.Price : 0,
-                         SoldTo = ut != null ? ut.User.FirstName + " " + ut.User.LastName : null
+                         SoldTo = ut != null ? ut.User.FirstName + " " + ut.User.LastName : null,
+                         IsReshuffled = ut != null ? ut.IsReshuffled : false,
+                         IsLeave = ut != null ? ut.ReshuffledStatus : false
                      }).AsQueryable();
 
-        // Player Name Filter
+        // Player Name Or User Name Filter
 
         if (!string.IsNullOrEmpty(request.Name))
         {
-            query = query.Where(p => p.PlayerName.ToLower().Contains(request.Name.ToLower().Trim()));
+            query = query.Where(p => p.PlayerName.ToLower().Contains(request.Name.ToLower().Trim()) ||
+                                     (p.SoldTo != null && p.SoldTo.ToLower().Contains(request.Name.ToLower().Trim())));
+
         }
+
+        // if (!string.IsNullOrEmpty(request.Name))
+        // {
+        //     query = query.Where(p => p.PlayerName.ToLower().Contains(request.Name.ToLower().Trim()));
+        // }
 
         // Player Skill Filter
 
@@ -135,7 +144,9 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
             PlayerSkill = p.PlayerSkill,
             SoldPrice = p.SoldPrice,
             Status = p.Status,
-            SoldTo = p.SoldTo
+            SoldTo = p.SoldTo,
+            IsReshuffled = p.IsReshuffled,
+            IsLeave = p.IsLeave
         });
 
         return paginatedResult;

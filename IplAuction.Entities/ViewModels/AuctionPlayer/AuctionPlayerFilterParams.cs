@@ -8,4 +8,5 @@ public class AuctionPlayerFilterParams : PaginationParams
     public string? Name { get; set; }
     public string? Skill { get; set; }
     public string? Status { get; set; }
+    public string? SoldTo { get; set; }
 }

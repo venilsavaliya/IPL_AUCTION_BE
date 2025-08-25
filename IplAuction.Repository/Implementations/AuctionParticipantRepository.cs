@@ -29,7 +29,8 @@ public class AuctionParticipantRepository(IplAuctionDbContext dbContext) : Gener
                 FullName = $"{ap.User.FirstName} {ap.User.LastName ?? ""}",
                 AuctionId = ap.AuctionId,
                 Image = ap.User.Image ?? "",
-                PurseBalance = ap.PurseBalance
+                PurseBalance = ap.PurseBalance,
+                TotalPlayer= ap.User.UserTeams.Count(ut=>ut.AuctionId == auctionId && ((ut.IsReshuffled == true && ut.ReshuffledStatus == true) || (ut.IsReshuffled == false && ut.ReshuffledStatus == false)))
             })
             .ToListAsync();
 

@@ -43,4 +43,25 @@ public class SeasonService(ISeasonRepository seasonRepository) : ISeasonService
 
         await _seasonRepository.SaveChangesAsync();
     }
+
+    public async Task StartSeason(int id)
+    {
+        Season existingSeason = await _seasonRepository.GetWithFilterAsync(s => s.Id == id) ?? throw new NotFoundException(nameof(Season));
+
+        if (!existingSeason.IsSeasonStarted)
+        {
+            existingSeason.IsSeasonStarted = true;
+
+            await _seasonRepository.SaveChangesAsync();
+        }
+    }
+
+    public async Task<SeasonStatusResponseModel> GetSeasonStartStatus(int id)
+    {
+        Season existingSeason = await _seasonRepository.GetWithFilterAsync(s => s.Id == id) ?? throw new NotFoundException(nameof(Season));
+
+        SeasonStatusResponseModel response = new(existingSeason);
+
+        return response;
+    }
 }

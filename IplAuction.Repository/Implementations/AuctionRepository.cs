@@ -46,9 +46,9 @@ public class AuctionRepository(IplAuctionDbContext context) : GenericRepository<
         if (filterParams.FromDate.HasValue && filterParams.ToDate.HasValue)
         {
             var fromDateUtc = DateTime.SpecifyKind(filterParams.FromDate.Value, DateTimeKind.Utc);
-            var toDateUtc = DateTime.SpecifyKind(filterParams.ToDate.Value, DateTimeKind.Utc);
+            var toDateUtc = DateTime.SpecifyKind(filterParams.ToDate.Value.AddDays(1), DateTimeKind.Utc);
 
-            query = query.Where(u => u.StartDate >= fromDateUtc && u.StartDate <= toDateUtc);
+            query = query.Where(u => u.StartDate >= fromDateUtc && u.StartDate < toDateUtc);
         }
 
         // Sorting

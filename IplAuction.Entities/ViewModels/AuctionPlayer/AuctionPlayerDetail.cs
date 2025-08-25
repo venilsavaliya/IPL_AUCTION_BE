@@ -15,4 +15,8 @@ public class AuctionPlayerDetail
     public int SoldPrice { get; set; }
 
     public string? SoldTo { get; set; }
+
+    public bool IsReshuffled { get; set; }
+
+    public bool IsLeave { get; set; }
 }

@@ -171,6 +171,19 @@ public class AuctionService(IAuctionRepository auctionRepository, ICurrentUserSe
 
         await _auctionRepository.SaveChangesAsync();
     }
+    public async Task MarkStatusToStart(int auctionId)
+    {
+        Auction auction = await _auctionRepository.GetWithFilterAsync(a => a.Id == auctionId) ?? throw new NotFoundException(nameof(Auction));
+
+        if (auction.AuctionStatus == AuctionStatus.Live)
+        {
+            throw new Exception(ExceptionMessages.AuctionAlreadyStarted);
+        }
+
+        auction.AuctionStatus = AuctionStatus.Live;
+
+        await _auctionRepository.SaveChangesAsync();
+    }
 
     public async Task<PaginatedResult<AuctionResponseModel>> GetAuctionsAsync(AuctionFilterParam filterParams)
     {

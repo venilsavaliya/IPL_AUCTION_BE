@@ -186,4 +186,14 @@ public class AuctionController(IAuctionService auctionService, IPlayerService pl
 
         return Ok(response);
     }
+
+    [HttpPost("mark-start/{auctionId}")]
+    public async Task<IActionResult> MarkAuctionAsStatrt(int auctionId)
+    {
+        await _auctionService.MarkStatusToStart(auctionId);
+
+        var response = ApiResponseBuilder.Create(200);
+
+        return Ok(response);
+    }
 }
