@@ -83,7 +83,7 @@ public class AuctionPlayerRepository(IplAuctionDbContext context) : GenericRepos
                          SoldPrice = ut != null ? ut.Price : 0,
                          SoldTo = ut != null ? ut.User.FirstName + " " + ut.User.LastName : null,
                          IsReshuffled = ut != null ? ut.IsReshuffled : false,
-                         IsLeave = ut != null ? ut.ReshuffledStatus : false
+                         IsLeave = ut != null ? !ut.ReshuffledStatus : false
                      }).AsQueryable();
 
         // Player Name Or User Name Filter
