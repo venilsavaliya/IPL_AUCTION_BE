@@ -9,7 +9,7 @@ COPY IplAuction.Service/*.csproj ./IplAuction.Service/
 COPY IplAuction.Repository/*.csproj ./IplAuction.Repository/
 COPY IplAuction.Entities/*.csproj ./IplAuction.Entities/
 
-RUN dotnet restore IPL_AUCTION_BE.sln
+RUN dotnet restore IPL_AUCTION.sln
 
 # Copy the rest of the code
 COPY . .
