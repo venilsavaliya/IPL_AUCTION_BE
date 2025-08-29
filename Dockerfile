@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj files and restore dependencies
-COPY IPL_AUCTION_BE.sln ./
+COPY IPL_AUCTION.sln ./
 COPY IplAuction.Api/*.csproj ./IplAuction.Api/
 COPY IplAuction.Service/*.csproj ./IplAuction.Service/
 COPY IplAuction.Repository/*.csproj ./IplAuction.Repository/
