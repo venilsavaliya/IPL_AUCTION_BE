@@ -1,29 +1,26 @@
-# ================================
-# STEP 1: Build the application
-# ================================
+# Use the official .NET 8 SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore as distinct layers (for faster builds)
-COPY *.sln .
+# Copy csproj files and restore dependencies
+COPY IPL_AUCTION_BE.sln ./
 COPY IplAuction.Api/*.csproj ./IplAuction.Api/
-RUN dotnet restore
+COPY IplAuction.Service/*.csproj ./IplAuction.Service/
+COPY IplAuction.Repository/*.csproj ./IplAuction.Repository/
+COPY IplAuction.Entities/*.csproj ./IplAuction.Entities/
 
-# Copy everything else and build
+RUN dotnet restore IPL_AUCTION_BE.sln
+
+# Copy the rest of the code
 COPY . .
+
 WORKDIR /src/IplAuction.Api
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o /app
 
-
-# ================================
-# STEP 2: Run the application
-# ================================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Final runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build /app .
 
-# Expose port 8080 for Render
-EXPOSE 8080
-
-# Run the app
+# Run the API
 ENTRYPOINT ["dotnet", "IplAuction.Api.dll"]
