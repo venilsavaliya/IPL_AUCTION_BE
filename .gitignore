@@ -6,4 +6,5 @@ IplAuction.Service/bin
 IplAuction.Service/obj
 IplAuction.Repository/bin
 IplAuction.Repository/obj
+IplAuction.Api/.env
 

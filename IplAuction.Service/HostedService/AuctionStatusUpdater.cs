@@ -3,6 +3,7 @@ using IplAuction.Entities.Models;
 using IplAuction.Repository.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace IplAuction.Service.HostedService;
 
@@ -13,30 +14,39 @@ public class AuctionStatusUpdater(IServiceScopeFactory serviceScopeFactory) : Ba
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            Console.WriteLine("Running background task at: " + DateTime.UtcNow.AddMinutes(2));
-
-            using (var scope = _serviceScopeFactory.CreateScope())
+            try
             {
-                var auctionRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Auction>>();
+                Console.WriteLine("Running background task at: " + DateTime.UtcNow.AddMinutes(2));
 
-                List<Auction> auctions = await auctionRepository.GetAllWithFilterAsync(
-                    a => !a.IsDeleted &&
-                         a.AuctionStatus == AuctionStatus.Scheduled &&
-                         a.StartDate <= DateTime.UtcNow
-                );
-
-                foreach (Auction a in auctions)
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    a.AuctionStatus = AuctionStatus.Live;
+                    var auctionRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Auction>>();
+
+                    List<Auction> auctions = await auctionRepository.GetAllWithFilterAsync(
+                        a => !a.IsDeleted &&
+                             a.AuctionStatus == AuctionStatus.Scheduled &&
+                             a.StartDate <= DateTime.UtcNow
+                    );
+
+                    foreach (Auction a in auctions)
+                    {
+                        a.AuctionStatus = AuctionStatus.Live;
+                    }
+
+                    if (auctions.Count != 0)
+                    {
+                        await auctionRepository.SaveChangesAsync();
+                    }
                 }
 
-                if (auctions.Count != 0)
-                {
-                    await auctionRepository.SaveChangesAsync();
-                }
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // runs every 1 minute
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, "Background job failed; will retry later.");
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // runs every 1 minute
         }
     }
 }

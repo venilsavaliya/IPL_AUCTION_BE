@@ -12,13 +12,28 @@ using IplAuction.Entities.Hubs;
 using FluentValidation;
 using IplAuction.Api.Validators;
 using FluentValidation.AspNetCore;
-using OfficeOpenXml;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load env vars from .env file (only in Development)
+if (builder.Environment.IsDevelopment())
+{
+    Env.Load();
+}
+
+var host = Environment.GetEnvironmentVariable("DB_HOST");
+var port = Environment.GetEnvironmentVariable("DB_PORT");
+var db = Environment.GetEnvironmentVariable("DB_NAME");
+var user = Environment.GetEnvironmentVariable("DB_USER");
+var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+var connectionString = $"Host={host};Port={port};Database={db};Username={user};Password={password}";
+
+Console.WriteLine($"host: {host}");
 
 builder.Services.AddDbContext<IplAuctionDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
@@ -88,7 +103,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "AllowOrigin",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173","http://localhost:5174")
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials(); // Important for cookies (if using HttpOnly tokens)

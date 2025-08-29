@@ -20,6 +20,7 @@ public class SeasonService(ISeasonRepository seasonRepository) : ISeasonService
     public async Task<List<SeasonResponseModel>> GetAllSeasons()
     {
         List<SeasonResponseModel> seasons = await _seasonRepository.GetAllAsync(s => new SeasonResponseModel(s));
+        seasons = seasons.OrderByDescending(s => int.Parse(s.Name)).ToList();
         return seasons;
     }
 
