@@ -103,7 +103,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "AllowOrigin",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174","https://auction-structured-fe.onrender.com")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials(); // Important for cookies (if using HttpOnly tokens)
