@@ -48,7 +48,7 @@ public class AuthService(IJwtService jwtService,
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = refreshToken.Expires
         });
 
@@ -56,7 +56,7 @@ public class AuthService(IJwtService jwtService,
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes)
         });
 
@@ -74,7 +74,6 @@ public class AuthService(IJwtService jwtService,
 
     public async Task<RefreshTokenResponse> RefreshTokenAsync()
     {
-
         var cookieRefreshToken = (_httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"]) ?? throw new UnauthorizedAccessException(Messages.UnAuthorize);
 
         var storedToken = await _refreshTokenService.GetToken(cookieRefreshToken);
@@ -89,7 +88,7 @@ public class AuthService(IJwtService jwtService,
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = newRefreshToken.Expires
         });
 
@@ -97,7 +96,7 @@ public class AuthService(IJwtService jwtService,
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes)
         });
 
